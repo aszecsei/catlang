@@ -42,6 +42,7 @@
 		function,
 		return,
 		struct,
+		enum,
 		SOA,
 	},
 	morekeywords = [2]{ % Control
@@ -71,6 +72,7 @@
 		double,
 		string,
 		this,
+		constructor,
 	},
 	keywordstyle = [1]\color{purple}\bfseries,
 	keywordstyle = [2]\color{blue}\bfseries,
@@ -100,6 +102,8 @@
 \maketitle
 
 \tableofcontents
+
+\clearpage
 
 \section{Background}
 
@@ -190,6 +194,15 @@ if (let castX = x as int) {
 }
 \end{lstlisting}
 
+The reason this last example works is that an assignment operator returns the object that was assigned; the last if statement is thus equivalent to:
+
+\begin{lstlisting}
+let castX = x as int;
+if (castX) {
+	myFunc(castX);
+}
+\end{lstlisting}
+
 \subsection{Unsafe Casting}
 
 Unsafe casting is used to force a cast from one value to another. While this can be used to avoid type lookups at run-time, it is not recommended for standard use. This is equivalent to a C-style cast.
@@ -258,7 +271,7 @@ const myPrint2 = (num?: int) -> {
 If a user wishes to force-unwrap an optional value, they can use the \lstinline$!$ operation to do so. This is, however, not recommended and may lead to null-pointer exceptions.
 
 \begin{lstlisting}
-const myPrint2 = (num?: int) -> {
+const myPrint = (num?: int) -> {
 	print(num!);
 } // OK!
 \end{lstlisting}
@@ -433,6 +446,19 @@ const v1 = Vector3;
 print(v1.toString());
 \end{lstlisting}
 
+There is one special instance function: if the \lstinline!constructor! function is declared, it is called whenever a new instance of the struct is created. If a constructor is declared, it \emph{must} be called; using the default constructor-less instantiation will raise an error.
+
+\begin{lstlisting}
+Vector3::constructor = (this, x: float, y: float, z: float) -> {
+	this.x = x;
+	this.y = y;
+	this.z = z;
+}
+const v1 = Vector3(2, 3, 4); // OK
+const v2 = new Vector3(1, 4, 9); // OK
+const v3 = Vector3; // ERROR!
+\end{lstlisting}
+
 Functions attached to a struct, whether static or instance, are treated as immutable and cannot be redefined. The only way to overload a function is through the use of optional types.
 
 Generic functions look similar to generics in other languages:
@@ -501,6 +527,32 @@ struct Transform {
 	rotation : !*Quaternion;
 }
 \end{lstlisting}
+
+\subsection{Enums}
+
+Enum types are declared similarly to structs:
+
+\begin{lstlisting}
+enum Alignment {
+	Left, // 0
+	Right, // 1
+	Center, // 2
+}
+const a = Alignment::Left;
+const val = a as U16;
+\end{lstlisting}
+
+By default, enums are wrappers around \lstinline!U16! values, starting at 0. However, they can be manually associated with other values:
+
+\begin{lstlisting}
+enum Alignment: U32 {
+	Left, // 0
+	Right = 12, // 12
+	Center // 13
+}
+\end{lstlisting}
+
+If the type an enum wraps is not able to be incremented (for example, a string) then the associated values of all enum values must be declared.
 
 \section{Build System}
 
