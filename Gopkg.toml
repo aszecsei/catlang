@@ -28,3 +28,13 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+
+[[constraint]]
+  name = "gopkg.in/alecthomas/kingpin.v2"
+  version = "2.2.6"
+
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.0.6"
