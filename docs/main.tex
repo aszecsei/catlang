@@ -3,7 +3,7 @@
 \usepackage[T1]{fontenc}
 
 \usepackage{libertine} % Normal text
-\usepackage{DejaVuSansMono} % Code
+\usepackage[scaled=.8]{DejaVuSansMono} % Code
 
 \usepackage{listings} % For code environments
 
@@ -42,8 +42,12 @@
 		function,
 		return,
 		struct,
+		type,
 		enum,
 		SOA,
+		import,
+		export,
+		from
 	},
 	morekeywords = [2]{ % Control
 		for,
@@ -88,6 +92,22 @@
   	identifierstyle=\color{maroon},
 }
 
+\lstdefinelanguage{yaml}{
+  keywords={true,false,null,y,n},
+  keywordstyle=\color{darkgray}\bfseries,
+  ndkeywords={},
+  ndkeywordstyle=\color{black}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  %moredelim=[l]{}{:},
+  comment=[l]{\#\ },
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{blue}\ttfamily,
+  %morestring=[l]{-}{},
+  morestring=[b]',
+  morestring=[b]"
+}
+
 \title{CatLang Design Doc}
 \author{Alic Szecsei}
 
@@ -95,7 +115,7 @@
 
 \lstset{
 	language=catlang,
-	basicstyle=\footnotesize\ttfamily,
+	basicstyle=\ttfamily,
 	breaklines=true,
 }
 
@@ -203,6 +223,15 @@ if (castX) {
 }
 \end{lstlisting}
 
+Numbers can be safely cast to any number type that is guaranteed not to lose data. For example:
+
+\begin{lstlisting}
+const xChar = 'a'
+const xInt = xChar as int // OK!
+const yInt = -2
+const yChar = yInt as char // ERROR!
+\end{lstlisting}
+
 \subsection{Unsafe Casting}
 
 Unsafe casting is used to force a cast from one value to another. While this can be used to avoid type lookups at run-time, it is not recommended for standard use. This is equivalent to a C-style cast.
@@ -245,6 +274,39 @@ const y = x as! int; // 705032704
 		\item \lstinline!null!
 	\end{enumerate}
 \end{enumerate}
+
+\subsubsection{Number Literals}
+
+Unless a type is specified, numbers are assumed to be either a signed 4-byte integer (\lstinline!int!) if they do not include a decimal point or a 4-byte \lstinline!float! if they do.
+
+\begin{lstlisting}
+const a = 128; // automatically of type int
+const b = 128.0 // automatically of type float
+const c = 123. // also a float
+const d: float = 128 // explicitly made a float
+const e = 128 as float // explictly made a float 
+\end{lstlisting}
+
+\subsubsection{String Literals}
+
+CatLang uses the C-style convention that character literals are wrapped with single quotes, while string literals are wrapped with double quotes:
+
+\begin{lstlisting}
+const a = 'a' // char
+const b = "abc" // string
+const c = "a" // string
+const d = 'abc' // ERROR!
+\end{lstlisting}
+
+\subsection{Type Definitions}
+CatLang allows users to write shorthands to refer to complex types. For example,
+
+\begin{lstlisting}
+type number = S8 | U8 | S16 | U16 | S32 | U32 | S64 | U64
+const genericFunction = (input: number) -> {
+	return input * 2
+}
+\end{lstlisting}
 
 \subsection{Any}
 
@@ -554,8 +616,190 @@ enum Alignment: U32 {
 
 If the type an enum wraps is not able to be incremented (for example, a string) then the associated values of all enum values must be declared.
 
+\section{Multi-File Programs}
+CatLang, by default, does not export anything from a file for use in another file. However, using the \lstinline!export! keyword before a declaration makes it so that other files are allowed to \lstinline!import! declarations for later use.
+
+For example:
+
+\begin{lstlisting}
+// foo.cat
+export const x = 12
+
+// bar.cat
+import x from "foo"
+
+const fun = () -> {
+	print(x)
+}
+\end{lstlisting}
+
+Directories can be used to create namespaces:
+
+\begin{lstlisting}
+// module/foo.cat
+export const fun = () -> {
+	print("Function!")
+}
+
+// bar.cat
+import fun from "module/foo"
+
+const main() -> {
+	fun()
+}
+\end{lstlisting}
+
+Imported declarations can be renamed:
+
+\begin{lstlisting}
+import fun as myFun from "module/foo"
+
+const main() -> {
+	myFun()
+}
+\end{lstlisting}
+
+In addition to importing specific declarations, files can import entire files:
+
+\begin{lstlisting}
+import * as foo from "module/foo"
+
+const main() -> {
+	foo.fun()
+}
+\end{lstlisting}
+
 \section{Build System}
 
-NOTE: THIS IS WORK-IN-PROGRESS
+\lstset{
+	language=yaml,
+	basicstyle=\ttfamily,
+	breaklines=true,
+}
+
+CatLang is designed to scale well from small files to large projects. The CLI can be used to build a single file; CatLang will attempt to locate all files imported by that entry point, and so on, until all required files have been read.
+
+For more complex projects, a configuration file is required, which must be named `package.yaml'.
+\subsection{Configuration Fields}
+\subsubsection{name}
+The name of the project. This, together with the version form an identifier which is assumed to be completely unique. This name is what other users will refer to when they import your package. To ensure uniqueness, it is recommended that names be prefaced with a username - for example, \texttt{@aszecsei/my-package}.
+
+A few rules:
+\begin{itemize}
+	\item The name may only consist of letters \texttt{a-z}, capital and lowercase; digits; the @ symbol; dashes; and underscores
+	\item The name cannot start with an underscore or dash
+	\item The name must be less than or equal to 256 characters.
+\end{itemize}
+
+\subsubsection{version}
+The version numbers are assumed to follow the Semantic Versioning Specification, as described at \url{https://semver.org}.
+
+\subsubsection{description}
+A brief description of your project.
+
+\subsubsection{keywords}
+An optional list of keywords describing your project.
+
+\subsubsection{homepage}
+The URL to the project homepage.
+
+Example:
+
+\begin{lstlisting}
+homepage: https://github.com/owner/project#readme
+\end{lstlisting}
+
+\subsubsection{bugs}
+The URL to your project's issue tracker and/or the email address to which issues should be reported. These are helpful for people who encounter issues with your project.
+
+\begin{lstlisting}
+bugs:
+	url: https://github.com/owner/project/issues
+	email: project@hostname.com
+\end{lstlisting}
+
+If you only want to provide a URL, you can specify the value for ``bugs'' as a simple string instead of an object.
+
+\subsubsection{license}
+The license field should be either an SPDX license ID, or expression. If you are using a custom license, or a license which does not have an SPDX identifier, use a string value such as \texttt{SEE LICENSE IN <filename>}. Then include a file named \texttt{<filename>} at the top level of the project.
+
+If you do not wish to grant others the right to use a private or unpublished project under any terms, set this value to \texttt{UNLICENSED}.
+
+You can view the list of current SPDX licenses at \url{https://spdx.org/licenses/}.
+
+\subsubsection{authors}
+This is a list of people; a ``person'' object contains a required ``name'' field and optional ``url'' and ``email'' fields. As an alternative to a person object, you can use a single string in the format ``\texttt{John Doe <j@doe.com> (http://jdoe.com)}''.
+
+\subsubsection{files}
+This describes which files should be used by other projects depending on this project; the reverse of a \texttt{.gitignore} file. Omitting this field will make it default to \texttt{[``*'']}, which will include all files.
+
+\subsubsection{main}
+The filename of the entry-point of the program. For applications, this should be a file which contains the function \texttt{main}. For libraries, this might be a file which simply exports relevant functions for users of the library.
+
+\subsubsection{repository}
+This is where your project lives. This is important, as it is how the CatLang package manager downloads your code. A few valid repository listings:
+
+\begin{lstlisting}
+repository: github:user/repo
+repository: gist:11081aaa281
+repository: bitbucker:user/repo
+repository: gitlab:user/repo
+repository:
+	type: git
+	url: https://github.com/user/repo.git
+\end{lstlisting}
+
+\subsubsection{dependencies}
+This is a map of package names to version ranges. Version ranges are strings which have one or more space-separated descriptors. Dependencies can also be identified with a git URL.
+
+\begin{itemize}
+	\item \texttt{\textbf{version}} Must match \texttt{version} exactly
+	\item \texttt{\textbf{>version}} Must be greater than \texttt{version}
+	\item \texttt{\textbf{>=version}} etc
+	\item \texttt{\textbf{<version}}
+	\item \texttt{\textbf{<=version}}
+	\item \texttt{\textbf{\textasciitilde version}} Approximately equal to \texttt{version}
+	\item \texttt{\textbf{\textasciicircum version}} Compatible with \texttt{version}
+	\item \texttt{\textbf{1.2.x}} 1.2.0, 1.2.1, etc., but not 1.3.0
+	\item \texttt{\textbf{*}} Matches any version
+	\item \texttt{\textbf{github:user/repo}} Uses the master branch of the repo
+\end{itemize}
+
+\subsubsection{private}
+Whether or not this project should show up in CatLang project searches. Defaults to \texttt{false}.
+
+\subsection{Example Configuration File}
+
+\begin{lstlisting}
+name: @aszecsei/my-library
+version: 0.1.0
+description: A basic library to do some basic things.
+keywords:
+  - catlang
+  - example
+homepage: https://github.com/aszecsei/catlang#readme
+bugs:
+  url: https://github.com/aszecsei/catlang/issues
+  email: aszecsei@gmail.com
+license: MIT
+authors:
+  - name: Alic Szecsei
+    email: aszecsei@gmail.com
+    url: https://alic-szecsei.com
+files:
+  - src/**/*.cat
+  - test/**/*.cat
+main: src/main.cat
+repository: github:aszecsei/catlang
+dependencies:
+  @guyfieri/project: ^2.3.1
+  other: github:username/other
+  yaml: 3.3.x
+private: false
+\end{lstlisting}
+
+\subsection{Project Initialization}
+
+A basic project configuration file can be created using the command \texttt{catlang init}. Alternately, passing an argument (\texttt{catlang init <name>}) will create a new folder \texttt{<name>} in the current directory and create a project configuration file within that new folder.
 
 \end{document}
