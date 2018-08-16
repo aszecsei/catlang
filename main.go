@@ -24,7 +24,7 @@ var (
 	buildCom      = app.Command("build", "Build an executable.")
 	buildOutput   = buildCom.Flag("output", "Output binary name.").Short('o').Default("main").String()
 	buildInput    = buildCom.Arg("input", "CatLang source file or package").String()
-	buildOptLevel = buildCom.Flag("opt-level", "LLVM optimization level").Short('O').Default("0").Int()
+	buildOptLevel = buildCom.Flag("optimization", "LLVM optimization level").Short('O').Default("0").Int()
 )
 
 var startTime time.Time
