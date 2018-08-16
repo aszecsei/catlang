@@ -11,17 +11,15 @@ type Lexeme struct {
 	Position  Pos
 }
 
-var (
-	currentLexeme Lexeme
-	nextLexeme    Lexeme
-)
-
 type Scanner struct {
 	ch      rune   // The current character ("rune" for unicode)
 	offset  int    // The offset of the current character
 	roffset int    // The offset of the next character
 	src     string // The actual source text
 	file    *File  // A representation of the file, broken down into lines
+
+	currentLexeme Lexeme
+	nextLexeme    Lexeme
 }
 
 func (s *Scanner) Init(file *File, src string) {
@@ -33,9 +31,17 @@ func (s *Scanner) Init(file *File, src string) {
 	s.next()
 }
 
+func (s *Scanner) CurrentLexeme() Lexeme {
+	return s.currentLexeme
+}
+
+func (s *Scanner) NextLexeme() Lexeme {
+	return s.nextLexeme
+}
+
 func (s *Scanner) Advance() {
-	currentLexeme = nextLexeme // slide the window forward
-	s.skipWhitespace()         // Skip whitespace
+	s.currentLexeme = s.nextLexeme // slide the window forward
+	s.skipWhitespace()             // Skip whitespace
 	// TODO: Skip comments
 	if unicode.IsDigit(s.ch) {
 		s.scanNumber()
@@ -53,9 +59,9 @@ func (s *Scanner) scanNumber() {
 	if s.ch == rune(0) {
 		offset++
 	}
-	nextLexeme.tokenType = INTEGER
-	nextLexeme.literal = s.src[start:offset]
-	nextLexeme.Position = s.file.Pos(start)
+	s.nextLexeme.tokenType = INTEGER
+	s.nextLexeme.literal = s.src[start:offset]
+	s.nextLexeme.Position = s.file.Pos(start)
 }
 
 func (s *Scanner) selectToken(r rune, a, b TokenType) TokenType {

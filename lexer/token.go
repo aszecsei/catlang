@@ -75,6 +75,8 @@ var tok_strings = map[TokenType]string{
 	BOOL:    "Boolean",
 	IDENT:   "Identifier",
 	INTEGER: "Integer",
+	STRING:  "String",
+	CHAR:    "Character",
 	LPAREN:  "(",
 	RPAREN:  ")",
 	COLON:   ":",
