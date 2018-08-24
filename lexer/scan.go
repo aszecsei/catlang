@@ -45,7 +45,26 @@ func (s *Scanner) Advance() {
 	// TODO: Skip comments
 	if unicode.IsDigit(s.ch) {
 		s.scanNumber()
+		return
 	}
+
+	// Check punctuation mark controls
+	if unicode.IsPunct(s.ch) {
+		s.scanPunct()
+		return
+	}
+
+	// Handle EOF
+	if s.ch == rune(0) {
+		s.nextLexeme.literal = "EOF"
+		s.nextLexeme.tokenType = EOF
+		s.nextLexeme.Position = s.file.Pos(s.offset)
+		return
+	}
+
+	// Identifiers
+	s.scanIdentifier()
+	return
 }
 
 func (s *Scanner) scanNumber() {
@@ -64,12 +83,83 @@ func (s *Scanner) scanNumber() {
 	s.nextLexeme.Position = s.file.Pos(start)
 }
 
+func (s *Scanner) scanPunct() {
+	s.nextLexeme.literal = string(s.ch)
+	s.nextLexeme.Position = s.file.Pos(s.offset)
+	switch s.ch {
+	case '(':
+		s.nextLexeme.tokenType = LPAREN
+	case ')':
+		s.nextLexeme.tokenType = RPAREN
+	case '{':
+		s.nextLexeme.tokenType = LCURLYB
+	case '}':
+		s.nextLexeme.tokenType = RCURLYB
+	case '[':
+		s.nextLexeme.tokenType = LSQUAREB
+	case ']':
+		s.nextLexeme.tokenType = RSQUAREB
+	case ':':
+		s.nextLexeme.tokenType = s.selectToken(':', DOUBLECOLON, COLON)
+	case ';':
+		s.nextLexeme.tokenType = SEMICOLON
+	case ',':
+		s.nextLexeme.tokenType = COMMA
+	case '@':
+		s.nextLexeme.tokenType = AT
+	case '+':
+		s.nextLexeme.tokenType = s.selectToken('=', ADDASSIGN, ADD)
+	case '-':
+		s.nextLexeme.tokenType = s.selectToken('=', SUBASSIGN, s.selectToken('>', ARROW, SUB))
+	case '*':
+		s.nextLexeme.tokenType = s.selectToken('=', MULASSIGN, MUL)
+	case '/':
+		s.nextLexeme.tokenType = s.selectToken('=', QUOASSIGN, QUO)
+	case '%':
+		s.nextLexeme.tokenType = s.selectToken('=', REMASSIGN, REM)
+	case '=':
+		s.nextLexeme.tokenType = s.selectToken('=', EQL, ASSIGN)
+	case '&':
+		s.nextLexeme.tokenType = s.selectToken('&', AND, s.selectToken('=', BITANDASSIGN, BITAND))
+	case '|':
+		s.nextLexeme.tokenType = s.selectToken('|', OR, s.selectToken('=', BITORASSIGN, BITOR))
+	case '!':
+		s.nextLexeme.tokenType = s.selectToken('=', NEQ, NOT)
+	case '<':
+		s.nextLexeme.tokenType = s.selectToken('=', LTE, LT)
+	case '>':
+		s.nextLexeme.tokenType = s.selectToken('=', GTE, GT)
+	case '?':
+		s.nextLexeme.tokenType = OPTIONAL
+	case '.':
+		s.nextLexeme.tokenType = s.selectToken('.', DOTDOT, DOT)
+	case '\'':
+		s.scanCharacterLiteral()
+	case '"':
+		s.scanStringLiteral()
+	default:
+		s.nextLexeme.tokenType = ILLEGAL
+	}
+}
+
+func (s *Scanner) scanCharacterLiteral() {
+
+}
+
+func (s *Scanner) scanStringLiteral() {
+
+}
+
 func (s *Scanner) selectToken(r rune, a, b TokenType) TokenType {
-	if s.ch == r {
+	if s.peek() == r {
 		s.next()
 		return a
 	}
 	return b
+}
+
+func (s *Scanner) scanIdentifier() {
+
 }
 
 func (s *Scanner) skipWhitespace() {
@@ -78,6 +168,8 @@ func (s *Scanner) skipWhitespace() {
 	}
 }
 
+// next returns the next Unicode character in the source, and advances the scanner.
+// It returns rune(0) if the scanner's position is at the last character of the source.
 func (s *Scanner) next() {
 	s.ch = rune(0)
 	runeSize := 1
@@ -89,4 +181,14 @@ func (s *Scanner) next() {
 		}
 		s.roffset += runeSize
 	}
+}
+
+// peek returns the next Unicode character in the source without advancing the scanner.
+// It returns rune(0) if the scanner's position is at the last character of the source.
+func (s *Scanner) peek() rune {
+	ch := rune(0)
+	if s.roffset < len(s.src) {
+		ch, _ = utf8.DecodeRuneInString(s.src[s.roffset:])
+	}
+	return ch
 }

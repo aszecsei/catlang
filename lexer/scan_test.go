@@ -16,11 +16,12 @@ func TestScanner_Advance(t *testing.T) {
 		INTEGER,
 		INTEGER,
 		INTEGER,
+		EOF,
 	}
-	for _, res := range results {
+	for i, res := range results {
 		scanner.Advance()
 		if scanner.NextLexeme().tokenType != res {
-			t.Errorf("Lexeme type was incorrect; wanted %s but got %s", res.String(), scanner.NextLexeme().tokenType.String())
+			t.Errorf("%d: Lexeme type was incorrect; wanted %s but got %s", i, res.String(), scanner.NextLexeme().tokenType.String())
 		}
 	}
 }
