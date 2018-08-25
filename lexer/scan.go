@@ -41,7 +41,11 @@ func (s *Scanner) NextLexeme() Lexeme {
 
 func (s *Scanner) Advance() {
 	s.currentLexeme = s.nextLexeme // slide the window forward
-	s.skipWhitespace()             // Skip whitespace
+	s.scan()
+}
+
+func (s *Scanner) scan() {
+	s.skipWhitespace() // Skip whitespace
 	// TODO: Skip comments
 	if unicode.IsDigit(s.ch) {
 		s.scanNumber()
@@ -114,7 +118,15 @@ func (s *Scanner) scanPunct() {
 	case '*':
 		s.nextLexeme.tokenType = s.selectToken('=', MULASSIGN, MUL)
 	case '/':
-		s.nextLexeme.tokenType = s.selectToken('=', QUOASSIGN, QUO)
+		if s.peek() == '*' {
+			s.skipComment(true)
+			s.scan()
+		} else if s.peek() == '/' {
+			s.skipComment(false)
+			s.scan()
+		} else {
+			s.nextLexeme.tokenType = s.selectToken('=', QUOASSIGN, QUO)
+		}
 	case '%':
 		s.nextLexeme.tokenType = s.selectToken('=', REMASSIGN, REM)
 	case '=':
@@ -139,6 +151,21 @@ func (s *Scanner) scanPunct() {
 		s.scanStringLiteral()
 	default:
 		s.nextLexeme.tokenType = ILLEGAL
+	}
+}
+
+func (s *Scanner) skipComment(isBlock bool) {
+	if isBlock {
+		for s.ch != '*' || s.peek() != '/' {
+			s.next()
+		}
+		s.next() // skip the *
+		s.next() // skip the /
+	} else {
+		for s.ch != '\n' {
+			s.next()
+		}
+		s.next() // skip the newline
 	}
 }
 
