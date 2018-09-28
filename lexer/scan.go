@@ -6,9 +6,9 @@ import (
 )
 
 type Lexeme struct {
-	tokenType TokenType
-	literal   string
-	Position  Pos
+	Type     TokenType
+	Literal  string
+	Position Pos
 }
 
 type Scanner struct {
@@ -60,8 +60,8 @@ func (s *Scanner) scan() {
 
 	// Handle EOF
 	if s.ch == rune(0) {
-		s.nextLexeme.literal = "EOF"
-		s.nextLexeme.tokenType = EOF
+		s.nextLexeme.Literal = "EOF"
+		s.nextLexeme.Type = EOF
 		s.nextLexeme.Position = s.file.Pos(s.offset)
 		return
 	}
@@ -82,41 +82,41 @@ func (s *Scanner) scanNumber() {
 	if s.ch == rune(0) {
 		offset++
 	}
-	s.nextLexeme.tokenType = INTEGER
-	s.nextLexeme.literal = s.src[start:offset]
+	s.nextLexeme.Type = INTEGER
+	s.nextLexeme.Literal = s.src[start:offset]
 	s.nextLexeme.Position = s.file.Pos(start)
 }
 
 func (s *Scanner) scanPunct() {
-	s.nextLexeme.literal = string(s.ch)
+	s.nextLexeme.Literal = string(s.ch)
 	s.nextLexeme.Position = s.file.Pos(s.offset)
 	switch s.ch {
 	case '(':
-		s.nextLexeme.tokenType = LPAREN
+		s.nextLexeme.Type = LPAREN
 	case ')':
-		s.nextLexeme.tokenType = RPAREN
+		s.nextLexeme.Type = RPAREN
 	case '{':
-		s.nextLexeme.tokenType = LCURLYB
+		s.nextLexeme.Type = LCURLYB
 	case '}':
-		s.nextLexeme.tokenType = RCURLYB
+		s.nextLexeme.Type = RCURLYB
 	case '[':
-		s.nextLexeme.tokenType = LSQUAREB
+		s.nextLexeme.Type = LSQUAREB
 	case ']':
-		s.nextLexeme.tokenType = RSQUAREB
+		s.nextLexeme.Type = RSQUAREB
 	case ':':
-		s.nextLexeme.tokenType = s.selectToken(':', DOUBLECOLON, COLON)
+		s.nextLexeme.Type = s.selectToken(':', DOUBLECOLON, COLON)
 	case ';':
-		s.nextLexeme.tokenType = SEMICOLON
+		s.nextLexeme.Type = SEMICOLON
 	case ',':
-		s.nextLexeme.tokenType = COMMA
+		s.nextLexeme.Type = COMMA
 	case '@':
-		s.nextLexeme.tokenType = AT
+		s.nextLexeme.Type = AT
 	case '+':
-		s.nextLexeme.tokenType = s.selectToken('=', ADDASSIGN, ADD)
+		s.nextLexeme.Type = s.selectToken('=', ADDASSIGN, ADD)
 	case '-':
-		s.nextLexeme.tokenType = s.selectToken('=', SUBASSIGN, s.selectToken('>', ARROW, SUB))
+		s.nextLexeme.Type = s.selectToken('=', SUBASSIGN, s.selectToken('>', ARROW, SUB))
 	case '*':
-		s.nextLexeme.tokenType = s.selectToken('=', MULASSIGN, MUL)
+		s.nextLexeme.Type = s.selectToken('=', MULASSIGN, MUL)
 	case '/':
 		if s.peek() == '*' {
 			s.skipComment(true)
@@ -125,32 +125,32 @@ func (s *Scanner) scanPunct() {
 			s.skipComment(false)
 			s.scan()
 		} else {
-			s.nextLexeme.tokenType = s.selectToken('=', QUOASSIGN, QUO)
+			s.nextLexeme.Type = s.selectToken('=', QUOASSIGN, QUO)
 		}
 	case '%':
-		s.nextLexeme.tokenType = s.selectToken('=', REMASSIGN, REM)
+		s.nextLexeme.Type = s.selectToken('=', REMASSIGN, REM)
 	case '=':
-		s.nextLexeme.tokenType = s.selectToken('=', EQL, ASSIGN)
+		s.nextLexeme.Type = s.selectToken('=', EQL, ASSIGN)
 	case '&':
-		s.nextLexeme.tokenType = s.selectToken('&', AND, s.selectToken('=', BITANDASSIGN, BITAND))
+		s.nextLexeme.Type = s.selectToken('&', AND, s.selectToken('=', BITANDASSIGN, BITAND))
 	case '|':
-		s.nextLexeme.tokenType = s.selectToken('|', OR, s.selectToken('=', BITORASSIGN, BITOR))
+		s.nextLexeme.Type = s.selectToken('|', OR, s.selectToken('=', BITORASSIGN, BITOR))
 	case '!':
-		s.nextLexeme.tokenType = s.selectToken('=', NEQ, NOT)
+		s.nextLexeme.Type = s.selectToken('=', NEQ, NOT)
 	case '<':
-		s.nextLexeme.tokenType = s.selectToken('=', LTE, LT)
+		s.nextLexeme.Type = s.selectToken('=', LTE, LT)
 	case '>':
-		s.nextLexeme.tokenType = s.selectToken('=', GTE, GT)
+		s.nextLexeme.Type = s.selectToken('=', GTE, GT)
 	case '?':
-		s.nextLexeme.tokenType = OPTIONAL
+		s.nextLexeme.Type = OPTIONAL
 	case '.':
-		s.nextLexeme.tokenType = s.selectToken('.', DOTDOT, DOT)
+		s.nextLexeme.Type = s.selectToken('.', DOTDOT, DOT)
 	case '\'':
 		s.scanCharacterLiteral()
 	case '"':
 		s.scanStringLiteral()
 	default:
-		s.nextLexeme.tokenType = ILLEGAL
+		s.nextLexeme.Type = ILLEGAL
 	}
 }
 
@@ -170,11 +170,37 @@ func (s *Scanner) skipComment(isBlock bool) {
 }
 
 func (s *Scanner) scanCharacterLiteral() {
-
+	s.next()
+	start := s.offset
+	for s.ch != '\'' && s.ch != rune(0) {
+		s.next()
+	}
+	offset := s.offset
+	if s.ch == rune(0) {
+		offset++
+	} else {
+		s.next()
+	}
+	s.nextLexeme.Type = CHAR
+	s.nextLexeme.Literal = s.src[start:offset]
+	s.nextLexeme.Position = s.file.Pos(start)
 }
 
 func (s *Scanner) scanStringLiteral() {
-
+	s.next()
+	start := s.offset
+	for s.ch != '"' && s.ch != rune(0) {
+		s.next()
+	}
+	offset := s.offset
+	if s.ch == rune(0) {
+		offset++
+	} else {
+		s.next()
+	}
+	s.nextLexeme.Type = STRING
+	s.nextLexeme.Literal = s.src[start:offset]
+	s.nextLexeme.Position = s.file.Pos(start)
 }
 
 func (s *Scanner) selectToken(r rune, a, b TokenType) TokenType {
