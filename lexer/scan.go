@@ -135,6 +135,8 @@ func (s *Scanner) scanPunct() {
 		s.nextLexeme.Type = s.selectToken('&', AND, s.selectToken('=', BITANDASSIGN, BITAND))
 	case '|':
 		s.nextLexeme.Type = s.selectToken('|', OR, s.selectToken('=', BITORASSIGN, BITOR))
+	case '^':
+		s.nextLexeme.Type = s.selectToken('=', XORASSIGN, XOR)
 	case '!':
 		s.nextLexeme.Type = s.selectToken('=', NEQ, NOT)
 	case '<':
@@ -152,6 +154,7 @@ func (s *Scanner) scanPunct() {
 	default:
 		s.nextLexeme.Type = ILLEGAL
 	}
+	s.next()
 }
 
 func (s *Scanner) skipComment(isBlock bool) {
@@ -195,8 +198,6 @@ func (s *Scanner) scanStringLiteral() {
 	offset := s.offset
 	if s.ch == rune(0) {
 		offset++
-	} else {
-		s.next()
 	}
 	s.nextLexeme.Type = STRING
 	s.nextLexeme.Literal = s.src[start:offset]
@@ -212,7 +213,18 @@ func (s *Scanner) selectToken(r rune, a, b TokenType) TokenType {
 }
 
 func (s *Scanner) scanIdentifier() {
-
+	// Get the identifier
+	start := s.offset
+	for !unicode.IsSpace(s.ch) && !unicode.IsPunct(s.ch) && s.ch != rune(0) {
+		s.next()
+	}
+	offset := s.offset
+	if s.ch == rune(0) {
+		offset++
+	}
+	s.nextLexeme.Literal = s.src[start:offset]
+	s.nextLexeme.Position = s.file.Pos(start)
+	s.nextLexeme.Type = Lookup(s.nextLexeme.Literal)
 }
 
 func (s *Scanner) skipWhitespace() {
