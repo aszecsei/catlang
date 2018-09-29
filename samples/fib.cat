@@ -1,3 +1,4 @@
+// The iterative version
 export const fibIter = (n: int) -> {
   let a = 0;
   let b = 1;
@@ -9,6 +10,21 @@ export const fibIter = (n: int) -> {
   return a;
 }
 
+struct SOA Vector3 {
+  x: float = 1;
+  y: float = 2;
+  z: float = 3;
+}
+
+enum Alignment: U32 {
+  Left,
+  Right,
+  Center,
+}
+
+/*
+  The recursive version
+*/
 export const fibRecur = (n: int) -> {
   if (n == 0) {
     return 0;
@@ -18,3 +34,5 @@ export const fibRecur = (n: int) -> {
   }
   return fibRecur(n-1) + fibRecur(n-2);
 }
+
+print("Hello, world!\n")

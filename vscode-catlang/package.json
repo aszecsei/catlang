@@ -1,0 +1,26 @@
+{
+    "name": "vscode-catlang",
+    "displayName": "vscode-catlang",
+    "description": "Language support for CatLang",
+    "version": "0.0.1",
+    "publisher": "AlicSzecsei",
+    "engines": {
+        "vscode": "^1.27.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "catlang",
+            "aliases": ["CatLang", "catlang"],
+            "extensions": [".cat"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "catlang",
+            "scopeName": "source.catlang",
+            "path": "./syntaxes/catlang.tmLanguage.json"
+        }]
+    }
+}
