@@ -32,8 +32,10 @@ const (
 
 	ADD
 	ADDASSIGN
+	INCREMENT
 	SUB
 	SUBASSIGN
+	DECREMENT
 	MUL
 	MULASSIGN
 	QUO
@@ -118,8 +120,10 @@ var tok_strings = map[TokenType]string{
 
 	ADD:       "+",
 	ADDASSIGN: "+=",
+	INCREMENT: "++",
 	SUB:       "-",
 	SUBASSIGN: "-=",
+	DECREMENT: "--",
 	MUL:       "*",
 	MULASSIGN: "*=",
 	QUO:       "/",

@@ -112,9 +112,9 @@ func (s *Scanner) scanPunct() {
 	case '@':
 		s.nextLexeme.Type = AT
 	case '+':
-		s.nextLexeme.Type = s.selectToken('=', ADDASSIGN, ADD)
+		s.nextLexeme.Type = s.selectToken('=', ADDASSIGN, s.selectToken('+', INCREMENT, ADD))
 	case '-':
-		s.nextLexeme.Type = s.selectToken('=', SUBASSIGN, s.selectToken('>', ARROW, SUB))
+		s.nextLexeme.Type = s.selectToken('=', SUBASSIGN, s.selectToken('-', DECREMENT, s.selectToken('>', ARROW, SUB)))
 	case '*':
 		s.nextLexeme.Type = s.selectToken('=', MULASSIGN, MUL)
 	case '/':
