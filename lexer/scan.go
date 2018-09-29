@@ -140,9 +140,9 @@ func (s *Scanner) scanPunct() {
 	case '!':
 		s.nextLexeme.Type = s.selectToken('=', NEQ, NOT)
 	case '<':
-		s.nextLexeme.Type = s.selectToken('=', LTE, LT)
+		s.nextLexeme.Type = s.selectToken('=', LTE, s.selectToken('<', SHIFTL, LT))
 	case '>':
-		s.nextLexeme.Type = s.selectToken('=', GTE, GT)
+		s.nextLexeme.Type = s.selectToken('=', GTE, s.selectToken('>', SHIFTR, GT))
 	case '?':
 		s.nextLexeme.Type = OPTIONAL
 	case '.':

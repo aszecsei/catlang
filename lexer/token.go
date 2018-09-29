@@ -54,6 +54,8 @@ const (
 	NOT
 	XOR
 	XORASSIGN
+	SHIFTL
+	SHIFTR
 
 	EQL
 	NEQ
@@ -142,6 +144,8 @@ var tok_strings = map[TokenType]string{
 	NOT:          "!",
 	XOR:          "^",
 	XORASSIGN:    "^=",
+	SHIFTL:       "<<",
+	SHIFTR:       ">>",
 
 	EQL: "==",
 	NEQ: "!=",
