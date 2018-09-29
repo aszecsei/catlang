@@ -1,4 +1,4 @@
-package lexer
+package token
 
 type File struct {
 	base  int

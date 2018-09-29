@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/aszecsei/catlang/lexer"
+	"github.com/aszecsei/catlang/token"
 )
 
 var _ = Describe("Scan", func() {
@@ -15,23 +16,23 @@ var _ = Describe("Scan", func() {
 	Context("when scanning numbers", func() {
 		BeforeEach(func() {
 			scanner = &Scanner{}
-			scanner.Init(NewFile("numbers.cc", 0, 100), "0 1 2 3 4 5 6 7 8 9 10")
+			scanner.Init(token.NewFile("numbers.cc", 0, 100), "0 1 2 3 4 5 6 7 8 9 10")
 		})
 
 		It("should construct a list of number tokens", func() {
-			results := []TokenType{
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				INTEGER,
-				EOF,
+			results := []token.TokenType{
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.INTEGER,
+				token.EOF,
 			}
 			for _, res := range results {
 				scanner.Advance()
@@ -63,14 +64,14 @@ var _ = Describe("Scan", func() {
 	Context("when scanning strings and chars", func() {
 		BeforeEach(func() {
 			scanner = &Scanner{}
-			scanner.Init(NewFile("text.cc", 0, 100), "'a' \"hello, world\"")
+			scanner.Init(token.NewFile("text.cc", 0, 100), "'a' \"hello, world\"")
 		})
 
 		It("should construct a list of char and string tokens", func() {
-			results := []TokenType{
-				CHAR,
-				STRING,
-				EOF,
+			results := []token.TokenType{
+				token.CHAR,
+				token.STRING,
+				token.EOF,
 			}
 			for _, res := range results {
 				scanner.Advance()
@@ -93,14 +94,14 @@ var _ = Describe("Scan", func() {
 	Context("when scanning boolean literals", func() {
 		BeforeEach(func() {
 			scanner = &Scanner{}
-			scanner.Init(NewFile("bools.cc", 0, 100), "true false")
+			scanner.Init(token.NewFile("bools.cc", 0, 100), "true false")
 		})
 
 		It("should construct a list of boolean tokens", func() {
-			results := []TokenType{
-				BOOL,
-				BOOL,
-				EOF,
+			results := []token.TokenType{
+				token.BOOL,
+				token.BOOL,
+				token.EOF,
 			}
 			for _, res := range results {
 				scanner.Advance()
@@ -123,17 +124,17 @@ var _ = Describe("Scan", func() {
 	Context("when scanning keywords and identifiers", func() {
 		BeforeEach(func() {
 			scanner = &Scanner{}
-			scanner.Init(NewFile("keywords.cc", 0, 100), "for let x plus mul")
+			scanner.Init(token.NewFile("keywords.cc", 0, 100), "for let x plus mul")
 		})
 
 		It("should construct a list of keyword and identifier tokens", func() {
-			results := []TokenType{
-				FOR,
-				LET,
-				IDENT,
-				IDENT,
-				IDENT,
-				EOF,
+			results := []token.TokenType{
+				token.FOR,
+				token.LET,
+				token.IDENT,
+				token.IDENT,
+				token.IDENT,
+				token.EOF,
 			}
 			for _, res := range results {
 				scanner.Advance()
@@ -159,28 +160,28 @@ var _ = Describe("Scan", func() {
 	Context("when scanning a combination of tokens", func() {
 		BeforeEach(func() {
 			scanner = &Scanner{}
-			scanner.Init(NewFile("test.cc", 0, 100), "function timesTwo(num: int) -> int {\nreturn num * 2;\n}")
+			scanner.Init(token.NewFile("test.cc", 0, 100), "function timesTwo(num: int) -> int {\nreturn num * 2;\n}")
 		})
 
 		It("should construct a list of tokens of the correct types", func() {
-			results := []TokenType{
-				FUNCTION,
-				IDENT,
-				LPAREN,
-				IDENT,
-				COLON,
-				IDENT,
-				RPAREN,
-				ARROW,
-				IDENT,
-				LCURLYB,
-				RETURN,
-				IDENT,
-				MUL,
-				INTEGER,
-				SEMICOLON,
-				RCURLYB,
-				EOF,
+			results := []token.TokenType{
+				token.FUNCTION,
+				token.IDENT,
+				token.LPAREN,
+				token.IDENT,
+				token.COLON,
+				token.IDENT,
+				token.RPAREN,
+				token.ARROW,
+				token.IDENT,
+				token.LCURLYB,
+				token.RETURN,
+				token.IDENT,
+				token.MUL,
+				token.INTEGER,
+				token.SEMICOLON,
+				token.RCURLYB,
+				token.EOF,
 			}
 			for _, res := range results {
 				scanner.Advance()

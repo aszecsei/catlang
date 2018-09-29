@@ -1,4 +1,4 @@
-package lexer
+package token
 
 // TokenType describes what kind of token the lexer finds
 type TokenType int
@@ -93,6 +93,8 @@ const (
 	WHILE
 	IF
 	ELSE
+	BREAK
+	CONTINUE
 	key_end
 
 	tok_end
@@ -182,6 +184,8 @@ var tok_strings = map[TokenType]string{
 	WHILE:    "while",
 	IF:       "if",
 	ELSE:     "else",
+	BREAK:    "break",
+	CONTINUE: "continue",
 }
 
 func (t TokenType) IsLiteral() bool {
