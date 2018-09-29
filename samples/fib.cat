@@ -1,0 +1,20 @@
+export const fibIter = (n: int) -> {
+  let a = 0;
+  let b = 1;
+  for (let x = 0; x < n; x++) {
+    const temp = a + b;
+    a = b;
+    b = temp;
+  }
+  return a;
+}
+
+export const fibRecur = (n: int) -> {
+  if (n == 0) {
+    return 0;
+  }
+  if (n == 1) {
+    return 1;
+  }
+  return fibRecur(n-1) + fibRecur(n-2);
+}
