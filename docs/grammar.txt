@@ -163,12 +163,14 @@
         |  <unsized array type>
         |  <type union>
         |  <typeof expression>
+        |  <optional type>
 
 <pointer type> ::= "*" <type>
 <sized array type> ::= "[" <expression> "]" <type>
 <unsized array type> ::= "[" ".." "]" <type>
 <type union> ::= <type> "|" <type>
 <typeof expression> ::= "typeof" <reference>
+<optional type> ::= <type> "?"
 
 
 <expression> ::= <assignment expression>
