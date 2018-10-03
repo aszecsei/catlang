@@ -1,4 +1,5 @@
 [![Built with Mage](https://magefile.org/badge.svg)](https://magefile.org)
+[![Go Report Card](https://goreportcard.com/badge/github.com/aszecsei/catlang)](https://goreportcard.com/report/github.com/aszecsei/catlang)
 
 # Language Guide
 The language guide is built using LaTeX, and can be found in the `docs` folder.
