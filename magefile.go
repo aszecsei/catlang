@@ -5,6 +5,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg" // mg contains helpful utility functions, like Deps
 	"github.com/magefile/mage/sh"
@@ -39,8 +41,37 @@ func Test() error {
 
 	gocmd := mg.GoCmd()
 
-	if err := sh.RunV(gocmd, "test", "./..."); err != nil {
+	if err := sh.RunV(gocmd, "test", "./lexer"); err != nil {
 		return err
 	}
+	return nil
+}
+
+func Coverage() error {
+	mg.Deps(Test)
+	fmt.Println("Getting coverage...")
+
+	gocmd := mg.GoCmd()
+
+	if err := sh.RunV(gocmd, "test", "./...", "-cover", "-covermode=count", "-coverprofile=out.coverprofile"); err != nil {
+		return err
+	}
+
+	if err := sh.RunV(gocmd, "get", "github.com/mattn/goveralls"); err != nil {
+		return err
+	}
+
+	gopath, err := sh.Output(gocmd, "env", "GOPATH")
+	if err != nil {
+		return fmt.Errorf("can't determine GOPATH: %v", err)
+	}
+	paths := strings.Split(gopath, string([]rune{os.PathListSeparator}))
+	bin := filepath.Join(paths[0], "bin")
+	path := filepath.Join(bin, "goveralls")
+
+	if err := sh.RunV(path, "-coverprofile=out.coverprofile", "-service=circle-ci", "-repotoken=$COVERALLS_TOKEN"); err != nil {
+		return err
+	}
+
 	return nil
 }

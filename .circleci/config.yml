@@ -6,12 +6,11 @@ jobs:
       - image: circleci/golang:1.11.1
     working_directory: ~/catlang
     steps:
-
       - checkout
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go run mage.go test
+      - run: go run mage.go coverage
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
