@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	// "path/filepath"
 
@@ -39,6 +38,9 @@ func Clean() {
 func Test() error {
 	mg.Deps(InstallDeps)
 	fmt.Println("Testing...")
+	if err := sh.RunV("go", "install", "github.com/onsi/ginkgo/ginkgo"); err != nil {
+		return err
+	}
 	gp := os.ExpandEnv("$GOPATH")
 	ginkgoPath := filepath.Join(gp, "bin", "ginkgo")
 	if err := sh.RunV(ginkgoPath, "-r", "--randomizeAllSpecs", "--randomizeSuites", "--failOnPending", "--cover", "--trace", "--race", "--progress"); err != nil {
