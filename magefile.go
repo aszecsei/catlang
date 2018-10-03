@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	// "path/filepath"
+	"path/filepath"
 
 	"github.com/magefile/mage/mg" // mg contains helpful utility functions, like Deps
 	"github.com/magefile/mage/sh"
