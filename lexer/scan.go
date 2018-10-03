@@ -239,7 +239,7 @@ func (s *Scanner) skipWhitespace() {
 // It returns rune(0) if the scanner's position is at the last character of the source.
 func (s *Scanner) next() {
 	s.ch = rune(0)
-	runeSize := 1
+	var runeSize int
 	if s.roffset < len(s.src) {
 		s.offset = s.roffset
 		s.ch, runeSize = utf8.DecodeRuneInString(s.src[s.offset:])
