@@ -7,7 +7,7 @@ jobs:
     working_directory: ~/catlang
     steps:
       - checkout
-      - run: go test -race
+      - run: go test -race ./...
 workflows:
   version: 2
   build_and_test:
