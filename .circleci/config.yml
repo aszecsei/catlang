@@ -4,7 +4,7 @@ jobs:
     docker:
       # specify the version
       - image: circleci/golang:1.11.1
-    working_directory: /go/src/github.com/aszecsei/catlang
+    working_directory: ~/catlang
     steps:
       - checkout
       - run: go get -d github.com/magefile/mage
