@@ -8,4 +8,9 @@ The language guide is built using LaTeX, and can be found in the `docs` folder.
 # Build Tools
 This compiler is built using [Go](https://golang.org/). Package dependencies are managed using [go modules](https://github.com/golang/go/wiki/Modules).
 
-Testing is written using [Ginkgo](https://onsi.github.io/ginkgo/) and [Gomega](https://github.com/onsi/gomega).
+Testing is written using [onpar](https://github.com/apoydence/onpar).
+
+## Magefile
+[Mage](https://magefile.org/) is the build tool used for this project, as it is cross-platform (unlike make) and its only dependency is Go, which is required to build this compiler anyway.
+
+To run mage without installing the binary, one can simply use `go run mage.go <target>`.
