@@ -7,7 +7,6 @@ jobs:
     working_directory: ~/catlang
     steps:
       - checkout
-      - run: go get -v -t -d ./...
       - run: go run mage.go test
 workflows:
   version: 2
