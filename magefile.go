@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"path/filepath"
-
 	"github.com/magefile/mage/mg" // mg contains helpful utility functions, like Deps
 	"github.com/magefile/mage/sh"
 )
@@ -38,12 +36,7 @@ func Clean() {
 func Test() error {
 	mg.Deps(InstallDeps)
 	fmt.Println("Testing...")
-	if err := sh.RunV("go", "get", "github.com/onsi/ginkgo/ginkgo"); err != nil {
-		return err
-	}
-	gp := os.ExpandEnv("$GOPATH")
-	ginkgoPath := filepath.Join(gp, "bin", "ginkgo")
-	if err := sh.RunV(ginkgoPath, "-r", "--randomizeAllSpecs", "--randomizeSuites", "--failOnPending", "--cover", "--trace", "--race", "--progress", "."); err != nil {
+	if err := sh.RunV("go", "test", "./...", "-ginkgo.randomizeAllSpecs", "-ginkgo.failOnPending", "-cover", "-ginkgo.progress"); err != nil {
 		return err
 	}
 	return nil
