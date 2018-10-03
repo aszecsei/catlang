@@ -9,13 +9,13 @@ jobs:
 
       - checkout
       - restore_cache:
-        keys:
-          - go-mod-v1-{{ checksum "go.sum" }}
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
       - run: go run mage.go test
       - save_cache:
-        key: go-mod-v1-{{ checksum "go.sum" }}
-        paths:
-          - "/go/pkg/mod"
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
 workflows:
   version: 2
   build_and_test:
