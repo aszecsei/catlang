@@ -43,7 +43,7 @@ func Test() error {
 	}
 	gp := os.ExpandEnv("$GOPATH")
 	ginkgoPath := filepath.Join(gp, "bin", "ginkgo")
-	if err := sh.RunV(ginkgoPath, "-r", "--randomizeAllSpecs", "--randomizeSuites", "--failOnPending", "--cover", "--trace", "--race", "--progress"); err != nil {
+	if err := sh.RunV(ginkgoPath, "-r", "--randomizeAllSpecs", "--randomizeSuites", "--failOnPending", "--cover", "--trace", "--race", "--progress", "."); err != nil {
 		return err
 	}
 	return nil
