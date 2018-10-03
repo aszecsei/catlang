@@ -4,6 +4,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
 	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf
 	github.com/hpcloud/tail v1.0.0
+	github.com/magefile/mage v1.6.2
 	github.com/onsi/ginkgo v1.6.0
 	github.com/onsi/gomega v1.4.2
 	github.com/sirupsen/logrus v1.0.6
