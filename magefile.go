@@ -5,6 +5,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg" // mg contains helpful utility functions, like Deps
 	"github.com/magefile/mage/sh"
@@ -36,7 +38,22 @@ func Clean() {
 func Test() error {
 	mg.Deps(InstallDeps)
 	fmt.Println("Testing...")
-	if err := sh.RunV("go", "test", "./...", "-ginkgo.randomizeAllSpecs", "-ginkgo.failOnPending", "-cover", "-ginkgo.progress"); err != nil {
+
+	gocmd := mg.GoCmd()
+	gopath, err := sh.Output(gocmd, "env", "GOPATH")
+	if err != nil {
+		return fmt.Errorf("can't determine GOPATH: %v", err)
+	}
+
+	paths := strings.Split(gopath, string([]rune{os.PathListSeparator}))
+	for i, p := range paths {
+		fmt.Printf("Path %d: %s\n", i, p)
+	}
+	bin := filepath.Join(paths[0], "bin")
+	path := filepath.Join(bin, "ginkgo")
+	fmt.Printf("Running from %s\n", path)
+
+	if err := sh.RunV(path, "-r"); err != nil {
 		return err
 	}
 	return nil
