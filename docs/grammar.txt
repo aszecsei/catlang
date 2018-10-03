@@ -1,0 +1,230 @@
+<lexeme> ::= <identifier>
+          |  <reserved word>
+          |  <number>
+          |  <string>
+          |  <character>
+          |  <punctuation>
+          |  <end of file>
+
+<identifier> ::= <letter> { <letter> | <digit> }
+<number> ::= <decimal number> | 0x<hexadecimal number> | 0o<octal number> | 0b<binary number>
+
+<decimal number> ::= <decimal integer> | <decimal float>
+<decimal integer> ::= <digit> { <digit> }
+<decimal float> ::= <digit> { <digit> } . { <digit> } /* Do we want to require a leading digit? ie is .27 a valid float? */
+
+<hexadecimal number> ::= <hexadecimal digit> { <hexadecimal digit> }
+<octal number> ::= <octal digit> { <octal digit> }
+<binary number> ::= <binary digit> { <binary digit> }
+
+<string> ::= '"' { <anything but "> } '"'
+<character> ::= "'" <anything but \ or '> | '\' <anything> "'"
+
+<punctuation> ::= "("
+               |  ")"
+               |  "{"
+               |  "}"
+               |  "["
+               |  "]"
+               |  ":"
+               |  "::"
+               |  ";"
+               |  ","
+               |  "@"
+               |  "+"
+               |  "+="
+               |  "++"
+               |  "-"
+               |  "-="
+               |  "--"
+               |  "*"
+               |  "*="
+               |  "/"
+               |  "/="
+               |  "%"
+               |  "%="
+               |  "="
+               |  "&&"
+               |  "&="
+               |  "||"
+               |  "|"
+               |  "|="
+               |  "!"
+               |  "^"
+               |  "^="
+               |  "<<"
+               |  ">>"
+               |  "=="
+               |  "!="
+               |  "<"
+               |  ">"
+               |  "<="
+               |  ">="
+               |  "->"
+               |  "?"
+               |  "."
+               |  ".."
+
+<reserved word> ::= "let"
+                 |  "const"
+                 |  "new"
+                 |  "delete"
+                 |  "typeof"
+                 |  "is"
+                 |  "as"
+                 |  "in"
+                 |  "function"
+                 |  "return"
+                 |  "struct"
+                 |  "type"
+                 |  "enum"
+                 |  "SOA"
+                 |  "owned"
+                 |  "import"
+                 |  "export"
+                 |  "from"
+                 |  "for"
+                 |  "while"
+                 |  "if"
+                 |  "else"
+                 |  "break"
+                 |  "continue"
+
+<catlang program> ::= <file> { <file> }
+
+<file> ::= <block> <end of file>
+
+<block> ::= { <block element> ";" }
+<block element> ::= <declaration>
+                 |  <statement>
+
+<declaration> ::= [ "export" ] <declarator>
+<declarator> ::= <constant declarator>
+              |  <type declarator>
+              |  <variable declarator>
+              |  <function declarator>
+              |  <struct declarator>
+              |  <enum declarator>
+
+<constant declarator> ::= "const" <identifier> "=" <expression>
+
+<type declarator> ::= "typedef" <identifier> "=" <type>
+
+<variable declarator> ::= "let" <identifier> ":" <type> [ "=" <expression> ]
+                       |  "let" <identifier> "=" <expression>
+
+<function declarator> ::= "function" <identifier> "(" [ <formal parameter list> ] ")" "{" <block> "}"
+<formal parameter list> ::= <parameter> { "," <parameter> }
+<parameter> ::= [ "const" ] <identifier> ":" <type>
+
+<struct declarator> ::= "struct" "{" <struct parameter list> "}"
+<struct parameter list> ::= { <parameter> [ ";" ] }
+<struct parameter> ::= [ "owned" ] <identifier> ":" <type> [ "=" <expression> ]
+                    |  [ "owned" ] <identifier> "=" <expression>
+
+<enum declarator> ::= "enum" "{" <enum value list> "}"
+<enum value list> ::= <identifier> { "," <identifier> }
+
+<statement> ::= <import>
+             |  <inner block>
+             |  <if>
+             |  <loop>
+             |  <jump statement>
+             |  <expression>
+
+
+<import> ::= "import" <import list> "from" <string>
+          |  "export" <import list> "from" <string>
+
+<import list> ::= <import identifier> { "," <import identifier> }
+<import identifier> ::= <identifier> [ "as" <identifier> ]
+                     | "*" "as" <identifier>
+
+<inner block> ::= "{" <block> "}"
+<if> ::= "if" <expression> "{" <block> "}" { <elif> } [ <else> ]
+<elif> ::= "else if" <expression> "{" <block> "}"
+<else> ::= "else" "{" <block> "}"
+
+<loop> ::= <for>
+        |  <while>
+        |  <do while>
+
+<for> ::= "for" "(" [ <expression> ] ";" [ <expression> ] ";" [ <expression> ] ")" "{" <block> "}"
+       |  "for" "(" <identifier> "in" <expression> ")" "{" <block> "}"
+<while> ::= "while" "(" <expression> ")" "{" <block> "}"
+<do while> ::= "do" "{" <block> "}" "while" "(" <expression> ")"
+
+<jump statement> ::= "break"
+                  |  "continue"
+                  |  "return" [ <expression> ]
+
+<type> ::= <pointer type>
+        |  <sized array type>
+        |  <unsized array type>
+        |  <type union>
+        |  <typeof expression>
+        |  <optional type>
+
+<pointer type> ::= "*" <type>
+<sized array type> ::= "[" <expression> "]" <type>
+<unsized array type> ::= "[" ".." "]" <type>
+<type union> ::= <type> "|" <type>
+<typeof expression> ::= "typeof" <reference>
+<optional type> ::= <type> "?"
+
+
+<expression> ::= <assignment expression>
+
+<assignment expression> ::= [ <identifier> "=" ] <ternary expression>
+<ternary expression> ::= <comparing expression> [ "?" <comparing expression> ":" <comparing expression> ]
+<comparing expression> ::= <comparand> [<comparing operator> <comparand>]
+<comparand> ::= <term> ::= { <adding operator> <term> }
+<term> ::= <factor> { <multiplying operator> <factor> }
+
+<comparing operator> ::= "=="
+                      |  "!="
+                      |  ">"
+                      |  ">="
+                      |  "<"
+                      |  "<="
+                      |  "in"
+                      |  "is"
+
+<adding operator> ::= "+"
+                   |  "-"
+                   |  "|"
+                   |  "^"
+                   |  "||"
+
+<multiplying operator> ::= "*"
+                        |  "/"
+                        |  "%"
+                        |  "&"
+                        |  "&&"
+
+<factor> ::= [ "-" | "!" ] <primary expression>
+
+<primary expression> ::= <number>
+                      |  <string constant>
+                      |  "null"
+                      |  <subexpression>
+                      |  <lambda expression>
+                      |  <reference>
+
+<subexpression> ::= "(" <expression> ")"
+<lambda expression> ::= "(" [ <formal parameter list> ] ")" "->" "{" <block> "}"
+<reference> ::= <identifier>
+             |  "@" <reference> /* address-of operator */
+             |  "*" <reference> /* pointer dereferencing */
+             |  <reference> "." <identifier>
+             |  <function call>
+             |  <constructor call>
+             |  <array reference>
+             |  <cast reference>
+
+<function call> ::= <reference> "(" [ <expressions> ] ")" /* reference is a function type */
+<constructor call> ::= [ "new" ] <reference> [ "(" [ <expressions> ] ")" ] /* reference is a struct type */
+<array reference> ::= <reference> "[" <expressions> "]" /* reference is a variable of array type */
+<cast reference> ::= <reference> "as" [ "!" ] <type>
+
+<expression list> ::= <expression> { "," <expression> }

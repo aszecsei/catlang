@@ -45,6 +45,7 @@
 		type,
 		enum,
 		SOA,
+		owned,
 		import,
 		export,
 		from
@@ -430,12 +431,12 @@ struct Vector3 {
 }
 \end{lstlisting}
 
-To denote an ``owned'' property in a struct, use the \lstinline$!$ keyword. When a struct is deleted, all owned properties are also deleted.
+To denote an ``owned'' property in a struct, use the \lstinline$owned$ keyword. When a struct is deleted, all owned properties are also deleted.
 
 \begin{lstlisting}
 struct Transform {
-	position : ! Vector3;
-	rotation : ! Quaternion;
+	owned position : Vector3;
+	owned rotation : Quaternion;
 }
 \end{lstlisting}
 
@@ -556,7 +557,7 @@ const arr = arrayFactory<int>(10); // OK!
 Functions can also be passed in to other functions, for a more functional style of programming. An example \lstinline!map! function might look like:
 
 \begin{lstlisting}
-const map = <InT, OutT>(arr: []T, fn: (InT)->OutT) -> {
+const map = <InT, OutT>(arr: []InT, fn: (InT)->OutT) -> {
 	result = new [arr.count]OutT;
 	for (x = 0; x < arr.count; x++) {
 		result[x] = fn(arr[x]);
