@@ -61,10 +61,10 @@ var _ = Describe("Scan", func() {
 		})
 	})
 
-	Context("when scanning strings and chars", func() {
+	Context("when scanning strings, comments, and chars", func() {
 		BeforeEach(func() {
 			scanner = &Scanner{}
-			scanner.Init(token.NewFile("text.cc", 0, 100), "'a' \"hello, world\"")
+			scanner.Init(token.NewFile("text.cc", 0, 100), "'a' /* I'm a comment */ // I'm another comment\n\"hello, world\"")
 		})
 
 		It("should construct a list of char and string tokens", func() {
