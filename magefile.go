@@ -40,6 +40,11 @@ func Test() error {
 	fmt.Println("Testing...")
 
 	gocmd := mg.GoCmd()
+
+	if err := sh.RunV(gocmd, "install", "github.com/onsi/ginkgo/ginkgo"); err != nil {
+		return err
+	}
+
 	gopath, err := sh.Output(gocmd, "env", "GOPATH")
 	if err != nil {
 		return fmt.Errorf("can't determine GOPATH: %v", err)
