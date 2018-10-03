@@ -38,7 +38,10 @@ func Clean() {
 func Test() error {
 	mg.Deps(InstallDeps)
 	fmt.Println("Testing...")
-	if err := sh.RunV("go", "install", "github.com/onsi/ginkgo/ginkgo"); err != nil {
+	if err := sh.RunV("go", "get", "-v", "github.com/onsi/ginkgo/ginkgo"); err != nil {
+		return err
+	}
+	if err := sh.RunV("go", "get", "-v", "github.com/onsi/gomega"); err != nil {
 		return err
 	}
 	gp := os.ExpandEnv("$GOPATH")
