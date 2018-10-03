@@ -9,7 +9,7 @@ require (
 	github.com/sirupsen/logrus v1.0.6
 	golang.org/x/crypto v0.0.0-20180723164146-c126467f60eb
 	golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3
-	golang.org/x/sys v0.0.0-20180727230415-bd9dbc187b6e
+	golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e
 	golang.org/x/text v0.3.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/fsnotify.v1 v1.4.7
