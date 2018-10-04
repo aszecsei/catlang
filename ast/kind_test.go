@@ -44,4 +44,14 @@ func TestKind(t *testing.T) {
 			Expect(t, k.String()).To(Equal("type"))
 		})
 	})
+
+	o.Group("other kinds", func() {
+		o.BeforeEach(func(t *testing.T) (*testing.T, Kind) {
+			return t, None
+		})
+
+		o.Spec("has the correct string", func(t *testing.T, k Kind) {
+			Expect(t, k.String()).To(Equal(""))
+		})
+	})
 }
