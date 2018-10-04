@@ -6,6 +6,7 @@ const (
 	None Kind = iota + 1
 	FuncDecl
 	VarDecl
+	TypeDecl
 )
 
 func (k Kind) String() string {
@@ -14,6 +15,8 @@ func (k Kind) String() string {
 		return "function"
 	case VarDecl:
 		return "variable"
+	case TypeDecl:
+		return "type"
 	default:
 		return ""
 	}

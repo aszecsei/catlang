@@ -12,7 +12,7 @@ import (
 	"github.com/aszecsei/catlang/token"
 )
 
-func TestSpecs(t *testing.T) {
+func TestAst(t *testing.T) {
 	o := onpar.New()
 	defer o.Run(t)
 
