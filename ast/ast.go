@@ -468,6 +468,20 @@ func (e *BinaryExpression) End() token.Pos { return e.RightHandSide.End() }
 
 var _ Expr = (*BinaryExpression)(nil)
 
+type LambdaExpression struct {
+	Expression
+	Opening token.Pos
+	Params  *FormalParameterList
+	Arrow   token.Pos
+	Block   *Block
+	Closing token.Pos
+}
+
+func (l *LambdaExpression) Pos() token.Pos { return l.Opening }
+func (l *LambdaExpression) End() token.Pos { return l.Closing }
+
+var _ Expr = (*LambdaExpression)(nil)
+
 type BasicLiteral struct {
 	LitPos token.Pos
 	Kind   token.TokenType
