@@ -32,12 +32,9 @@ func (d *Declaration) blockElementNode() {}
 
 var _ BlockElement = (*Declaration)(nil) // InternalDeclaration implements BlockElement
 
-type InternalDeclaration struct {
+type ExportedDeclaration struct {
 	Declaration
-}
-
-type ExternalDeclaration struct {
-	Declaration
+	Export token.Pos
 }
 
 type Decl interface {
@@ -125,8 +122,8 @@ type StructDeclarator struct {
 func (d *StructDeclarator) Pos() token.Pos { return d.StructPos }
 
 type StructMemberList struct {
-	StructMember []*StructMember
-	pos          token.Pos
+	Members []*StructMember
+	pos     token.Pos
 }
 
 func (s *StructMemberList) Pos() token.Pos { return s.pos }
@@ -159,8 +156,8 @@ type EnumDeclarator struct {
 func (d *EnumDeclarator) Pos() token.Pos { return d.EnumPos }
 
 type EnumValueList struct {
-	Names []*Ident
-	pos   token.Pos
+	Values []*Ident
+	pos    token.Pos
 }
 
 func (e *EnumValueList) Pos() token.Pos { return e.pos }
@@ -255,9 +252,9 @@ var _ Cond = (*Else)(nil) // Else implements Condition
 type ForLoop struct {
 	Statement
 	For       token.Pos
-	Initial   *Expression
-	Condition *Expression
-	Step      *Expression
+	Initial   Expr
+	Condition Expr
+	Step      Expr
 	Block     *Block
 }
 
@@ -268,7 +265,7 @@ var _ Stmt = (*ForLoop)(nil) // ForLoop implements Statement
 type WhileLoop struct {
 	Statement
 	While     token.Pos
-	Condition *Expression
+	Condition Expr
 	Block     *Block
 }
 
@@ -280,7 +277,7 @@ type DoWhileLoop struct {
 	Statement
 	Do        token.Pos
 	Block     *Block
-	Condition *Expression
+	Condition Expr
 }
 
 func (w *DoWhileLoop) Pos() token.Pos { return w.Do }
@@ -495,7 +492,19 @@ type Ident struct {
 
 func (i *Ident) Pos() token.Pos { return i.NamePos }
 
-var _ Node = (*CharacterLiteral)(nil)
+var _ Node = (*Ident)(nil)
+
+type File struct {
+	Block *Block
+}
+
+func (f *File) Pos() token.Pos { return token.NoPos }
+
+type Package struct {
+	Files []*File
+}
+
+func (p *Package) Pos() token.Pos { return token.NoPos }
 
 // Code to deal with objects
 
