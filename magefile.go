@@ -41,7 +41,7 @@ func Test() error {
 
 	gocmd := mg.GoCmd()
 
-	if err := sh.RunV(gocmd, "test", "./lexer"); err != nil {
+	if err := sh.RunV(gocmd, "test", "./..."); err != nil {
 		return err
 	}
 	return nil
