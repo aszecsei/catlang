@@ -6,17 +6,14 @@ import (
 
 type Node interface {
 	Pos() token.Pos
-	End() token.Pos
 }
 
 type Block struct {
 	Elements []BlockElement
 	Opening  token.Pos
-	Closing  token.Pos
 }
 
 func (b *Block) Pos() token.Pos { return b.Opening }
-func (b *Block) End() token.Pos { return b.Closing }
 
 var _ Node = (*Block)(nil) // Ensure block is a node
 
@@ -27,12 +24,10 @@ type BlockElement interface {
 
 type Declaration struct {
 	Declarator Decl
-	Opening    token.Pos
-	Closing    token.Pos
+	pos        token.Pos
 }
 
-func (d *Declaration) Pos() token.Pos    { return d.Opening }
-func (d *Declaration) End() token.Pos    { return d.Closing }
+func (d *Declaration) Pos() token.Pos    { return d.pos }
 func (d *Declaration) blockElementNode() {}
 
 var _ BlockElement = (*Declaration)(nil) // InternalDeclaration implements BlockElement
@@ -51,13 +46,10 @@ type Decl interface {
 }
 
 type Declarator struct {
-	Name    *Ident
-	Opening token.Pos
-	Closing token.Pos
+	Name *Ident
 }
 
-func (d *Declarator) Pos() token.Pos  { return d.Opening }
-func (d *Declarator) End() token.Pos  { return d.Closing }
+func (d *Declarator) Pos() token.Pos  { return token.NoPos }
 func (d *Declarator) declaratorNode() {}
 
 var _ Decl = (*Declarator)(nil) // Declarator implements Decl
@@ -69,12 +61,16 @@ type ConstantDeclarator struct {
 	Value     Expr
 }
 
+func (d *ConstantDeclarator) Pos() token.Pos { return d.ConstPos }
+
 type TypeDeclarator struct {
 	Declarator
 	TypedefPos token.Pos
 	EqualsPos  token.Pos
 	Type       Type
 }
+
+func (d *TypeDeclarator) Pos() token.Pos { return d.TypedefPos }
 
 type VariableDeclarator struct {
 	Declarator
@@ -83,20 +79,23 @@ type VariableDeclarator struct {
 	Value  Expr
 }
 
+func (d *VariableDeclarator) Pos() token.Pos { return d.LetPos }
+
 type FunctionDeclarator struct {
 	Declarator
-	Params *FormalParameterList
-	Block  *Block
+	FunctionPos token.Pos
+	Params      *FormalParameterList
+	Block       *Block
 }
+
+func (d *FunctionDeclarator) Pos() token.Pos { return d.FunctionPos }
 
 type FormalParameterList struct {
 	Parameters []*Parameter
-	Opening    token.Pos
-	Closing    token.Pos
+	pos        token.Pos
 }
 
-func (f *FormalParameterList) Pos() token.Pos { return f.Opening }
-func (f *FormalParameterList) End() token.Pos { return f.Closing }
+func (f *FormalParameterList) Pos() token.Pos { return f.pos }
 
 var _ Node = (*FormalParameterList)(nil) // FormalParameterList implements Node
 
@@ -107,31 +106,30 @@ type Parameter struct {
 }
 
 func (p *Parameter) Pos() token.Pos { return p.Name.NamePos }
-func (p *Parameter) End() token.Pos { return p.Type.End() }
 
 var _ Node = (*Parameter)(nil) // Parameter implements Node
 
 type ConstParameter struct {
 	Parameter
+	ConstPos token.Pos
 }
 
-type MutableParameter struct {
-	Parameter
-}
+func (d *ConstParameter) Pos() token.Pos { return d.ConstPos }
 
 type StructDeclarator struct {
 	Declarator
-	Members *StructMemberList
+	StructPos token.Pos
+	Members   *StructMemberList
 }
+
+func (d *StructDeclarator) Pos() token.Pos { return d.StructPos }
 
 type StructMemberList struct {
 	StructMember []*StructMember
-	Opening      token.Pos
-	Closing      token.Pos
+	pos          token.Pos
 }
 
-func (s *StructMemberList) Pos() token.Pos { return s.Opening }
-func (s *StructMemberList) End() token.Pos { return s.Closing }
+func (s *StructMemberList) Pos() token.Pos { return s.pos }
 
 var _ Node = (*StructMemberList)(nil) // StructMemberList implements Node
 
@@ -142,33 +140,30 @@ type StructMember struct {
 }
 
 func (s *StructMember) Pos() token.Pos { return s.Name.NamePos }
-func (s *StructMember) End() token.Pos {
-	if s.InitialValue != nil {
-		return s.InitialValue.End()
-	} else {
-		return s.Type.End()
-	}
-}
 
 var _ Node = (*StructMember)(nil) // StructMember implements Node
 
 type OwnedStructMember struct {
 	StructMember
+	OwnedPos token.Pos
 }
+
+func (d *OwnedStructMember) Pos() token.Pos { return d.OwnedPos }
 
 type EnumDeclarator struct {
 	Declarator
-	Values *EnumValueList
+	EnumPos token.Pos
+	Values  *EnumValueList
 }
+
+func (d *EnumDeclarator) Pos() token.Pos { return d.EnumPos }
 
 type EnumValueList struct {
-	Names   []*Ident
-	Opening token.Pos
-	Closing token.Pos
+	Names []*Ident
+	pos   token.Pos
 }
 
-func (e *EnumValueList) Pos() token.Pos { return e.Opening }
-func (e *EnumValueList) End() token.Pos { return e.Closing }
+func (e *EnumValueList) Pos() token.Pos { return e.pos }
 
 var _ Node = (*EnumValueList)(nil) // EnumValueList implements Node
 
@@ -192,18 +187,15 @@ type ImportStatement struct {
 }
 
 func (e *ImportStatement) Pos() token.Pos { return e.Import }
-func (e *ImportStatement) End() token.Pos { return e.Path.End() }
 
 var _ Stmt = (*ImportStatement)(nil) // ImportStatement implements Stmt
 
 type ImportList struct {
-	Names   []*ImportIdent
-	Opening token.Pos
-	Closing token.Pos
+	Names []*ImportIdent
+	pos   token.Pos
 }
 
-func (i *ImportList) Pos() token.Pos { return i.Opening }
-func (i *ImportList) End() token.Pos { return i.Closing }
+func (i *ImportList) Pos() token.Pos { return i.pos }
 
 var _ Node = (*ImportList)(nil) // ImportList implements Node
 
@@ -214,19 +206,16 @@ type ImportIdent struct {
 }
 
 func (i *ImportIdent) Pos() token.Pos { return i.OldName.NamePos }
-func (i *ImportIdent) End() token.Pos { return i.NewName.End() }
 
 var _ Node = (*ImportIdent)(nil) // ImportIdent implements Node
 
 type InnerBlock struct {
 	Statement
-	Opening token.Pos
-	Block   *Block
-	Closing token.Pos
+	Block *Block
+	pos   token.Pos
 }
 
-func (i *InnerBlock) Pos() token.Pos { return i.Opening }
-func (i *InnerBlock) End() token.Pos { return i.Closing }
+func (i *InnerBlock) Pos() token.Pos { return i.pos }
 
 var _ Stmt = (*InnerBlock)(nil) // InnerBlock implements Stmt
 
@@ -249,27 +238,17 @@ type If struct {
 }
 
 func (i *If) Pos() token.Pos { return i.If }
-func (i *If) End() token.Pos {
-	if i.Else != nil {
-		return i.Else.End()
-	} else {
-		return i.Then.End()
-	}
-}
-func (e *If) conditionNode() {}
 
 var _ Stmt = (*If)(nil) // If implements Statement
 var _ Cond = (*If)(nil) // If implements Condition
 
 type Else struct {
-	Opening token.Pos
-	Block   *Block
-	Closing token.Pos
+	Condition
+	Else  token.Pos
+	Block *Block
 }
 
-func (e *Else) Pos() token.Pos { return e.Opening }
-func (e *Else) End() token.Pos { return e.Closing }
-func (e *Else) conditionNode() {}
+func (e *Else) Pos() token.Pos { return e.Else }
 
 var _ Cond = (*Else)(nil) // Else implements Condition
 
@@ -280,11 +259,9 @@ type ForLoop struct {
 	Condition *Expression
 	Step      *Expression
 	Block     *Block
-	Closing   token.Pos
 }
 
 func (f *ForLoop) Pos() token.Pos { return f.For }
-func (f *ForLoop) End() token.Pos { return f.Closing }
 
 var _ Stmt = (*ForLoop)(nil) // ForLoop implements Statement
 
@@ -293,11 +270,9 @@ type WhileLoop struct {
 	While     token.Pos
 	Condition *Expression
 	Block     *Block
-	Closing   token.Pos
 }
 
 func (w *WhileLoop) Pos() token.Pos { return w.While }
-func (w *WhileLoop) End() token.Pos { return w.Closing }
 
 var _ Stmt = (*WhileLoop)(nil) // WhileLoop implements Statement
 
@@ -306,11 +281,9 @@ type DoWhileLoop struct {
 	Do        token.Pos
 	Block     *Block
 	Condition *Expression
-	Closing   token.Pos
 }
 
 func (w *DoWhileLoop) Pos() token.Pos { return w.Do }
-func (w *DoWhileLoop) End() token.Pos { return w.Closing }
 
 var _ Stmt = (*DoWhileLoop)(nil) // DoWhileLoop implements Loop
 
@@ -322,13 +295,6 @@ type JumpStatement struct {
 }
 
 func (j *JumpStatement) Pos() token.Pos { return j.CommandPos }
-func (j *JumpStatement) End() token.Pos {
-	if j.Returns != nil {
-		return j.Returns.End()
-	} else {
-		return j.CommandPos + token.Pos(len(j.Command.String()))
-	}
-}
 
 var _ Stmt = (*JumpStatement)(nil) // JumpStatement implements Stmt
 
@@ -348,7 +314,6 @@ type PointerType struct {
 }
 
 func (p *PointerType) Pos() token.Pos { return p.Pointer }
-func (p *PointerType) End() token.Pos { return p.Type.End() }
 
 var _ Type = (*PointerType)(nil)
 
@@ -360,7 +325,6 @@ type SizedArrayType struct {
 }
 
 func (s *SizedArrayType) Pos() token.Pos { return s.pos }
-func (s *SizedArrayType) End() token.Pos { return s.Type.End() }
 
 var _ Type = (*SizedArrayType)(nil)
 
@@ -371,7 +335,6 @@ type UnsizedArrayType struct {
 }
 
 func (u *UnsizedArrayType) Pos() token.Pos { return u.pos }
-func (u *UnsizedArrayType) End() token.Pos { return u.Type.End() }
 
 var _ Type = (*UnsizedArrayType)(nil)
 
@@ -383,7 +346,6 @@ type TypeUnion struct {
 }
 
 func (t *TypeUnion) Pos() token.Pos { return t.FirstType.Pos() }
-func (t *TypeUnion) End() token.Pos { return t.SecondType.End() }
 
 var _ Type = (*TypeUnion)(nil)
 
@@ -394,7 +356,6 @@ type TypeofType struct {
 }
 
 func (t *TypeofType) Pos() token.Pos { return t.Typeof }
-func (t *TypeofType) End() token.Pos { return t.Expression.End() }
 
 var _ Type = (*TypeofType)(nil)
 
@@ -405,7 +366,6 @@ type OptionalType struct {
 }
 
 func (o *OptionalType) Pos() token.Pos { return o.Type.Pos() }
-func (o *OptionalType) End() token.Pos { return o.Option }
 
 var _ Type = (*OptionalType)(nil)
 
@@ -415,7 +375,6 @@ type NamedType struct {
 }
 
 func (n *NamedType) Pos() token.Pos { return n.Name.NamePos }
-func (n *NamedType) End() token.Pos { return n.Name.End() }
 
 var _ Type = (*NamedType)(nil)
 
@@ -437,7 +396,6 @@ type AssignmentExpression struct {
 }
 
 func (e *AssignmentExpression) Pos() token.Pos { return e.Name.NamePos }
-func (e *AssignmentExpression) End() token.Pos { return e.Value.End() }
 
 var _ Expr = (*AssignmentExpression)(nil)
 
@@ -451,7 +409,6 @@ type TernaryExpression struct {
 }
 
 func (e *TernaryExpression) Pos() token.Pos { return e.Condition.Pos() }
-func (e *TernaryExpression) End() token.Pos { return e.FalseCase.End() }
 
 var _ Expr = (*TernaryExpression)(nil)
 
@@ -464,21 +421,18 @@ type BinaryExpression struct {
 }
 
 func (e *BinaryExpression) Pos() token.Pos { return e.LeftHandSide.Pos() }
-func (e *BinaryExpression) End() token.Pos { return e.RightHandSide.End() }
 
 var _ Expr = (*BinaryExpression)(nil)
 
 type LambdaExpression struct {
 	Expression
-	Opening token.Pos
-	Params  *FormalParameterList
-	Arrow   token.Pos
-	Block   *Block
-	Closing token.Pos
+	pos    token.Pos
+	Params *FormalParameterList
+	Arrow  token.Pos
+	Block  *Block
 }
 
-func (l *LambdaExpression) Pos() token.Pos { return l.Opening }
-func (l *LambdaExpression) End() token.Pos { return l.Closing }
+func (l *LambdaExpression) Pos() token.Pos { return l.pos }
 
 var _ Expr = (*LambdaExpression)(nil)
 
@@ -489,7 +443,6 @@ type BasicLiteral struct {
 }
 
 func (b *BasicLiteral) Pos() token.Pos { return b.LitPos }
-func (b *BasicLiteral) End() token.Pos { return b.LitPos + token.Pos(len(b.Lit)) }
 func (b *BasicLiteral) exprNode()      {}
 
 type IntegerLiteral struct {
@@ -540,15 +493,19 @@ type Ident struct {
 	Object  *Object // may be nil (ie. Name is a type keyword)
 }
 
-func (i *Ident) End() token.Pos { return i.NamePos + token.Pos(len(i.Name)) }
+func (i *Ident) Pos() token.Pos { return i.NamePos }
+
+var _ Node = (*CharacterLiteral)(nil)
 
 // Code to deal with objects
 
 type Object struct {
-	DefinedAt token.Pos
-	Name      string
-	Kind      Kind
+	Name    string
+	NamePos token.Pos
+	Kind    Kind
 }
+
+func (o *Object) Pos() token.Pos { return o.NamePos }
 
 type Scope struct {
 	Parent *Scope
