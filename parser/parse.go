@@ -140,6 +140,53 @@ func (p *parser) parseDeclaration() *ast.Declaration {
 }
 
 func (p *parser) parseDeclarator() ast.Decl {
+	cur := p.scanner.CurrentLexeme()
+	switch cur.Type {
+	case token.CONST:
+		return p.parseConstDeclarator()
+	case token.TYPEDEF:
+		return p.parseTypeDeclarator()
+	case token.LET:
+		return p.parseVariableDeclarator()
+	case token.FUNCTION:
+		return p.parseFunctionDeclarator()
+	case token.STRUCT:
+		return p.parseStructDeclarator()
+	case token.ENUM:
+		return p.parseEnumDeclarator()
+	default:
+		p.addError("Expected a declarator; got '" + cur.Literal + "'")
+		return nil
+	}
+}
+
+func (p *parser) parseConstDeclarator() *ast.ConstantDeclarator {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseTypeDeclarator() *ast.TypeDeclarator {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseVariableDeclarator() *ast.VariableDeclarator {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseFunctionDeclarator() *ast.FunctionDeclarator {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseStructDeclarator() *ast.StructDeclarator {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseEnumDeclarator() *ast.EnumDeclarator {
+	// TODO
 	return nil
 }
 
