@@ -23,19 +23,14 @@ type BlockElement interface {
 }
 
 type Declaration struct {
+	IsExported bool
 	Declarator Decl
-	pos        token.Pos
 }
 
-func (d *Declaration) Pos() token.Pos    { return d.pos }
+func (d *Declaration) Pos() token.Pos    { return d.Declarator.Pos() }
 func (d *Declaration) blockElementNode() {}
 
 var _ BlockElement = (*Declaration)(nil) // InternalDeclaration implements BlockElement
-
-type ExportedDeclaration struct {
-	Declaration
-	Export token.Pos
-}
 
 type Decl interface {
 	Node
@@ -88,11 +83,12 @@ type FunctionDeclarator struct {
 func (d *FunctionDeclarator) Pos() token.Pos { return d.FunctionPos }
 
 type FormalParameterList struct {
+	Open       token.Pos
 	Parameters []*Parameter
-	pos        token.Pos
+	Close      token.Pos
 }
 
-func (f *FormalParameterList) Pos() token.Pos { return f.pos }
+func (f *FormalParameterList) Pos() token.Pos { return f.Open }
 
 var _ Node = (*FormalParameterList)(nil) // FormalParameterList implements Node
 
@@ -122,11 +118,12 @@ type StructDeclarator struct {
 func (d *StructDeclarator) Pos() token.Pos { return d.StructPos }
 
 type StructMemberList struct {
+	Open    token.Pos
 	Members []*StructMember
-	pos     token.Pos
+	Close   token.Pos
 }
 
-func (s *StructMemberList) Pos() token.Pos { return s.pos }
+func (s *StructMemberList) Pos() token.Pos { return s.Open }
 
 var _ Node = (*StructMemberList)(nil) // StructMemberList implements Node
 
@@ -156,11 +153,12 @@ type EnumDeclarator struct {
 func (d *EnumDeclarator) Pos() token.Pos { return d.EnumPos }
 
 type EnumValueList struct {
+	Open   token.Pos
 	Values []*Ident
-	pos    token.Pos
+	Close  token.Pos
 }
 
-func (e *EnumValueList) Pos() token.Pos { return e.pos }
+func (e *EnumValueList) Pos() token.Pos { return e.Open }
 
 var _ Node = (*EnumValueList)(nil) // EnumValueList implements Node
 
@@ -188,11 +186,12 @@ func (e *ImportStatement) Pos() token.Pos { return e.Import }
 var _ Stmt = (*ImportStatement)(nil) // ImportStatement implements Stmt
 
 type ImportList struct {
+	Open  token.Pos
 	Names []*ImportIdent
-	pos   token.Pos
+	Close token.Pos
 }
 
-func (i *ImportList) Pos() token.Pos { return i.pos }
+func (i *ImportList) Pos() token.Pos { return i.Open }
 
 var _ Node = (*ImportList)(nil) // ImportList implements Node
 
@@ -208,11 +207,12 @@ var _ Node = (*ImportIdent)(nil) // ImportIdent implements Node
 
 type InnerBlock struct {
 	Statement
+	Open  token.Pos
 	Block *Block
-	pos   token.Pos
+	Close token.Pos
 }
 
-func (i *InnerBlock) Pos() token.Pos { return i.pos }
+func (i *InnerBlock) Pos() token.Pos { return i.Open }
 
 var _ Stmt = (*InnerBlock)(nil) // InnerBlock implements Stmt
 
@@ -316,22 +316,24 @@ var _ Type = (*PointerType)(nil)
 
 type SizedArrayType struct {
 	TypeStr
-	pos  token.Pos
-	Size Expr
-	Type Type
+	Open  token.Pos
+	Size  Expr
+	Close token.Pos
+	Type  Type
 }
 
-func (s *SizedArrayType) Pos() token.Pos { return s.pos }
+func (s *SizedArrayType) Pos() token.Pos { return s.Open }
 
 var _ Type = (*SizedArrayType)(nil)
 
 type UnsizedArrayType struct {
 	TypeStr
-	pos  token.Pos
-	Type Type
+	Open  token.Pos
+	Close token.Pos
+	Type  Type
 }
 
-func (u *UnsizedArrayType) Pos() token.Pos { return u.pos }
+func (u *UnsizedArrayType) Pos() token.Pos { return u.Open }
 
 var _ Type = (*UnsizedArrayType)(nil)
 
@@ -423,13 +425,12 @@ var _ Expr = (*BinaryExpression)(nil)
 
 type LambdaExpression struct {
 	Expression
-	pos    token.Pos
 	Params *FormalParameterList
 	Arrow  token.Pos
 	Block  *Block
 }
 
-func (l *LambdaExpression) Pos() token.Pos { return l.pos }
+func (l *LambdaExpression) Pos() token.Pos { return l.Params.Pos() }
 
 var _ Expr = (*LambdaExpression)(nil)
 

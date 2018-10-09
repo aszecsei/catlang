@@ -16,9 +16,6 @@ func Walk(node Node, v Visitor) {
 		}
 	case *Declaration:
 		Walk(n.Declarator, v)
-		Walk(n.Declarator, v)
-	case *ExportedDeclaration:
-		Walk(n.Declarator, v)
 	case *Declarator:
 		Walk(n.Name, v)
 	case *ConstantDeclarator:

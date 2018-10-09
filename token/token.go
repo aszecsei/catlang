@@ -87,6 +87,7 @@ const (
 	ENUM
 	SOA
 	OWNED
+	TYPEDEF
 	IMPORT
 	EXPORT
 	FROM
@@ -178,7 +179,8 @@ var tok_strings = map[TokenType]string{
 	TYPE:     "type",
 	ENUM:     "enum",
 	SOA:      "SOA",
-	OWNED:		"owned",
+	OWNED:    "owned",
+	TYPEDEF:  "typedef",
 	IMPORT:   "import",
 	EXPORT:   "export",
 	FROM:     "from",
