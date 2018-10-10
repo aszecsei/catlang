@@ -140,7 +140,7 @@
                      | "*" "as" <identifier>
 
 <inner block> ::= "{" <block> "}"
-<if> ::= "if" <expression> "{" <block> "}" { <elif> } [ <else> ]
+<if> ::= "if" "(" <expression> ")" "{" <block> "}" { <elif> } [ <else> ]
 <elif> ::= "else if" <expression> "{" <block> "}"
 <else> ::= "else" "{" <block> "}"
 

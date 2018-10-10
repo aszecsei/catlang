@@ -259,6 +259,19 @@ func (f *ForLoop) Pos() token.Pos { return f.For }
 
 var _ Stmt = (*ForLoop)(nil) // ForLoop implements Statement
 
+type ForInLoop struct {
+	Statement
+	For   token.Pos
+	Var   *Ident
+	In    token.Pos
+	Range Expr
+	Block *Block
+}
+
+func (f *ForInLoop) Pos() token.Pos { return f.For }
+
+var _ Stmt = (*ForInLoop)(nil) // ForInLoop implements Statement
+
 type WhileLoop struct {
 	Statement
 	While     token.Pos

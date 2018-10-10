@@ -381,6 +381,7 @@ func (p *parser) parseStatement() ast.Stmt {
 	case token.IF:
 		return p.parseIf()
 	case token.FOR:
+		// TODO: Determine for loop vs for-in loop
 		return p.parseFor()
 	case token.WHILE:
 		return p.parseWhile()
@@ -456,7 +457,9 @@ func (p *parser) parseInnerBlock() *ast.InnerBlock {
 
 func (p *parser) parseIf() *ast.If {
 	ifPos := p.expect(token.IF)
+	p.expect(token.LPAREN)
 	condition := p.parseExpression()
+	p.expect(token.RPAREN)
 	p.expect(token.LCURLYB)
 	block := p.parseBlock()
 	p.expect(token.RCURLYB)
@@ -494,8 +497,39 @@ func (p *parser) parseElse() *ast.Else {
 }
 
 func (p *parser) parseFor() *ast.ForLoop {
-	// TODO
-	return nil
+	forPos := p.expect(token.FOR)
+	p.expect(token.LPAREN)
+
+	var initial, condition, step ast.Expr
+	initial = nil
+	condition = nil
+	step = nil
+
+	if p.scanner.CurrentLexeme().Type != token.SEMICOLON {
+		initial = p.parseExpression()
+	}
+	p.expect(token.SEMICOLON)
+	if p.scanner.CurrentLexeme().Type != token.SEMICOLON {
+		condition = p.parseExpression()
+	}
+	p.expect(token.SEMICOLON)
+	if p.scanner.CurrentLexeme().Type != token.SEMICOLON {
+		step = p.parseExpression()
+	}
+	p.expect(token.SEMICOLON)
+
+	p.expect(token.RPAREN)
+	p.expect(token.LCURLYB)
+	block := p.parseBlock()
+	p.expect(token.RCURLYB)
+
+	return &ast.ForLoop{
+		For: forPos,
+		Initial: initial,
+		Condition: condition,
+		Step: step,
+		Block: block,
+	}
 }
 
 func (p *parser) parseWhile() *ast.WhileLoop {
