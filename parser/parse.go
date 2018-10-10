@@ -455,8 +455,42 @@ func (p *parser) parseInnerBlock() *ast.InnerBlock {
 }
 
 func (p *parser) parseIf() *ast.If {
-	// TODO
-	return nil
+	ifPos := p.expect(token.IF)
+	condition := p.parseExpression()
+	p.expect(token.LCURLYB)
+	block := p.parseBlock()
+	p.expect(token.RCURLYB)
+	var elseCond ast.Cond
+	elseCond = nil
+	if p.scanner.CurrentLexeme().Type == token.ELSE {
+		if p.scanner.NextLexeme().Type == token.IF {
+			// else if
+			p.expect(token.ELSE)
+			elseCond = p.parseIf()
+		} else {
+			// final else
+			elseCond = p.parseElse()
+		}
+	}
+
+	return &ast.If{
+		If: ifPos,
+		Cond: condition,
+		Then: block,
+		Else: elseCond,
+	}
+}
+
+func (p *parser) parseElse() *ast.Else {
+	elsePos := p.expect(token.ELSE)
+	p.expect(token.LCURLYB)
+	block := p.parseBlock()
+	p.expect(token.RCURLYB)
+	
+	return &ast.Else{
+		Else: elsePos,
+		Block: block,
+	}
 }
 
 func (p *parser) parseFor() *ast.ForLoop {

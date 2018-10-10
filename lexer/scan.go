@@ -75,7 +75,7 @@ func (s *Scanner) scan() {
 
 func (s *Scanner) scanNumber() {
 	// TODO: Handle floats
-	// TODO: Handle overflow
+	// TODO: Handle number bases other than 10
 	start := s.offset
 	for unicode.IsDigit(s.ch) {
 		s.next()
