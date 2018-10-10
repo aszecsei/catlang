@@ -112,7 +112,7 @@ func isDeclarationStarter(t token.TokenType) bool {
 func (p *parser) parseBlock() *ast.Block {
 	elems := make([]ast.BlockElement, 0)
 	begin := p.scanner.CurrentLexeme().Position
-	for p.scanner.CurrentLexeme().Type != token.EOF {
+	for p.scanner.CurrentLexeme().Type != token.EOF || p.scanner.CurrentLexeme().Type != token.RCURLYB {
 		cur := p.scanner.CurrentLexeme()
 		var elem ast.BlockElement
 		if isDeclarationStarter(cur.Type) {
@@ -373,15 +373,133 @@ func (p *parser) parseEnumValueList() *ast.EnumValueList {
 }
 
 func (p *parser) parseStatement() ast.Stmt {
+	switch p.scanner.CurrentLexeme().Type {
+	case token.IMPORT:
+		return p.parseImport()
+	case token.LCURLYB:
+		return p.parseInnerBlock()
+	case token.IF:
+		return p.parseIf()
+	case token.FOR:
+		return p.parseFor()
+	case token.WHILE:
+		return p.parseWhile()
+	case token.DO:
+		return p.parseDoWhile()
+	case token.BREAK:
+		return p.parseJumpStatement()
+	case token.CONTINUE:
+		return p.parseJumpStatement()
+	case token.RETURN:
+		return p.parseJumpStatement()
+	default:
+		return p.parseExpression()
+	}
+}
+
+func (p *parser) parseImport() *ast.ImportStatement {
+	importPos := p.expect(token.IMPORT)
+	imports := p.parseImportList()
+	fromPos := p.expect(token.FROM)
+	path := p.parseStringLiteral()
+
+	return &ast.ImportStatement{
+		Import: importPos,
+		ImportList: imports,
+		From: fromPos,
+		Path: path,
+	}
+}
+
+func (p *parser) parseImportList() *ast.ImportList {
+	vals := make([]*ast.ImportIdent, 0)
+	v := p.parseImportIdent()
+	vals = append(vals, v)
+	for p.scanner.CurrentLexeme().Type == token.COMMA {
+		p.expect(token.COMMA)
+		x := p.parseImportIdent()
+		vals = append(vals, x)
+	}
+
+	return &ast.ImportList{
+		Names: vals,
+	}
+}
+
+func (p *parser) parseImportIdent() *ast.ImportIdent {
+	old := p.parseIdentifier()
+	asPos := token.NoPos
+	var newName *ast.Ident
+	newName = nil
+	if old.Name == "*" || p.scanner.CurrentLexeme().Type == token.AS {
+		asPos = p.expect(token.AS)
+		newName = p.parseIdentifier()
+	}
+	return &ast.ImportIdent{
+		OldName: old,
+		As: asPos,
+		NewName: newName,
+	}
+}
+
+func (p *parser) parseInnerBlock() *ast.InnerBlock {
+	open := p.expect(token.LCURLYB)
+	block := p.parseBlock()
+	close := p.expect(token.RCURLYB)
+
+	return &ast.InnerBlock{
+		Open: open,
+		Block: block,
+		Close: close,
+	}
+}
+
+func (p *parser) parseIf() *ast.If {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseFor() *ast.ForLoop {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseWhile() *ast.WhileLoop {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseDoWhile() *ast.DoWhileLoop {
+	// TODO
+	return nil
+}
+
+func (p *parser) parseJumpStatement() *ast.JumpStatement {
+	// TODO
 	return nil
 }
 
 func (p *parser) parseExpression() ast.Expr {
+	// TODO
 	return nil
 }
 
 func (p *parser) parseType() ast.Type {
+	// TODO
 	return nil
+}
+
+func (p *parser) parseStringLiteral() *ast.StringLiteral {
+	lit := p.scanner.CurrentLexeme().Literal
+	pos := p.expect(token.STRING)
+	return &ast.StringLiteral{
+		BasicLiteral: ast.BasicLiteral{
+			LitPos: pos,
+			Kind: token.STRING,
+			Lit: lit,
+		},
+		Value: lit,
+	}
 }
 
 func (p *parser) parseIdentifier() *ast.Ident {

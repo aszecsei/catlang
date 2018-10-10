@@ -93,6 +93,7 @@ const (
 	FROM
 	FOR
 	WHILE
+	DO
 	IF
 	ELSE
 	BREAK
@@ -186,6 +187,7 @@ var tok_strings = map[TokenType]string{
 	FROM:     "from",
 	FOR:      "for",
 	WHILE:    "while",
+	DO:       "do",
 	IF:       "if",
 	ELSE:     "else",
 	BREAK:    "break",

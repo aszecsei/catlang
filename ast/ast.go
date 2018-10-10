@@ -185,12 +185,10 @@ func (e *ImportStatement) Pos() token.Pos { return e.Import }
 var _ Stmt = (*ImportStatement)(nil) // ImportStatement implements Stmt
 
 type ImportList struct {
-	Open  token.Pos
 	Names []*ImportIdent
-	Close token.Pos
 }
 
-func (i *ImportList) Pos() token.Pos { return i.Open }
+func (i *ImportList) Pos() token.Pos { return i.Names[0].Pos() }
 
 var _ Node = (*ImportList)(nil) // ImportList implements Node
 
@@ -377,11 +375,12 @@ func (n *NamedType) Pos() token.Pos { return n.Name.NamePos }
 var _ Type = (*NamedType)(nil)
 
 type Expr interface {
-	Node
+	Stmt
 	exprNode()
 }
 
 type Expression struct {
+	Statement
 }
 
 func (e *Expression) exprNode() {}
@@ -439,8 +438,10 @@ type BasicLiteral struct {
 	Lit    string
 }
 
-func (b *BasicLiteral) Pos() token.Pos { return b.LitPos }
-func (b *BasicLiteral) exprNode()      {}
+func (b *BasicLiteral) Pos() token.Pos    { return b.LitPos }
+func (b *BasicLiteral) exprNode()         {}
+func (b *BasicLiteral) blockElementNode() {}
+func (b *BasicLiteral) statementNode()    {}
 
 type IntegerLiteral struct {
 	BasicLiteral

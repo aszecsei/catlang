@@ -191,16 +191,16 @@
                       |  "in"
                       |  "is"
 
-<adding operator> ::= "+"
-                   |  "-"
-                   |  "|"
-                   |  "^"
+<adding operator> ::= "+" [ "=" ]
+                   |  "-" [ "=" ]
+                   |  "|" [ "=" ]
+                   |  "^" [ "=" ]
                    |  "||"
 
-<multiplying operator> ::= "*"
-                        |  "/"
-                        |  "%"
-                        |  "&"
+<multiplying operator> ::= "*" [ "=" ]
+                        |  "/" [ "=" ]
+                        |  "%" [ "=" ]
+                        |  "&" [ "=" ]
                         |  "&&"
 
 <factor> ::= [ "-" | "!" ] <primary expression>
