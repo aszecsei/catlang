@@ -533,18 +533,52 @@ func (p *parser) parseFor() *ast.ForLoop {
 }
 
 func (p *parser) parseWhile() *ast.WhileLoop {
-	// TODO
-	return nil
+	whilePos := p.expect(token.WHILE)
+	p.expect(token.LPAREN)
+	condition := p.parseExpression()
+	p.expect(token.RPAREN)
+	p.expect(token.LCURLYB)
+	block := p.parseBlock()
+	p.expect(token.RCURLYB)
+
+	return &ast.WhileLoop{
+		While: whilePos,
+		Condition: condition,
+		Block: block,
+	}
 }
 
 func (p *parser) parseDoWhile() *ast.DoWhileLoop {
-	// TODO
-	return nil
+	doPos := p.expect(token.DO)
+	p.expect(token.LCURLYB)
+	block := p.parseBlock()
+	p.expect(token.RCURLYB)
+	p.expect(token.WHILE)
+	p.expect(token.LPAREN)
+	condition := p.parseExpression()
+	p.expect(token.RPAREN)
+
+	return &ast.DoWhileLoop{
+		Do: doPos,
+		Block: block,
+		Condition: condition,
+	}
 }
 
 func (p *parser) parseJumpStatement() *ast.JumpStatement {
-	// TODO
-	return nil
+	command := p.scanner.CurrentLexeme().Type
+	commandPos := p.expect(command)
+	var returns ast.Expr
+	returns = nil
+	if command == token.RETURN {
+		returns = p.parseExpression()
+	}
+	
+	return &ast.JumpStatement{
+		Command: command,
+		CommandPos: commandPos,
+		Returns: returns,
+	}
 }
 
 func (p *parser) parseExpression() ast.Expr {
