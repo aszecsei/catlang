@@ -119,8 +119,7 @@
 
 <struct declarator> ::= "struct" <identifier> "{" <struct parameter list> "}"
 <struct parameter list> ::= { <parameter> [ ";" ] }
-<struct parameter> ::= [ "owned" ] <identifier> ":" <type> [ "=" <expression> ]
-                    |  [ "owned" ] <identifier> "=" <expression>
+<struct parameter> ::= <identifier> ":" [ "owned" ] <type> [ "=" <expression> ]
 
 <enum declarator> ::= "enum" "{" <enum value list> "}"
 <enum value list> ::= <identifier> { "," <identifier> }

@@ -66,9 +66,11 @@ func (d *TypeDeclarator) Pos() token.Pos { return d.TypedefPos }
 
 type VariableDeclarator struct {
 	Declarator
-	LetPos token.Pos
-	Type   Type
-	Value  Expr
+	LetPos    token.Pos
+	ColonPos  token.Pos
+	Type      Type
+	EqualsPos token.Pos
+	Value     Expr
 }
 
 func (d *VariableDeclarator) Pos() token.Pos { return d.LetPos }
@@ -77,7 +79,9 @@ type FunctionDeclarator struct {
 	Declarator
 	FunctionPos token.Pos
 	Params      *FormalParameterList
+	OpenBlock   token.Pos
 	Block       *Block
+	CloseBlock  token.Pos
 }
 
 func (d *FunctionDeclarator) Pos() token.Pos { return d.FunctionPos }
@@ -129,6 +133,8 @@ var _ Node = (*StructMemberList)(nil) // StructMemberList implements Node
 
 type StructMember struct {
 	Name         *Ident
+	ColonPos     token.Pos
+	IsOwned      bool
 	Type         Type
 	InitialValue Expr
 }
@@ -136,13 +142,6 @@ type StructMember struct {
 func (s *StructMember) Pos() token.Pos { return s.Name.NamePos }
 
 var _ Node = (*StructMember)(nil) // StructMember implements Node
-
-type OwnedStructMember struct {
-	StructMember
-	OwnedPos token.Pos
-}
-
-func (d *OwnedStructMember) Pos() token.Pos { return d.OwnedPos }
 
 type EnumDeclarator struct {
 	Declarator
@@ -488,7 +487,7 @@ var _ Expr = (*CharacterLiteral)(nil)
 type Ident struct {
 	NamePos token.Pos
 	Name    string
-	Object  *Object // may be nil (ie. Name is a type keyword)
+	Type    *Ident // may be nil (ie. Name is a type keyword)
 }
 
 func (i *Ident) Pos() token.Pos { return i.NamePos }

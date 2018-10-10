@@ -53,10 +53,6 @@ func Walk(node Node, v Visitor) {
 		Walk(n.Name, v)
 		Walk(n.Type, v)
 		Walk(n.InitialValue, v)
-	case *OwnedStructMember:
-		Walk(n.Name, v)
-		Walk(n.Type, v)
-		Walk(n.InitialValue, v)
 	case *EnumDeclarator:
 		Walk(n.Name, v)
 		Walk(n.Values, v)
