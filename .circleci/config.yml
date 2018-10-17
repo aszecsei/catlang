@@ -82,7 +82,11 @@ workflows:
     jobs:
       - build
       - deploy-website
-    filters: *filter-only-master
+    filters:
+      branches:
+        only:
+          - master
+- master
   build_and_test:
     jobs:
       - build
