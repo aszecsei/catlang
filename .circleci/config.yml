@@ -3,18 +3,41 @@ jobs:
   build:
     docker:
       # specify the version
-      - image: circleci/golang:1.11.1
+      - image: circleci/rust:latest
     working_directory: ~/catlang
     steps:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go run mage.go coverage
+            - rust-mod-v1-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Check formatting
+          command: |
+            rustfmt --version
+            cargo fmt -- --write-mode=diff
+      - run:
+          name: Nightly Build
+          command: |
+            rustup run nightly rustc --version --verbose
+            rustup run nightly cargo --version --verbose
+            rustup run nightly cargo build
+      - run:
+          name: Stable Build
+          command: |
+            rustup run stable rustc --version --verbose
+            rustup run stable cargo --version --verbose
+            rustup run stable cargo build
+      - run:
+          name: Test
+          command: rustup run stable cargo test
+      - run:
+          name: Upload Coverage
+          command: ./scripts/codecov.sh
       - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
+          key: rust-mod-v1-{{ checksum "Cargo.lock" }}
           paths:
-            - "/go/pkg/mod"
+            - "~/.cargo"
+            - "./target"
 workflows:
   version: 2
   build_and_test:
