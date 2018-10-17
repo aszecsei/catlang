@@ -41,7 +41,9 @@ jobs:
           command: rustup run stable cargo test
       - run:
           name: Upload Coverage
-          command: ./scripts/codecov.sh
+          command: |
+            chmod +x ./scripts/codecov.sh
+            ./scripts/codecov.sh
       - save_cache:
           key: rust-mod-v1-{{ checksum "Cargo.lock" }}
           paths:
