@@ -42,6 +42,7 @@ jobs:
             cargo install cargo-cov
             rustup run nightly cargo cov clean
             rustup run nightly cargo cov test
+            rustup run nightly cargo cov report
       - run:
           name: Upload Coverage
           command: |
