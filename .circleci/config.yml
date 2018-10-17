@@ -7,6 +7,9 @@ jobs:
     working_directory: ~/catlang
     steps:
       - checkout
+      - run:
+          name: Install rustfmt
+          command: rustup component add rustfmt-preview
       - restore_cache:
           keys:
             - rust-mod-v1-{{ checksum "Cargo.lock" }}
