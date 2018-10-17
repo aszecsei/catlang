@@ -38,12 +38,13 @@ jobs:
             rustup run stable cargo build
       - run:
           name: Test
-          command: rustup run stable cargo test
+          command: |
+            cargo install cargo-cov
+            rustup run nightly cargo cov clean
+            rustup run nightly cargo cov test
       - run:
           name: Upload Coverage
           command: |
-            cargo install grcov
-            grcov build -t lcov > lcov.info
             bash <(curl -s https://codecov.io/bash) &&
             echo "Uploaded code coverage"
       - save_cache:
