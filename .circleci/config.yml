@@ -86,7 +86,6 @@ workflows:
       branches:
         only:
           - master
-- master
   build_and_test:
     jobs:
       - build
