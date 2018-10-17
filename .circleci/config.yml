@@ -38,14 +38,23 @@ jobs:
             rustup run stable cargo build
       - run:
           name: Test
-          command: |
-            cargo install cargo-cov
-            rustup run nightly cargo cov clean
-            rustup run nightly cargo cov test
-            rustup run nightly cargo cov report
+          command: rustup run stable cargo test
       - run:
           name: Upload Coverage
           command: |
+            sudo apt-get update
+            sudo apt-get install -y libcurl4-openssl-dev libelf-dev libdw-dev cmake gcc binutils-dev libiberty-dev
+            wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+            tar xzf master.tar.gz &&
+            cd kcov-master &&
+            mkdir build &&
+            cd build &&
+            cmake .. &&
+            make &&
+            make install DESTDIR=../../kcov-build &&
+            cd ../.. &&
+            rm -rf kcov-master &&
+            for file in target/debug/examplerust-*[^\.d]; do mkdir -p "target/cov/$(basename $file)"; ./kcov-build/usr/local/bin/kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
             bash <(curl -s https://codecov.io/bash) &&
             echo "Uploaded code coverage"
       - save_cache:
