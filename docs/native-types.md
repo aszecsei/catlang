@@ -55,7 +55,7 @@ const d = 'abc'; // ERROR!
 Catlang allows users to write shorthands to refer to complex types. For example:
 
 ```
-typedef number = S8 | U8 | S16 | U16 | S32 | U32 | S64 | U64 | float | double;
+type number = S8 | U8 | S16 | U16 | S32 | U32 | S64 | U64 | float | double;
 const genericFunction = (input: number) -> {
   return input * 2;
 }
