@@ -4,3 +4,7 @@ version = "0.1.0"
 authors = ["Alic Szecsei <aszecsei@gmail.com>"]
 
 [dependencies]
+clap = "2.32.0"
+log = "0.4"
+loggerv = "0.7.1"
+ansi_term = "0.11.0"
