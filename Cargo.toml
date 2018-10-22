@@ -2,9 +2,20 @@
 name = "catlang"
 version = "0.1.0"
 authors = ["Alic Szecsei <aszecsei@gmail.com>"]
+publish = false
+description = "A compiler for the Catlang programming language"
+documentation = "aszecsei.github.io/catlang"
+repository = "github.com/aszecsei/catlang"
+
+readme = "README.md"
+
+keywords = ["catlang", "compiler"]
+
+license = "MIT"
 
 [dependencies]
+ansi_term = "0.11.0"
 clap = "2.32.0"
+human-panic = "1.0.1"
 log = "0.4"
 loggerv = "0.7.1"
-ansi_term = "0.11.0"
