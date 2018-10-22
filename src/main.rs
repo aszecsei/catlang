@@ -1,17 +1,21 @@
 extern crate ansi_term;
 extern crate clap;
 #[macro_use]
+extern crate human_panic;
+#[macro_use]
 extern crate log;
 extern crate loggerv;
 
-pub mod token;
 pub mod lexer;
+pub mod token;
 
 use clap::{App, Arg, SubCommand};
 
 fn main() {
     #[cfg(windows)]
     ansi_term::enable_ansi_support().unwrap();
+
+    setup_panic!();
 
     const VERSION: &str = "0.0.1";
     const AUTHOR: &str = "Alic Szecsei <aszecsei@gmail.com>";
@@ -68,5 +72,6 @@ fn main() {
             "Optimization level: {}",
             matches.value_of("optimization").unwrap()
         );
+        panic!("oh god oh god");
     }
 }
