@@ -104,8 +104,6 @@ fn run(matches: ArgMatches) -> std::io::Result<()> {
         file.read_to_string(&mut contents)?;
 
         let mut scanner = lexer::Scanner::new(fname, &contents);
-        scanner.advance();
-        scanner.advance();
         loop {
             match scanner.current_lexeme {
                 None => break,

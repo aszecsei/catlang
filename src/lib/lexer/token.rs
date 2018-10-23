@@ -3,7 +3,7 @@ use std::fmt;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum Token {
-    Illegal,
+    Illegal(char),
     EOF,
 
     // Literals
@@ -99,7 +99,7 @@ pub enum Token {
 
 impl Default for Token {
     fn default() -> Token {
-        Token::Illegal
+        Token::Illegal(' ')
     }
 }
 

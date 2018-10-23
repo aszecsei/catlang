@@ -27,7 +27,7 @@ pub struct Scanner<'a> {
 
 impl<'a> Scanner<'a> {
     pub fn new(filename: &'a str, src: &'a str) -> Scanner<'a> {
-        let s = Scanner {
+        let mut s = Scanner {
             ch: None,
             offset: 0,
             src: src.chars().peekable(),
@@ -36,6 +36,10 @@ impl<'a> Scanner<'a> {
             current_lexeme: Default::default(),
             next_lexeme: Default::default(),
         };
+        s.read_char();
+
+        s.advance();
+        s.advance();
         return s;
     }
 
@@ -63,7 +67,29 @@ impl<'a> Scanner<'a> {
 
         let pos = Pos::Pos(self.offset);
 
-        let t = match self.ch {
+        let t = if let Some(ch) = self.ch {
+            if ch.is_ascii_punctuation() {
+                self.scan_punc()
+            } else if is_letter(ch) {
+                let literal = self.scan_identifier();
+                Token::lookup_ident(&literal)
+            } else if ch.is_numeric() {
+                self.scan_number()
+            } else {
+                Token::Illegal(ch)
+            }
+        } else {
+            Token::EOF
+        };
+
+        self.next_lexeme = Some(Lexeme {
+            token: t,
+            position: pos,
+        });
+    }
+
+    fn scan_punc(&mut self) -> Token {
+        let mut t = match self.ch {
             Some('(') => Token::LParen,
             Some(')') => Token::RParen,
             Some('{') => Token::LCurlyB,
@@ -231,33 +257,54 @@ impl<'a> Scanner<'a> {
                     Token::Dot
                 }
             }
-            Some('\'') => Token::Char('\n'), // TODO: Scan char literal
-            Some('"') => Token::String(Symbol::intern("default")), // TODO: Scan string literal
+            Some('\'') => self.scan_char_literal(),
+            Some('"') => self.scan_string_literal(), // TODO: Scan string literal
 
-            Some(ch) => {
-                if is_letter(ch) {
-                    let literal = self.scan_identifier();
-                    Token::lookup_ident(&literal)
-                } else if ch.is_numeric() {
-                    self.scan_number()
-                } else {
-                    Token::Illegal // TODO: we may need to display a nice error message later
-                }
-            }
+            Some(ch) => Token::Illegal(ch), // TODO: we may need to display a nice error message later
             None => Token::EOF,
         };
+        self.read_char();
+        t
+    }
 
-        self.next_lexeme = Some(Lexeme {
-            token: t,
-            position: pos,
-        });
+    fn scan_char_literal(&mut self) -> Token {
+        self.read_char(); // skip over "'"
+        Token::Char(self.ch.unwrap()) // TODO: Unwrap
+                                      // scan_punct adds a read_char to the end to skip over the last quote
+    }
+
+    fn scan_string_literal(&mut self) -> Token {
+        self.read_char(); // skip over """
+        let mut value = String::new();
+        while let Some(ch) = self.ch {
+            if ch == '"' {
+                break;
+            }
+            value.push(ch);
+            self.read_char();
+        }
+        Token::String(Symbol::intern(&value))
     }
 
     fn scan_number(&mut self) -> Token {
         // TODO: Handle floats
         // TODO: Handle number bases other than 10
-        // TODO
-        Token::Integer(0)
+        let mut value: i32 = 0;
+        while let Some(c) = self.ch {
+            if c.is_numeric() {
+                let v = c.to_digit(10);
+                if let Some(v_d) = v {
+                    value *= 10;
+                    value += v_d as i32;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+            self.read_char();
+        }
+        Token::Integer(value)
     }
 
     fn scan_identifier(&mut self) -> String {
@@ -293,10 +340,11 @@ impl<'a> Scanner<'a> {
     }
 
     fn skip_whitespace(&mut self) {
-        while let Some(c) = self.read_char() {
+        while let Some(c) = self.ch {
             if !c.is_whitespace() {
                 break;
             }
+            self.read_char();
         }
     }
 
