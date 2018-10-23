@@ -1,15 +1,16 @@
+use lexer::symbol::Symbol;
 use std::fmt;
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum Token {
     Illegal,
     EOF,
 
     // Literals
     Bool(bool),
-    Ident(String),
+    Ident(Symbol),
     Integer(i32),
-    String(String),
+    String(Symbol),
     Char(char),
 
     // Operators
@@ -129,7 +130,7 @@ impl Token {
             "else" => Token::Else,
             "break" => Token::Break,
             "continue" => Token::Continue,
-            _ => Token::Ident(ident.to_string()),
+            _ => Token::Ident(Symbol::intern(ident)),
         }
     }
 }
@@ -176,101 +177,5 @@ impl fmt::Display for Position {
             "" => write!(f, "{}:{}", self.row, self.col),
             fname => write!(f, "{}:{}:{}", fname, self.row, self.col),
         };
-    }
-}
-
-pub struct File {
-    base: i32,
-    name: String,
-    lines: Vec<i32>,
-    size: i32,
-}
-
-impl File {
-    pub fn new(name: String, base: i32, size: i32) -> File {
-        return File {
-            base: base,
-            name: name,
-            lines: vec![0; 16],
-            size: size,
-        };
-    }
-
-    pub fn add_line(&mut self, offset: i32) {
-        if offset >= self.base - 1 && offset < self.base + self.size {
-            self.lines.push(offset);
-        }
-    }
-
-    pub fn get_pos(&self, offset: i32) -> Pos {
-        if offset < 0 || offset >= self.size {
-            panic!("Illegal file offset");
-        }
-        return Pos::Pos((self.base + offset) as u32);
-    }
-
-    pub fn get_position(&self, p: Pos) -> Position {
-        let p_int = match p {
-            Pos::NoPos => 0,
-            Pos::Pos(v) => v,
-        } as i32;
-        let mut col = p_int + self.base + 1;
-        let mut row: i32 = 1;
-
-        for i in 0..self.lines.len() {
-            let nl = self.lines[i];
-            if p_int > self.get_pos(nl).to_int() {
-                col = (p_int - self.get_pos(nl).to_int()) - self.base + 1;
-                row = (i as i32) + 1;
-            }
-        }
-
-        return Position {
-            filename: self.name.to_string(),
-            col: col,
-            row: row,
-        };
-    }
-}
-
-pub struct FileSet {
-    base: i32,
-    files: Vec<File>,
-}
-
-impl FileSet {
-    pub fn new() -> FileSet {
-        return FileSet {
-            base: 1,
-            files: vec![],
-        };
-    }
-
-    pub fn add(&mut self, name: String, src: String) -> &File {
-        let f = File::new(name, self.base, src.len() as i32);
-        self.files.push(f);
-        self.base += src.len() as i32;
-
-        match self.files.last() {
-            None => panic!("No file found!"),
-            Some(file) => return file,
-        };
-    }
-
-    pub fn get_position(&self, p: Pos) -> Position {
-        if !p.is_valid() {
-            panic!("Invalid position");
-        }
-        let mut pos = Position {
-            filename: String::from(""),
-            col: 0,
-            row: 0,
-        };
-        for f in self.files.iter() {
-            if p.to_int() > self.base && p.to_int() < f.base + f.size {
-                pos = f.get_position(p);
-            }
-        }
-        return pos;
     }
 }

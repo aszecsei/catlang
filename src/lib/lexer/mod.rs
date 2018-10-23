@@ -1,41 +1,45 @@
-use token;
-use token::Token;
+pub mod globals;
+pub mod symbol;
+pub mod token;
+
+use lexer::symbol::Symbol;
+use lexer::token::{Pos, Token};
 
 use std::iter::Peekable;
 use std::str::Chars;
 
-#[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Hash)]
 pub struct Lexeme {
-    token: Token,
-    position: token::Pos,
+    pub token: Token,
+    pub position: token::Pos,
 }
 
+#[derive(Clone, Debug)]
 pub struct Scanner<'a> {
     ch: Option<char>,
-    offset: i32,
+    offset: u32,
     src: Peekable<Chars<'a>>,
-    file: &'a mut token::File,
+    filename: &'a str,
 
-    current_lexeme: Option<Lexeme>,
-    next_lexeme: Option<Lexeme>,
+    pub current_lexeme: Option<Lexeme>,
+    pub next_lexeme: Option<Lexeme>,
 }
 
 impl<'a> Scanner<'a> {
-    pub fn new(file: &'a mut token::File, src: &'a str) -> Scanner<'a> {
+    pub fn new(filename: &'a str, src: &'a str) -> Scanner<'a> {
         let s = Scanner {
             ch: None,
             offset: 0,
             src: src.chars().peekable(),
-            file: file,
+            filename: filename,
 
             current_lexeme: Default::default(),
             next_lexeme: Default::default(),
         };
-        s.file.add_line(s.offset);
         return s;
     }
 
-    pub fn advance(mut self) {
+    pub fn advance(&mut self) {
         self.current_lexeme = self.next_lexeme;
         self.next_lexeme = None;
         self.scan();
@@ -57,7 +61,7 @@ impl<'a> Scanner<'a> {
             return;
         }
 
-        let pos = self.file.get_pos(self.offset);
+        let pos = Pos::Pos(self.offset);
 
         let t = match self.ch {
             Some('(') => Token::LParen,
@@ -228,7 +232,7 @@ impl<'a> Scanner<'a> {
                 }
             }
             Some('\'') => Token::Char('\n'), // TODO: Scan char literal
-            Some('"') => Token::String(String::from("")), // TODO: Scan string literal
+            Some('"') => Token::String(Symbol::intern("default")), // TODO: Scan string literal
 
             Some(ch) => {
                 if is_letter(ch) {
@@ -257,8 +261,14 @@ impl<'a> Scanner<'a> {
     }
 
     fn scan_identifier(&mut self) -> String {
-        let ident = String::new();
-        // TODO
+        let mut ident = String::new();
+        while let Some(c) = self.ch {
+            if !is_letter(c) {
+                break;
+            }
+            ident.push(c);
+            self.read_char();
+        }
         return ident;
     }
 
@@ -266,7 +276,7 @@ impl<'a> Scanner<'a> {
         self.offset += 1;
         self.ch = self.src.next();
         if self.ch == Some('\n') {
-            self.file.add_line(self.offset);
+            // TODO: new line
         }
         return self.ch;
     }
@@ -300,7 +310,6 @@ impl<'a> Scanner<'a> {
                 break;
             }
             if !is_block && c == '\n' {
-                self.read_char(); // pass through \n
                 break;
             }
         }
