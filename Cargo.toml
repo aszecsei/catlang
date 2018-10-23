@@ -14,8 +14,19 @@ keywords = ["catlang", "compiler"]
 license = "MIT"
 
 [dependencies]
-ansi_term = "0.11.0"
+chrono = "0.4.6"
 clap = "2.32.0"
+console = "0.6.2"
 human-panic = "1.0.1"
-log = "0.4"
-loggerv = "0.7.1"
+indicatif = "0.9.0"
+lazy_static = "1.1.0"
+log = "0.4.5"
+serde = "1.0.80"
+
+[lib]
+name = "catlang"
+path = "src/lib/lib.rs"
+
+[[bin]]
+name = "catlang"
+path = "src/bin/main.rs"
