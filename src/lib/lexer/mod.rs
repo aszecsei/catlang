@@ -258,9 +258,9 @@ impl<'a> Scanner<'a> {
                 }
             }
             Some('\'') => self.scan_char_literal(),
-            Some('"') => self.scan_string_literal(), // TODO: Scan string literal
+            Some('"') => self.scan_string_literal(),
 
-            Some(ch) => Token::Illegal(ch), // TODO: we may need to display a nice error message later
+            Some(ch) => Token::Illegal(ch),
             None => Token::EOF,
         };
         self.read_char();
