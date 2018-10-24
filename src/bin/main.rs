@@ -61,7 +61,7 @@ fn main() {
                 ),
         ).get_matches();
 
-    if let Err(e) = run(matches) {
+    if let Err(e) = run(&matches) {
         panic!("Application error: {}", e);
     }
 
@@ -72,10 +72,11 @@ fn main() {
     );
 }
 
-fn run(matches: ArgMatches) -> std::io::Result<()> {
-    let verbose_num = match matches.is_present("quiet") {
-        true => 0,
-        false => matches.occurrences_of("verbose") + 1,
+fn run(matches: &ArgMatches) -> std::io::Result<()> {
+    let verbose_num = if matches.is_present("quiet") {
+        0
+    } else {
+        matches.occurrences_of("verbose") + 1
     };
     let max_log_level = match verbose_num {
         0 => log::LevelFilter::Off,
@@ -88,7 +89,7 @@ fn run(matches: ArgMatches) -> std::io::Result<()> {
     let _res = logger::init_with_max_level(max_log_level);
     println!("Log level: {}", max_log_level);
 
-    if let Some(m) = matches.subcommand_matches("init") {
+    if let Some(_m) = matches.subcommand_matches("init") {
         info!("Initializing...");
     }
 

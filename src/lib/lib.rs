@@ -5,3 +5,4 @@ extern crate log;
 
 pub mod lexer;
 pub mod logger;
+pub mod parser;

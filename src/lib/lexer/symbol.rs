@@ -23,8 +23,8 @@ impl Symbol {
         with_interner(|interner| interner.gensymed(self))
     }
 
-    pub fn get(&self) -> String {
-        with_interner(|interner| String::from(interner.get(*self)))
+    pub fn get(self) -> String {
+        with_interner(|interner| String::from(interner.get(self)))
     }
 }
 
@@ -84,7 +84,7 @@ impl Interner {
         Symbol(!0 - self.gensyms.len() as u32 + 1)
     }
 
-    fn is_gensymed(&mut self, symbol: Symbol) -> bool {
+    fn is_gensymed(&self, symbol: Symbol) -> bool {
         symbol.0 as usize >= self.strings.len()
     }
 

@@ -153,15 +153,15 @@ impl Default for Pos {
 }
 
 impl Pos {
-    fn is_valid(&self) -> bool {
-        *self != Pos::NoPos
+    fn is_valid(self) -> bool {
+        self != Pos::NoPos
     }
 
-    fn to_int(&self) -> i32 {
-        return match *self {
+    fn to_int(self) -> i32 {
+        match self {
             Pos::NoPos => 0,
-            Pos::Pos(x) => x,
-        } as i32;
+            Pos::Pos(x) => x as i32,
+        }
     }
 }
 
@@ -173,9 +173,9 @@ pub struct Position {
 
 impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return match &*self.filename {
+        match &*self.filename {
             "" => write!(f, "{}:{}", self.row, self.col),
             fname => write!(f, "{}:{}:{}", fname, self.row, self.col),
-        };
+        }
     }
 }

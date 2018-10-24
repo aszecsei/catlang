@@ -31,7 +31,7 @@ impl<'a> Scanner<'a> {
             ch: None,
             offset: 0,
             src: src.chars().peekable(),
-            filename: filename,
+            filename,
 
             current_lexeme: Default::default(),
             next_lexeme: Default::default(),
@@ -40,7 +40,7 @@ impl<'a> Scanner<'a> {
 
         s.advance();
         s.advance();
-        return s;
+        s
     }
 
     pub fn advance(&mut self) {
@@ -89,7 +89,7 @@ impl<'a> Scanner<'a> {
     }
 
     fn scan_punc(&mut self) -> Token {
-        let mut t = match self.ch {
+        let t = match self.ch {
             Some('(') => Token::LParen,
             Some(')') => Token::RParen,
             Some('{') => Token::LCurlyB,
@@ -173,13 +173,11 @@ impl<'a> Scanner<'a> {
                     } else {
                         Token::And
                     }
+                } else if self.peek_char_eq('=') {
+                    self.read_char();
+                    Token::BitAndAssign
                 } else {
-                    if self.peek_char_eq('=') {
-                        self.read_char();
-                        Token::BitAndAssign
-                    } else {
-                        Token::BitAnd
-                    }
+                    Token::BitAnd
                 }
             }
             Some('|') => {
@@ -191,13 +189,11 @@ impl<'a> Scanner<'a> {
                     } else {
                         Token::Or
                     }
+                } else if self.peek_char_eq('=') {
+                    self.read_char();
+                    Token::BitOrAssign
                 } else {
-                    if self.peek_char_eq('=') {
-                        self.read_char();
-                        Token::BitOrAssign
-                    } else {
-                        Token::BitOr
-                    }
+                    Token::BitOr
                 }
             }
             Some('^') => {
@@ -316,7 +312,7 @@ impl<'a> Scanner<'a> {
             ident.push(c);
             self.read_char();
         }
-        return ident;
+        ident
     }
 
     fn read_char(&mut self) -> Option<char> {
@@ -325,7 +321,7 @@ impl<'a> Scanner<'a> {
         if self.ch == Some('\n') {
             // TODO: new line
         }
-        return self.ch;
+        self.ch
     }
 
     fn peek_char(&mut self) -> Option<&char> {

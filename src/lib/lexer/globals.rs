@@ -1,6 +1,7 @@
 use lexer::symbol::Interner;
 use std::sync::{Arc, Mutex};
 
+#[derive(Default)]
 pub struct Globals {
     pub symbol_interner: Arc<Mutex<Interner>>,
 }
