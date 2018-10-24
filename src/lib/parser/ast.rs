@@ -1,6 +1,5 @@
 use lexer::symbol;
 use lexer::token;
-use std::rc::Rc;
 
 pub struct Block {
     pub elements: Vec<Box<BlockElement>>,
