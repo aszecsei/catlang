@@ -121,7 +121,7 @@
 <struct parameter list> ::= { <parameter> [ ";" ] }
 <struct parameter> ::= <identifier> ":" [ "owned" ] <type> [ "=" <expression> ]
 
-<enum declarator> ::= "enum" "{" <enum value list> "}"
+<enum declarator> ::= "enum" <identifier> "{" <enum value list> "}"
 <enum value list> ::= <identifier> { "," <identifier> }
 
 <statement> ::= <import>
