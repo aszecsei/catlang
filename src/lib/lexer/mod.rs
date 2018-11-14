@@ -244,7 +244,7 @@ impl<'a> Scanner<'a> {
                     Token::GreaterThan
                 }
             }
-            Some('?') => Token::Optional,
+            Some('?') => Token::Question,
             Some('.') => {
                 if self.peek_char_eq('.') {
                     self.read_char();

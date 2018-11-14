@@ -7,9 +7,11 @@ extern crate human_panic;
 extern crate indicatif;
 #[macro_use]
 extern crate log;
+extern crate serde_yaml;
 
 use catlang::lexer;
 use catlang::logger;
+use catlang::parser;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use console::Emoji;
 use indicatif::{HumanBytes, HumanDuration};
@@ -104,20 +106,9 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
-        let mut scanner = lexer::Scanner::new(fname, &contents);
-        loop {
-            match scanner.current_lexeme {
-                None => break,
-                Some(lexeme) => {
-                    if lexeme.token == lexer::token::Token::EOF {
-                        debug!("EOF");
-                        break;
-                    }
-                    debug!("{:?}", lexeme.token);
-                    scanner.advance();
-                }
-            }
-        }
+        let mut main_block = parser::Parser::parse_file(fname, &contents);
+        let s = serde_yaml::to_string(&main_block).unwrap();
+        info!("{}", s);
     }
     Ok(())
 }

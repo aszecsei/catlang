@@ -2,7 +2,9 @@ use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+use serde_derive::{Serialize, Deserialize};
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Symbol(u32);
 
 impl Symbol {
