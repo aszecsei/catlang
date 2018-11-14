@@ -2,8 +2,8 @@ pub mod ast;
 
 use lexer;
 use lexer::token;
-use std::rc::Rc;
 use std::fmt;
+use std::rc::Rc;
 
 use log::error;
 
@@ -23,7 +23,6 @@ impl Error {
         Error { msg }
     }
 }
-
 
 pub struct Parser<'a> {
     fname: &'a str,
@@ -48,12 +47,18 @@ impl<'a> Parser<'a> {
         let r = match self.scanner.current_lexeme {
             Some(lexeme) => {
                 if lexeme.token != tok {
-                    Err(Error::new(format!("Expected '{}' but got '{}'", tok, lexeme.token)))
+                    Err(Error::new(format!(
+                        "Expected '{}' but got '{}'",
+                        tok, lexeme.token
+                    )))
                 } else {
                     Ok(())
                 }
             }
-            None => Err(Error::new(format!("Expected '{}' but no lexeme was found!", tok))),
+            None => Err(Error::new(format!(
+                "Expected '{}' but no lexeme was found!",
+                tok
+            ))),
         };
         self.next();
         r
@@ -87,13 +92,13 @@ impl<'a> Parser<'a> {
     }
 
     fn is_declaration_starter(t: token::Token) -> bool {
-        t == token::Token::Export ||
-               t == token::Token::Const ||
-               t == token::Token::Type ||
-               t == token::Token::Let ||
-               t == token::Token::Function ||
-               t == token::Token::Struct ||
-               t == token::Token::Enum
+        t == token::Token::Export
+            || t == token::Token::Const
+            || t == token::Token::Type
+            || t == token::Token::Let
+            || t == token::Token::Function
+            || t == token::Token::Struct
+            || t == token::Token::Enum
     }
 
     fn parse_block(&mut self) -> ast::Block {
@@ -121,17 +126,15 @@ impl<'a> Parser<'a> {
 
                     match self.expect(token::Token::Semicolon) {
                         Err(e) => self.errors.push(e),
-                        _ => ()
+                        _ => (),
                     };
-                },
+                }
                 _ => {
                     break;
                 }
             }
         }
-        ast::Block {
-            elements
-        }
+        ast::Block { elements }
     }
 
     fn parse_declaration(&mut self) -> Result<ast::Declaration, Error> {
@@ -146,31 +149,40 @@ impl<'a> Parser<'a> {
                 let declarator = self.parse_declarator()?;
                 Ok(ast::Declaration {
                     is_exported,
-                    declarator
+                    declarator,
                 })
-            },
-            _ => {
-                Err(Error::new(String::from("Unexpected end of file")))
             }
+            _ => Err(Error::new(String::from("Unexpected end of file"))),
         }
     }
 
     fn parse_declarator(&mut self) -> Result<ast::Declarator, Error> {
         match self.scanner.current_lexeme {
-            Some(l) => {
-                match l.token {
-                    token::Token::Const => Ok(ast::Declarator::ConstantDeclarator(self.parse_const_declarator()?)),
-                    token::Token::Type => Ok(ast::Declarator::TypeDeclarator(self.parse_type_declarator()?)),
-                    token::Token::Let => Ok(ast::Declarator::VariableDeclarator(self.parse_variable_declarator()?)),
-                    token::Token::Function => Ok(ast::Declarator::FunctionDeclarator(self.parse_function_declarator()?)),
-                    token::Token::Struct => Ok(ast::Declarator::StructDeclarator(self.parse_struct_declarator()?)),
-                    token::Token::Enum => Ok(ast::Declarator::EnumDeclarator(self.parse_enum_declarator()?)),
-                    _ => Err(Error::new(String::from(format!("Expected a declarator, got {}", l.token))))
-                }
+            Some(l) => match l.token {
+                token::Token::Const => Ok(ast::Declarator::ConstantDeclarator(
+                    self.parse_const_declarator()?,
+                )),
+                token::Token::Type => Ok(ast::Declarator::TypeDeclarator(
+                    self.parse_type_declarator()?,
+                )),
+                token::Token::Let => Ok(ast::Declarator::VariableDeclarator(
+                    self.parse_variable_declarator()?,
+                )),
+                token::Token::Function => Ok(ast::Declarator::FunctionDeclarator(
+                    self.parse_function_declarator()?,
+                )),
+                token::Token::Struct => Ok(ast::Declarator::StructDeclarator(
+                    self.parse_struct_declarator()?,
+                )),
+                token::Token::Enum => Ok(ast::Declarator::EnumDeclarator(
+                    self.parse_enum_declarator()?,
+                )),
+                _ => Err(Error::new(String::from(format!(
+                    "Expected a declarator, got {}",
+                    l.token
+                )))),
             },
-            _ => {
-                Err(Error::new(String::from("Unexpected end of file")))
-            }
+            _ => Err(Error::new(String::from("Unexpected end of file"))),
         }
     }
 
@@ -182,7 +194,7 @@ impl<'a> Parser<'a> {
 
         Ok(ast::ConstantDeclarator {
             identifier,
-            expression
+            expression,
         })
     }
 
@@ -194,7 +206,7 @@ impl<'a> Parser<'a> {
 
         Ok(ast::TypeDeclarator {
             identifier,
-            type_expression: assigned_type
+            type_expression: assigned_type,
         })
     }
 
@@ -203,35 +215,31 @@ impl<'a> Parser<'a> {
         let identifier = self.parse_identifier()?;
 
         let type_expression = match self.scanner.current_lexeme {
-            Some(l) => {
-                match l.token {
-                    token::Token::Colon => {
-                        self.next();
-                        Some(self.parse_type()?)
-                    },
-                    _ => None,
+            Some(l) => match l.token {
+                token::Token::Colon => {
+                    self.next();
+                    Some(self.parse_type()?)
                 }
+                _ => None,
             },
             _ => None,
         };
 
         let expression = match self.scanner.current_lexeme {
-            Some(l) => {
-                match l.token {
-                    token::Token::Assign => {
-                        self.next();
-                        Some(self.parse_expression()?)
-                    },
-                    _ => None
+            Some(l) => match l.token {
+                token::Token::Assign => {
+                    self.next();
+                    Some(self.parse_expression()?)
                 }
+                _ => None,
             },
-            _ => None
+            _ => None,
         };
 
-        Ok(ast::VariableDeclarator{
+        Ok(ast::VariableDeclarator {
             identifier,
             type_expression,
-            expression
+            expression,
         })
     }
 
@@ -244,9 +252,9 @@ impl<'a> Parser<'a> {
         let return_type = match self.scanner.current_lexeme {
             Some(l) => match l.token {
                 token::Token::LCurlyB => None,
-                _ => Some(self.parse_type()?)
+                _ => Some(self.parse_type()?),
             },
-            _ => None
+            _ => None,
         };
         self.expect(token::Token::LCurlyB)?;
         let block = self.parse_block();
@@ -256,7 +264,7 @@ impl<'a> Parser<'a> {
             identifier,
             parameters,
             return_type,
-            block
+            block,
         })
     }
 
@@ -266,16 +274,14 @@ impl<'a> Parser<'a> {
 
         loop {
             match self.scanner.current_lexeme {
-                Some(l) => {
-                    match l.token {
-                        token::Token::RParen => break,
-                        _ => {
-                            params.push(self.parse_parameter()?);
-                            self.expect(token::Token::Comma)?;
-                        }
+                Some(l) => match l.token {
+                    token::Token::RParen => break,
+                    _ => {
+                        params.push(self.parse_parameter()?);
+                        self.expect(token::Token::Comma)?;
                     }
                 },
-                _ => return Err(Error::new(String::from("Unexpected end of file")))
+                _ => return Err(Error::new(String::from("Unexpected end of file"))),
             }
         }
         self.expect(token::Token::RParen)?;
@@ -313,16 +319,14 @@ impl<'a> Parser<'a> {
 
         loop {
             match self.scanner.current_lexeme {
-                Some(l) => {
-                    match l.token {
-                        token::Token::RCurlyB => break,
-                        _ => {
-                            members.push(self.parse_struct_member()?);
-                            self.expect(token::Token::Semicolon)?;
-                        }
+                Some(l) => match l.token {
+                    token::Token::RCurlyB => break,
+                    _ => {
+                        members.push(self.parse_struct_member()?);
+                        self.expect(token::Token::Semicolon)?;
                     }
                 },
-                _ => return Err(Error::new(String::from("Unexpected end of file")))
+                _ => return Err(Error::new(String::from("Unexpected end of file"))),
             }
         }
         self.expect(token::Token::RCurlyB)?;
@@ -362,10 +366,7 @@ impl<'a> Parser<'a> {
         let identifier = self.parse_identifier()?;
         let values = self.parse_enum_value_list()?;
 
-        Ok(ast::EnumDeclarator {
-            identifier,
-            values
-        })
+        Ok(ast::EnumDeclarator { identifier, values })
     }
 
     fn parse_enum_value_list(&mut self) -> Result<Vec<ast::Ident>, Error> {
@@ -374,16 +375,14 @@ impl<'a> Parser<'a> {
 
         loop {
             match self.scanner.current_lexeme {
-                Some(l) => {
-                    match l.token {
-                        token::Token::RCurlyB => break,
-                        _ => {
-                            values.push(self.parse_identifier()?);
-                            self.expect(token::Token::Semicolon)?;
-                        }
+                Some(l) => match l.token {
+                    token::Token::RCurlyB => break,
+                    _ => {
+                        values.push(self.parse_identifier()?);
+                        self.expect(token::Token::Semicolon)?;
                     }
                 },
-                _ => return Err(Error::new(String::from("Unexpected end of file")))
+                _ => return Err(Error::new(String::from("Unexpected end of file"))),
             }
         }
         self.expect(token::Token::RCurlyB)?;
@@ -391,27 +390,21 @@ impl<'a> Parser<'a> {
         Ok(values)
     }
 
-
-
     fn parse_statement(&mut self) -> Result<ast::Statement, Error> {
         match self.scanner.current_lexeme {
-            Some(l) => {
-                match l.token {
-                    token::Token::Import => Ok(ast::Statement::ImportStatement(self.parse_import()?)),
-                    token::Token::LCurlyB => Ok(ast::Statement::InnerBlock(self.parse_inner_block()?)),
-                    token::Token::If => Ok(ast::Statement::IfStatement(self.parse_if()?)),
-                    token::Token::For => Ok(ast::Statement::LoopStatement(self.parse_loop()?)),
-                    token::Token::While => Ok(ast::Statement::LoopStatement(self.parse_loop()?)),
-                    token::Token::Do => Ok(ast::Statement::LoopStatement(self.parse_loop()?)),
-                    token::Token::Break => Ok(ast::Statement::JumpStatement(self.parse_jump()?)),
-                    token::Token::Continue => Ok(ast::Statement::JumpStatement(self.parse_jump()?)),
-                    token::Token::Return => Ok(ast::Statement::JumpStatement(self.parse_jump()?)),
-                    _ => Ok(ast::Statement::Expression(self.parse_expression()?))
-                }
+            Some(l) => match l.token {
+                token::Token::Import => Ok(ast::Statement::ImportStatement(self.parse_import()?)),
+                token::Token::LCurlyB => Ok(ast::Statement::InnerBlock(self.parse_inner_block()?)),
+                token::Token::If => Ok(ast::Statement::IfStatement(self.parse_if()?)),
+                token::Token::For => Ok(ast::Statement::LoopStatement(self.parse_loop()?)),
+                token::Token::While => Ok(ast::Statement::LoopStatement(self.parse_loop()?)),
+                token::Token::Do => Ok(ast::Statement::LoopStatement(self.parse_loop()?)),
+                token::Token::Break => Ok(ast::Statement::JumpStatement(self.parse_jump()?)),
+                token::Token::Continue => Ok(ast::Statement::JumpStatement(self.parse_jump()?)),
+                token::Token::Return => Ok(ast::Statement::JumpStatement(self.parse_jump()?)),
+                _ => Ok(ast::Statement::Expression(self.parse_expression()?)),
             },
-            _ => {
-                Err(Error::new(String::from("Unexpected end of file")))
-            }
+            _ => Err(Error::new(String::from("Unexpected end of file"))),
         }
     }
 
@@ -447,10 +440,17 @@ impl<'a> Parser<'a> {
     // Right-associative
     fn parse_assignment_expression(&mut self) -> Result<ast::Expression, Error> {
         let assignment_operators = vec![
-            token::Token::Assign, token::Token::AddAssign, token::Token::SubAssign,
-            token::Token::MulAssign, token::Token::QuoAssign, token::Token::ModAssign,
-            token::Token::BitOrAssign, token::Token::BitAndAssign, token::Token::XorAssign,
-            token::Token::ShiftLAssign, token::Token::ShiftRAssign,
+            token::Token::Assign,
+            token::Token::AddAssign,
+            token::Token::SubAssign,
+            token::Token::MulAssign,
+            token::Token::QuoAssign,
+            token::Token::ModAssign,
+            token::Token::BitOrAssign,
+            token::Token::BitAndAssign,
+            token::Token::XorAssign,
+            token::Token::ShiftLAssign,
+            token::Token::ShiftRAssign,
         ];
         let lhs = self.parse_conditional_expression()?;
         if let Some(l) = self.scanner.current_lexeme {
@@ -458,7 +458,7 @@ impl<'a> Parser<'a> {
                 let assignment_operator = l.token;
                 self.next();
                 let rhs = self.parse_expression()?;
-                Ok(ast::Expression::BinaryExpression(ast::BinaryExpression{
+                Ok(ast::Expression::BinaryExpression(ast::BinaryExpression {
                     left_hand_side: Box::new(lhs),
                     operator: assignment_operator,
                     right_hand_side: Box::new(rhs),
@@ -480,10 +480,10 @@ impl<'a> Parser<'a> {
                 let true_value = Box::new(self.parse_expression()?);
                 self.expect(token::Token::Colon)?;
                 let false_value = Box::new(self.parse_expression()?);
-                Ok(ast::Expression::TernaryExpression(ast::TernaryExpression{
+                Ok(ast::Expression::TernaryExpression(ast::TernaryExpression {
                     condition: Box::new(condition),
                     true_value,
-                    false_value
+                    false_value,
                 }))
             } else {
                 Ok(condition)
@@ -496,8 +496,12 @@ impl<'a> Parser<'a> {
     // Right-associative
     fn parse_comparing_expression(&mut self) -> Result<ast::Expression, Error> {
         let comparing_operators = vec![
-            token::Token::Equals, token::Token::GreaterThan, token::Token::GreaterThanEquals,
-            token::Token::NotEquals, token::Token::LessThan, token::Token::LessThanEquals,
+            token::Token::Equals,
+            token::Token::GreaterThan,
+            token::Token::GreaterThanEquals,
+            token::Token::NotEquals,
+            token::Token::LessThan,
+            token::Token::LessThanEquals,
             token::Token::In,
         ];
 
@@ -507,7 +511,7 @@ impl<'a> Parser<'a> {
                 let comparing_operator = l.token;
                 self.next();
                 let rhs = self.parse_expression()?;
-                Ok(ast::Expression::BinaryExpression(ast::BinaryExpression{
+                Ok(ast::Expression::BinaryExpression(ast::BinaryExpression {
                     left_hand_side: Box::new(lhs),
                     operator: comparing_operator,
                     right_hand_side: Box::new(rhs),
@@ -523,7 +527,10 @@ impl<'a> Parser<'a> {
     // Left-associative
     fn parse_comparand(&mut self) -> Result<ast::Expression, Error> {
         let adding_operators = vec![
-            token::Token::Add, token::Token::Sub, token::Token::Or, token::Token::BitOr,
+            token::Token::Add,
+            token::Token::Sub,
+            token::Token::Or,
+            token::Token::BitOr,
         ];
 
         let lhs = self.parse_term()?;
@@ -536,7 +543,7 @@ impl<'a> Parser<'a> {
                     self.next();
 
                     let rhs = self.parse_term()?;
-                    expr = ast::Expression::BinaryExpression(ast::BinaryExpression{
+                    expr = ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left_hand_side: Box::new(expr),
                         operator: adding_operator,
                         right_hand_side: Box::new(rhs),
@@ -554,7 +561,10 @@ impl<'a> Parser<'a> {
     // Left-associative
     fn parse_term(&mut self) -> Result<ast::Expression, Error> {
         let multiplying_operators = vec![
-            token::Token::Mul, token::Token::Quo, token::Token::And, token::Token::BitAnd,
+            token::Token::Mul,
+            token::Token::Quo,
+            token::Token::And,
+            token::Token::BitAnd,
         ];
 
         let lhs = self.parse_factor()?;
@@ -567,7 +577,7 @@ impl<'a> Parser<'a> {
                     self.next();
                     let rhs = self.parse_factor()?;
 
-                    expr = ast::Expression::BinaryExpression(ast::BinaryExpression{
+                    expr = ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left_hand_side: Box::new(expr),
                         operator: multiplying_operator,
                         right_hand_side: Box::new(rhs),
@@ -584,9 +594,7 @@ impl<'a> Parser<'a> {
 
     // Left-associative
     fn parse_factor(&mut self) -> Result<ast::Expression, Error> {
-        let shifting_operators = vec![
-            token::Token::ShiftL, token::Token::ShiftR
-        ];
+        let shifting_operators = vec![token::Token::ShiftL, token::Token::ShiftR];
 
         let lhs = self.parse_unary()?;
         let mut expr = lhs;
@@ -598,7 +606,7 @@ impl<'a> Parser<'a> {
                     self.next();
 
                     let rhs = self.parse_unary()?;
-                    expr = ast::Expression::BinaryExpression(ast::BinaryExpression{
+                    expr = ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left_hand_side: Box::new(expr),
                         operator: shifting_operator,
                         right_hand_side: Box::new(rhs),
@@ -615,17 +623,22 @@ impl<'a> Parser<'a> {
 
     fn parse_unary(&mut self) -> Result<ast::Expression, Error> {
         let unary_operators = vec![
-            token::Token::Not, token::Token::Sub, token::Token::Increment, token::Token::Decrement
+            token::Token::Not,
+            token::Token::Sub,
+            token::Token::Increment,
+            token::Token::Decrement,
         ];
 
         if let Some(l) = self.scanner.current_lexeme {
             if unary_operators.contains(&l.token) {
                 self.next();
                 let rhs = self.parse_unary()?;
-                Ok(ast::Expression::UnaryPrefixExpression(ast::UnaryExpression{
-                    operator: l.token,
-                    expression: Box::new(rhs)
-                }))
+                Ok(ast::Expression::UnaryPrefixExpression(
+                    ast::UnaryExpression {
+                        operator: l.token,
+                        expression: Box::new(rhs),
+                    },
+                ))
             } else {
                 let mut expr = self.parse_primary_expression()?;
                 loop {
@@ -634,7 +647,7 @@ impl<'a> Parser<'a> {
                             self.next();
                             expr = ast::Expression::UnaryPostfixExpression(ast::UnaryExpression {
                                 operator: l2.token,
-                                expression: Box::new(expr)
+                                expression: Box::new(expr),
                             });
                         } else {
                             break;
@@ -651,7 +664,9 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_primary_expression(&mut self) -> Result<ast::Expression, Error> {
-        Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Reference(ast::Reference::Ident(self.parse_identifier()?))))
+        Ok(ast::Expression::PrimaryExpression(
+            ast::PrimaryExpression::Reference(ast::Reference::Ident(self.parse_identifier()?)),
+        ))
     }
 
     fn parse_type(&mut self) -> Result<ast::TypeExpression, Error> {
@@ -661,16 +676,17 @@ impl<'a> Parser<'a> {
 
     fn parse_identifier(&mut self) -> Result<ast::Ident, Error> {
         match self.scanner.current_lexeme {
-            Some(l) => {
-                match l.token {
-                    token::Token::Ident(sym) => {
-                        self.next();
-                        Ok(ast::Ident{ name: sym })
-                    },
-                    _ => Err(Error::new(format!("Expected identifier but got {}", l.token)))
+            Some(l) => match l.token {
+                token::Token::Ident(sym) => {
+                    self.next();
+                    Ok(ast::Ident { name: sym })
                 }
+                _ => Err(Error::new(format!(
+                    "Expected identifier but got {}",
+                    l.token
+                ))),
             },
-            _ => Err(Error::new(String::from("Unexpected end of file")))
+            _ => Err(Error::new(String::from("Unexpected end of file"))),
         }
     }
 }

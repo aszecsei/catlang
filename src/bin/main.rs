@@ -35,12 +35,14 @@ fn main() {
                 .help("sets the level of verbosity")
                 .global(true)
                 .conflicts_with("quiet"),
-        ).arg(
+        )
+        .arg(
             Arg::with_name("quiet")
                 .long("quiet")
                 .help("Quiet output")
                 .global(true),
-        ).subcommand(SubCommand::with_name("init").about("initialize a new catlang project"))
+        )
+        .subcommand(SubCommand::with_name("init").about("initialize a new catlang project"))
         .subcommand(
             SubCommand::with_name("build")
                 .about("build an executable")
@@ -49,19 +51,22 @@ fn main() {
                         .short("o")
                         .default_value("main")
                         .help("output binary name"),
-                ).arg(
+                )
+                .arg(
                     Arg::with_name("INPUT")
                         .required(true)
                         .index(1)
                         .help("application entry point"),
-                ).arg(
+                )
+                .arg(
                     Arg::with_name("optimization")
                         .short("O")
                         .default_value("2")
                         .possible_values(&["0", "1", "2", "3"])
                         .help("LLVM optimization level"),
                 ),
-        ).get_matches();
+        )
+        .get_matches();
 
     if let Err(e) = run(&matches) {
         panic!("Application error: {}", e);

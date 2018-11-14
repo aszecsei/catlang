@@ -1,6 +1,6 @@
 use lexer::symbol::Symbol;
+use serde_derive::{Deserialize, Serialize};
 use std::fmt;
-use serde_derive::{Serialize, Deserialize};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub enum Token {

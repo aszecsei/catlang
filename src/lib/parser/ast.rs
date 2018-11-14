@@ -3,7 +3,7 @@ use lexer::symbol;
 use lexer::token;
 use std::rc::Rc;
 
-use serde_derive::{Serialize, Deserialize};
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Block {
