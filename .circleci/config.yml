@@ -83,7 +83,7 @@ workflows:
       - build:
           filters:
             branches:
-              not:
+              ignore:
                 - gh-pages
       - deploy-website:
           filters:
