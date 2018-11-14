@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://aszecsei.github.io/catlang/blog</id>
+    <title>Catlang Blog</title>
+    <updated>2018-10-17T06:00:00Z</updated>
+    <generator>Feed for Node.js</generator>
+    <link rel="alternate" href="https://aszecsei.github.io/catlang/blog"/>
+    <subtitle>The best place to stay up-to-date with the latest Catlang news and events.</subtitle>
+    <logo>https://aszecsei.github.io/catlang/img/docusaurus.svg</logo>
+    <rights>Copyright © 2018 Alic Szecsei</rights>
+    <entry>
+        <title type="html"><![CDATA[Hello, World!]]></title>
+        <id>https://aszecsei.github.io/catlang/blog/2018/10/17/hello-world.html</id>
+        <link href="https://aszecsei.github.io/catlang/blog/2018/10/17/hello-world.html">
+        </link>
+        <updated>2018-10-17T06:00:00Z</updated>
+        <summary type="html"><![CDATA[<p>While much of Catlang is progressing nicely (the grammar is almost entirely fleshed out!) there have been a few setbacks. Namely, we're switching from Go to Rust - which is a net positive, but requires re-writing some of the existing code.</p>
+]]></summary>
+        <author>
+            <name>Alic Szecsei</name>
+            <uri>https://alic-szecsei.com/</uri>
+        </author>
+    </entry>
+</feed>
