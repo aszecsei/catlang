@@ -8,14 +8,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install rustfmt
-          command: rustup component add rustfmt-preview
-      - run:
           name: Install nightly & stable
           command: |
             rustup install nightly
             rustup install stable
             rustup update
+      - run:
+          name: Install rustfmt
+          command: rustup component add rustfmt-preview --toolchain nightly
       - restore_cache:
           keys:
             - rust-mod-v1-{{ checksum "Cargo.lock" }}
