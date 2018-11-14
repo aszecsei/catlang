@@ -1,0 +1,19 @@
+{
+  "docs": {
+    "Intro": ["what-and-why"],
+    "Setup": ["installation", "editor-plugins"],
+    "Language Basics": [
+      "overview",
+      "functions",
+      "typing",
+      "casting",
+      "native-types",
+      "generics",
+      "project-structure",
+      "build-system"
+    ]
+  },
+  "api": {
+    "Index": ["api-index"]
+  }
+}

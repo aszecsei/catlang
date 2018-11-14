@@ -119,10 +119,9 @@
 
 <struct declarator> ::= "struct" <identifier> "{" <struct parameter list> "}"
 <struct parameter list> ::= { <parameter> [ ";" ] }
-<struct parameter> ::= [ "owned" ] <identifier> ":" <type> [ "=" <expression> ]
-                    |  [ "owned" ] <identifier> "=" <expression>
+<struct parameter> ::= <identifier> ":" [ "owned" ] <type> [ "=" <expression> ]
 
-<enum declarator> ::= "enum" "{" <enum value list> "}"
+<enum declarator> ::= "enum" <identifier> "{" <enum value list> "}"
 <enum value list> ::= <identifier> { "," <identifier> }
 
 <statement> ::= <import>
@@ -141,7 +140,7 @@
                      | "*" "as" <identifier>
 
 <inner block> ::= "{" <block> "}"
-<if> ::= "if" <expression> "{" <block> "}" { <elif> } [ <else> ]
+<if> ::= "if" "(" <expression> ")" "{" <block> "}" { <elif> } [ <else> ]
 <elif> ::= "else if" <expression> "{" <block> "}"
 <else> ::= "else" "{" <block> "}"
 
@@ -192,16 +191,16 @@
                       |  "in"
                       |  "is"
 
-<adding operator> ::= "+"
-                   |  "-"
-                   |  "|"
-                   |  "^"
+<adding operator> ::= "+" [ "=" ]
+                   |  "-" [ "=" ]
+                   |  "|" [ "=" ]
+                   |  "^" [ "=" ]
                    |  "||"
 
-<multiplying operator> ::= "*"
-                        |  "/"
-                        |  "%"
-                        |  "&"
+<multiplying operator> ::= "*" [ "=" ]
+                        |  "/" [ "=" ]
+                        |  "%" [ "=" ]
+                        |  "&" [ "=" ]
                         |  "&&"
 
 <factor> ::= [ "-" | "!" ] <primary expression>

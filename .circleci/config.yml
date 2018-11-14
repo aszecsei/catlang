@@ -3,20 +3,86 @@ jobs:
   build:
     docker:
       # specify the version
-      - image: circleci/golang:1.11.1
+      - image: circleci/rust:latest
     working_directory: ~/catlang
     steps:
       - checkout
+      - run:
+          name: Install nightly & stable
+          command: |
+            rustup install nightly
+            rustup install stable
+            rustup update
+      - run:
+          name: Install rustfmt
+          command: rustup component add rustfmt-preview --toolchain nightly
       - restore_cache:
           keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go run mage.go coverage
+            - rust-mod-v1-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Check formatting
+          command: |
+            cargo +nightly fmt --version
+            cargo +nightly fmt --all -- --check
+      - run:
+          name: Nightly Build
+          command: |
+            rustup run nightly rustc --version --verbose
+            rustup run nightly cargo --version --verbose
+            rustup run nightly cargo build
+      - run:
+          name: Stable Build
+          command: |
+            rustup run stable rustc --version --verbose
+            rustup run stable cargo --version --verbose
+            rustup run stable cargo build
+      - run:
+          name: Test
+          command: rustup run stable cargo test
+      - run:
+          name: Upload Coverage
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libcurl4-openssl-dev libelf-dev libdw-dev cmake gcc binutils-dev libiberty-dev
+            wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+            tar xzf master.tar.gz &&
+            cd kcov-master &&
+            mkdir build &&
+            cd build &&
+            cmake .. &&
+            make &&
+            make install DESTDIR=../../kcov-build &&
+            cd ../.. &&
+            rm -rf kcov-master &&
+            for file in target/debug/catlang-*[^\.d]; do mkdir -p "target/cov/$(basename $file)"; ./kcov-build/usr/local/bin/kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
+            bash <(curl -s https://codecov.io/bash) &&
+            echo "Uploaded code coverage"
       - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
+          key: rust-mod-v1-{{ checksum "Cargo.lock" }}
           paths:
-            - "/go/pkg/mod"
+            - "~/.cargo"
+            - "./target"
+  deploy-website:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8.11.1
+
+    steps:
+      - checkout
+      - run:
+          name: Deploying to GitHub Pages
+          command: |
+            git config --global user.email "aszecsei@users.noreply.github.com"
+            git config --global user.name "Alic Szecsei"
+            echo "machine github.com login aszecsei password $GITHUB_TOKEN" > ~/.netrc
+            cd website && yarn install && GIT_USER=aszecsei yarn run publish-gh-pages
 workflows:
   version: 2
-  build_and_test:
+  build_and_deploy:
     jobs:
       - build
+      - deploy-website:
+          filters:
+            branches:
+              only:
+                - master

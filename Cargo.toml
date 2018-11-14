@@ -1,0 +1,35 @@
+[package]
+name = "catlang"
+version = "0.1.0"
+authors = ["Alic Szecsei <aszecsei@gmail.com>"]
+publish = false
+description = "A compiler for the Catlang programming language"
+documentation = "aszecsei.github.io/catlang"
+repository = "github.com/aszecsei/catlang"
+
+readme = "README.md"
+
+keywords = ["catlang", "compiler"]
+
+license = "MIT"
+
+[dependencies]
+chrono = "0.4.6"
+clap = "2.32.0"
+console = "0.6.2"
+fnv = "1.0.6"
+human-panic = "1.0.1"
+indicatif = "0.9.0"
+lazy_static = "1.1.0"
+log = "0.4.5"
+serde = "1.0.80"
+serde_derive = "1.0.80"
+serde_yaml = "0.8.7"
+
+[lib]
+name = "catlang"
+path = "src/lib/lib.rs"
+
+[[bin]]
+name = "catlang"
+path = "src/bin/main.rs"
