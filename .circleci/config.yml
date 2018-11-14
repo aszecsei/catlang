@@ -22,8 +22,8 @@ jobs:
       - run:
           name: Check formatting
           command: |
-            rustfmt --version
-            cargo fmt --all -- --check
+            cargo +nightly fmt --version
+            cargo +nightly fmt --all -- --check
       - run:
           name: Nightly Build
           command: |
