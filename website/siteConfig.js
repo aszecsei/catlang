@@ -23,8 +23,8 @@ const users = [
 const siteConfig = {
   title: "Catlang", // Title for your website.
   tagline: "A strongly-typed language without the pain",
-  url: "https://aszecsei.github.io/catlang", // Your website URL
-  baseUrl: "/", // Base URL for your project */
+  url: "https://aszecsei.github.io", // Your website URL
+  baseUrl: "/catlang/", // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
