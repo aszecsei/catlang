@@ -860,4 +860,13 @@ mod tests {
         assert!(res2.is_err());
         assert!(res3.is_err());
     }
+
+    #[test]
+    fn test_is_declaration_starter() {
+        let r1 = Parser::is_declaration_starter(token::Token::Function);
+        let r2 = Parser::is_declaration_starter(token::Token::Comma);
+
+        assert!(r1);
+        assert!(!r2);
+    }
 }
