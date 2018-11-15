@@ -168,7 +168,7 @@
 <pointer type> ::= "*" <type>
 <sized array type> ::= "[" <expression> "]" <type>
 <unsized array type> ::= "[" ".." "]" <type>
-<type union> ::= <type> "|" <type>
+<type union> ::= <type> { "|" <type> }
 <typeof expression> ::= "typeof" <expression>
 <optional type> ::= <type> "?"
 <named type> ::= <identifier>
