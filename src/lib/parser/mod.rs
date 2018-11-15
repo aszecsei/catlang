@@ -5,7 +5,7 @@ use lexer::token;
 use std::fmt;
 use std::rc::Rc;
 
-use log::error;
+use log::{debug, error};
 
 pub struct Error {
     // TODO: Add position information
@@ -106,8 +106,14 @@ impl<'a> Parser<'a> {
         loop {
             match self.scanner.current_lexeme {
                 Some(l) => {
+                    debug!("Parsing start of block element: {:?}", l.token);
                     if l.token == token::Token::EOF || l.token == token::Token::RCurlyB {
                         break;
+                    }
+
+                    if l.token == token::Token::Semicolon {
+                        self.next();
+                        continue;
                     }
 
                     if Parser::is_declaration_starter(l.token) {
@@ -122,11 +128,6 @@ impl<'a> Parser<'a> {
                             Err(e) => self.errors.push(e),
                             Ok(s) => elements.push(Box::new(ast::BlockElement::Statement(s))),
                         };
-                    };
-
-                    match self.expect(token::Token::Semicolon) {
-                        Err(e) => self.errors.push(e),
-                        _ => (),
                     };
                 }
                 _ => {
@@ -272,14 +273,24 @@ impl<'a> Parser<'a> {
         let mut params = vec![];
         self.expect(token::Token::LParen)?;
 
+        if let Some(l) = self.scanner.current_lexeme {
+            if l.token == token::Token::RParen {
+                self.next();
+                return Ok(params);
+            } else {
+                params.push(self.parse_parameter()?);
+            }
+        }
+
         loop {
             match self.scanner.current_lexeme {
                 Some(l) => match l.token {
                     token::Token::RParen => break,
-                    _ => {
+                    token::Token::Comma => {
+                        self.next();
                         params.push(self.parse_parameter()?);
-                        self.expect(token::Token::Comma)?;
                     }
+                    _ => return Err(Error::new(format!("Unexpected token {:?}", l.token))),
                 },
                 _ => return Err(Error::new(String::from("Unexpected end of file"))),
             }
@@ -622,15 +633,17 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_unary(&mut self) -> Result<ast::Expression, Error> {
-        let unary_operators = vec![
+        let prefix_unary_operators = vec![
             token::Token::Not,
             token::Token::Sub,
             token::Token::Increment,
             token::Token::Decrement,
         ];
 
+        let postfix_unary_operators = vec![token::Token::Increment, token::Token::Decrement];
+
         if let Some(l) = self.scanner.current_lexeme {
-            if unary_operators.contains(&l.token) {
+            if prefix_unary_operators.contains(&l.token) {
                 self.next();
                 let rhs = self.parse_unary()?;
                 Ok(ast::Expression::UnaryPrefixExpression(
@@ -643,7 +656,7 @@ impl<'a> Parser<'a> {
                 let mut expr = self.parse_primary_expression()?;
                 loop {
                     if let Some(l2) = self.scanner.current_lexeme {
-                        if unary_operators.contains(&l2.token) {
+                        if postfix_unary_operators.contains(&l2.token) {
                             self.next();
                             expr = ast::Expression::UnaryPostfixExpression(ast::UnaryExpression {
                                 operator: l2.token,
@@ -664,14 +677,155 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_primary_expression(&mut self) -> Result<ast::Expression, Error> {
-        Ok(ast::Expression::PrimaryExpression(
-            ast::PrimaryExpression::Reference(ast::Reference::Ident(self.parse_identifier()?)),
-        ))
+        let l = self.scanner.current_lexeme.unwrap(); // TODO: Unwrap
+        match l.token {
+            token::Token::Integer(x) => {
+                self.next();
+                Ok(ast::Expression::PrimaryExpression(
+                    ast::PrimaryExpression::Literal(l.token),
+                ))
+            }
+            token::Token::String(x) => {
+                self.next();
+                Ok(ast::Expression::PrimaryExpression(
+                    ast::PrimaryExpression::Literal(l.token),
+                ))
+            }
+            token::Token::Null => {
+                self.next();
+                Ok(ast::Expression::PrimaryExpression(
+                    ast::PrimaryExpression::Null,
+                ))
+            }
+            token::Token::LParen => {
+                self.next(); // Consume left paren
+                             // Determine if this is a lambda or a subexpression
+                let x = self.scanner.next_lexeme.unwrap(); // TODO: Unwrap
+                if l.token == token::Token::Colon {
+                    // TODO: Lambdas
+                    Err(Error::new(String::from("Lambdas are not yet supported")))
+                } else {
+                    let r = self.parse_expression()?;
+                    self.expect(token::Token::RParen)?;
+                    Ok(ast::Expression::PrimaryExpression(
+                        ast::PrimaryExpression::SubExpression(Box::new(r)),
+                    ))
+                }
+            }
+            _ => Ok(ast::Expression::PrimaryExpression(
+                ast::PrimaryExpression::Reference(self.parse_reference()?),
+            )),
+        }
+    }
+
+    fn parse_reference(&mut self) -> Result<ast::Reference, Error> {
+        let l = self.scanner.current_lexeme.unwrap(); // TODO: Unwrap
+        let r = match l.token {
+            token::Token::At => {
+                self.next();
+                ast::Reference::AddressOf(Box::new(self.parse_reference()?))
+            }
+            token::Token::Mul => {
+                self.next();
+                ast::Reference::Dereference(Box::new(self.parse_reference()?))
+            }
+            _ => ast::Reference::Ident(self.parse_identifier()?),
+        };
+
+        // TODO: member access
+        // TODO: function call
+        // TODO: constructor call
+        // TODO: array reference
+        // TODO: cast reference
+
+        Ok(r)
     }
 
     fn parse_type(&mut self) -> Result<ast::TypeExpression, Error> {
-        self.next();
-        Err(Error::new(String::from("Type expressions not implemented")))
+        let mut type_expr = self.parse_unary_type()?;
+        loop {
+            if let Some(l) = self.scanner.current_lexeme {
+                match l.token {
+                    token::Token::BitOr => {
+                        // Type union
+                        self.next();
+                        let other_type = self.parse_unary_type()?;
+                        type_expr = ast::TypeExpression::TypeUnion(ast::TypeUnion {
+                            first_type: Box::new(type_expr),
+                            second_type: Box::new(other_type),
+                        });
+                    }
+                    _ => {
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+        Ok(type_expr)
+    }
+
+    fn parse_unary_type(&mut self) -> Result<ast::TypeExpression, Error> {
+        let l = self.scanner.current_lexeme.unwrap(); // TODO: Unwrap
+        let mut type_expr = match l.token {
+            token::Token::Mul => {
+                self.next();
+                ast::TypeExpression::PointerType(Box::new(self.parse_unary_type()?))
+            }
+            token::Token::LSquareB => {
+                self.next();
+                let l2 = self.scanner.current_lexeme.unwrap(); // TODO: Unwrap
+                match l2.token {
+                    token::Token::DotDot => {
+                        // Unsized array
+                        self.next();
+                        self.expect(token::Token::RSquareB)?;
+                        let array_type = self.parse_unary_type()?;
+                        ast::TypeExpression::UnsizedArrayType(Box::new(array_type))
+                    }
+                    _ => {
+                        // Sized array
+                        let array_size = self.parse_expression()?;
+                        self.expect(token::Token::RSquareB)?;
+                        let array_type = self.parse_unary_type()?;
+                        ast::TypeExpression::SizedArrayType(ast::SizedArrayType {
+                            size: array_size,
+                            type_expression: Box::new(array_type),
+                        })
+                    }
+                }
+            }
+            token::Token::Typeof => {
+                self.next();
+                let expr = self.parse_expression()?;
+                ast::TypeExpression::TypeofExpression(expr)
+            }
+            token::Token::LParen => {
+                self.next();
+                let t = self.parse_type()?;
+                self.expect(token::Token::RParen)?;
+                t
+            }
+            _ => ast::TypeExpression::NamedType(self.parse_identifier()?),
+        };
+        loop {
+            if let Some(l) = self.scanner.current_lexeme {
+                match l.token {
+                    token::Token::Question => {
+                        // Optional type
+                        self.next();
+                        type_expr = ast::TypeExpression::OptionalType(Box::new(type_expr));
+                    }
+                    _ => {
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+        Ok(type_expr)
     }
 
     fn parse_identifier(&mut self) -> Result<ast::Ident, Error> {
@@ -688,5 +842,22 @@ impl<'a> Parser<'a> {
             },
             _ => Err(Error::new(String::from("Unexpected end of file"))),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_expect() {
+        let mut p = Parser::new("test.cat", "; 21", None);
+        let res1 = p.expect(token::Token::Semicolon);
+        let res2 = p.expect(token::Token::Semicolon);
+        let res3 = p.expect(token::Token::Semicolon);
+
+        assert!(res1.is_ok());
+        assert!(res2.is_err());
+        assert!(res3.is_err());
     }
 }

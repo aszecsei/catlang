@@ -1,3 +1,9 @@
-let x = y + z + w;
-x += y++++;
-z = --y + x;
+let x: int | *string | [..](double | string) = (2 + 3) * 4 + 1;
+let y = 2;
+x += y++;
+export const z = x + --y;
+
+function timesTwo(x: int) -> {
+    x += 2;
+}
+export let w = "Hello, world!";

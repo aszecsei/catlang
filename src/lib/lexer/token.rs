@@ -97,6 +97,7 @@ pub enum Token {
     Else,
     Break,
     Continue,
+    Null,
 }
 
 impl Default for Token {
@@ -201,6 +202,7 @@ impl fmt::Display for Token {
             Token::Else => write!(f, "else"),
             Token::Break => write!(f, "break"),
             Token::Continue => write!(f, "continue"),
+            Token::Null => write!(f, "null"),
         }
     }
 }
@@ -233,6 +235,7 @@ impl Token {
             "else" => Token::Else,
             "break" => Token::Break,
             "continue" => Token::Continue,
+            "null" => Token::Null,
             _ => Token::Ident(Symbol::intern(ident)),
         }
     }
