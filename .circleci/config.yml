@@ -54,7 +54,7 @@ jobs:
             make install DESTDIR=../../kcov-build &&
             cd ../.. &&
             rm -rf kcov-master &&
-            ./kcov-build/usr/local/bin/kco --coveralls-id=$COVERALLS_TOKEN --exclude-pattern=/.cargo,/usr/lib --verify target/cov target/debug/catlang
+            ./kcov-build/usr/local/bin/kcov --coveralls-id=$COVERALLS_TOKEN --exclude-pattern=/.cargo,/usr/lib --verify target/cov target/debug/catlang
             echo "Uploaded code coverage"
       - save_cache:
           key: rust-mod-v1-{{ checksum "Cargo.lock" }}
