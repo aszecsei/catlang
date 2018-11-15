@@ -622,15 +622,20 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_unary(&mut self) -> Result<ast::Expression, Error> {
-        let unary_operators = vec![
+        let prefix_unary_operators = vec![
             token::Token::Not,
             token::Token::Sub,
             token::Token::Increment,
             token::Token::Decrement,
         ];
 
+        let postfix_unary_operators = vec![
+            token::Token::Increment,
+            token::Token::Decrement,
+        ];
+
         if let Some(l) = self.scanner.current_lexeme {
-            if unary_operators.contains(&l.token) {
+            if prefix_unary_operators.contains(&l.token) {
                 self.next();
                 let rhs = self.parse_unary()?;
                 Ok(ast::Expression::UnaryPrefixExpression(
@@ -643,7 +648,7 @@ impl<'a> Parser<'a> {
                 let mut expr = self.parse_primary_expression()?;
                 loop {
                     if let Some(l2) = self.scanner.current_lexeme {
-                        if unary_operators.contains(&l2.token) {
+                        if postfix_unary_operators.contains(&l2.token) {
                             self.next();
                             expr = ast::Expression::UnaryPostfixExpression(ast::UnaryExpression {
                                 operator: l2.token,
@@ -664,9 +669,58 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_primary_expression(&mut self) -> Result<ast::Expression, Error> {
-        Ok(ast::Expression::PrimaryExpression(
-            ast::PrimaryExpression::Reference(ast::Reference::Ident(self.parse_identifier()?)),
-        ))
+        let l = self.scanner.current_lexeme.unwrap(); // TODO: Unwrap
+        match l.token {
+            token::Token::Integer(x) => {
+                self.next();
+                Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Literal(l.token)))
+            },
+            token::Token::String(x) => {
+                self.next();
+                Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Literal(l.token)))
+            },
+            token::Token::Null => {
+                self.next();
+                Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Null))
+            },
+            token::Token::LParen => {
+                self.next(); // Consume left paren
+                // Determine if this is a lambda or a subexpression
+                let x = self.scanner.next_lexeme.unwrap(); // TODO: Unwrap
+                if l.token == token::Token::Colon {
+                    // TODO: Lambdas
+                    Err(Error::new(String::from("Lambdas are not yet supported")))
+                } else {
+                    let r = self.parse_expression()?;
+                    self.expect(token::Token::RParen)?;
+                    Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::SubExpression(Box::new(r))))
+                }
+            },
+            _ => Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Reference(self.parse_reference()?)))
+        }
+    }
+
+    fn parse_reference(&mut self) -> Result<ast::Reference, Error> {
+        let l = self.scanner.current_lexeme.unwrap(); // TODO: Unwrap
+        let r = match l.token {
+            token::Token::At => {
+                self.next();
+                ast::Reference::AddressOf(Box::new(self.parse_reference()?))
+            },
+            token::Token::Mul => {
+                self.next();
+                ast::Reference::Dereference(Box::new(self.parse_reference()?))
+            },
+            _ => ast::Reference::Ident(self.parse_identifier()?)
+        };
+
+        // TODO: member access
+        // TODO: function call
+        // TODO: constructor call
+        // TODO: array reference
+        // TODO: cast reference
+
+        Ok(r)
     }
 
     fn parse_type(&mut self) -> Result<ast::TypeExpression, Error> {
