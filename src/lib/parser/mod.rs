@@ -629,10 +629,7 @@ impl<'a> Parser<'a> {
             token::Token::Decrement,
         ];
 
-        let postfix_unary_operators = vec![
-            token::Token::Increment,
-            token::Token::Decrement,
-        ];
+        let postfix_unary_operators = vec![token::Token::Increment, token::Token::Decrement];
 
         if let Some(l) = self.scanner.current_lexeme {
             if prefix_unary_operators.contains(&l.token) {
@@ -673,19 +670,25 @@ impl<'a> Parser<'a> {
         match l.token {
             token::Token::Integer(x) => {
                 self.next();
-                Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Literal(l.token)))
-            },
+                Ok(ast::Expression::PrimaryExpression(
+                    ast::PrimaryExpression::Literal(l.token),
+                ))
+            }
             token::Token::String(x) => {
                 self.next();
-                Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Literal(l.token)))
-            },
+                Ok(ast::Expression::PrimaryExpression(
+                    ast::PrimaryExpression::Literal(l.token),
+                ))
+            }
             token::Token::Null => {
                 self.next();
-                Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Null))
-            },
+                Ok(ast::Expression::PrimaryExpression(
+                    ast::PrimaryExpression::Null,
+                ))
+            }
             token::Token::LParen => {
                 self.next(); // Consume left paren
-                // Determine if this is a lambda or a subexpression
+                             // Determine if this is a lambda or a subexpression
                 let x = self.scanner.next_lexeme.unwrap(); // TODO: Unwrap
                 if l.token == token::Token::Colon {
                     // TODO: Lambdas
@@ -693,10 +696,14 @@ impl<'a> Parser<'a> {
                 } else {
                     let r = self.parse_expression()?;
                     self.expect(token::Token::RParen)?;
-                    Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::SubExpression(Box::new(r))))
+                    Ok(ast::Expression::PrimaryExpression(
+                        ast::PrimaryExpression::SubExpression(Box::new(r)),
+                    ))
                 }
-            },
-            _ => Ok(ast::Expression::PrimaryExpression(ast::PrimaryExpression::Reference(self.parse_reference()?)))
+            }
+            _ => Ok(ast::Expression::PrimaryExpression(
+                ast::PrimaryExpression::Reference(self.parse_reference()?),
+            )),
         }
     }
 
@@ -706,12 +713,12 @@ impl<'a> Parser<'a> {
             token::Token::At => {
                 self.next();
                 ast::Reference::AddressOf(Box::new(self.parse_reference()?))
-            },
+            }
             token::Token::Mul => {
                 self.next();
                 ast::Reference::Dereference(Box::new(self.parse_reference()?))
-            },
-            _ => ast::Reference::Ident(self.parse_identifier()?)
+            }
+            _ => ast::Reference::Ident(self.parse_identifier()?),
         };
 
         // TODO: member access
