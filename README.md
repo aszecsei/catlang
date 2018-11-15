@@ -1,5 +1,7 @@
 [![CircleCI](https://circleci.com/gh/aszecsei/catlang/tree/master.svg?style=svg)](https://circleci.com/gh/aszecsei/catlang/tree/master)
-[![Coverage Status](https://coveralls.io/repos/github/aszecsei/catlang/badge.svg?branch=master)](https://coveralls.io/github/aszecsei/catlang?branch=master)
+[![codecov](https://codecov.io/gh/aszecsei/catlang/branch/master/graph/badge.svg)](https://codecov.io/gh/aszecsei/catlang)
+
+
 
 # Language Guide
 
