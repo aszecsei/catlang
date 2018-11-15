@@ -43,8 +43,18 @@ jobs:
           name: Upload Coverage
           command: |
             sudo apt-get update
-            sudo apt-get install -y kcov
-            kcov --coveralls-id=$COVERALLS_TOKEN --exclude-pattern=/.cargo,/usr/lib --verify target/cov target/debug/catlang
+            sudo apt-get install -y libcurl4-openssl-dev libelf-dev libdw-dev cmake gcc binutils-dev libiberty-dev
+            wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+            tar xzf master.tar.gz &&
+            cd kcov-master &&
+            mkdir build &&
+            cd build &&
+            cmake .. &&
+            make &&
+            make install DESTDIR=../../kcov-build &&
+            cd ../.. &&
+            rm -rf kcov-master &&
+            ./kcov-build/usr/local/bin/kco --coveralls-id=$COVERALLS_TOKEN --exclude-pattern=/.cargo,/usr/lib --verify target/cov target/debug/catlang
             echo "Uploaded code coverage"
       - save_cache:
           key: rust-mod-v1-{{ checksum "Cargo.lock" }}
