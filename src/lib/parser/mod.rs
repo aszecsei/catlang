@@ -844,3 +844,20 @@ impl<'a> Parser<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_expect() {
+        let mut p = Parser::new("test.cat", "; 21", None);
+        let res1 = p.expect(token::Token::Semicolon);
+        let res2 = p.expect(token::Token::Semicolon);
+        let res3 = p.expect(token::Token::Semicolon);
+
+        assert!(res1.is_ok());
+        assert!(res2.is_err());
+        assert!(res3.is_err());
+    }
+}
