@@ -38,7 +38,7 @@ jobs:
             rustup run stable cargo build
       - run:
           name: Test
-          command: rustup run stable cargo test
+          command: rustup run stable cargo test --no-run
       - run:
           name: Upload Coverage
           command: |
