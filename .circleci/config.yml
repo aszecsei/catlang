@@ -38,24 +38,16 @@ jobs:
             rustup run stable cargo build
       - run:
           name: Test
-          command: rustup run stable cargo test
+          command: rustup run stable cargo test --no-run
       - run:
           name: Upload Coverage
           command: |
             sudo apt-get update
-            sudo apt-get install -y libcurl4-openssl-dev libelf-dev libdw-dev cmake gcc binutils-dev libiberty-dev
-            wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
-            tar xzf master.tar.gz &&
-            cd kcov-master &&
-            mkdir build &&
-            cd build &&
-            cmake .. &&
-            make &&
-            make install DESTDIR=../../kcov-build &&
-            cd ../.. &&
-            rm -rf kcov-master &&
-            for file in target/debug/catlang-*[^\.d]; do mkdir -p "target/cov/$(basename $file)"; ./kcov-build/usr/local/bin/kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
-            bash <(curl -s https://codecov.io/bash) &&
+            sudo apt-get install -y libssl-dev pkg-config cmake zlib1g-dev
+            RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo +nightly install cargo-tarpaulin
+            cargo +nightly tarpaulin --version
+            cargo +nightly tarpaulin -v --ciserver circle-ci --coveralls $COVERALLS_TOKEN
+
             echo "Uploaded code coverage"
       - save_cache:
           key: rust-mod-v1-{{ checksum "Cargo.lock" }}
