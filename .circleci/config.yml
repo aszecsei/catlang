@@ -46,7 +46,8 @@ jobs:
             sudo apt-get install -y libssl-dev pkg-config cmake zlib1g-dev
             RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo +nightly install cargo-tarpaulin
             cargo +nightly tarpaulin --version
-            cargo +nightly tarpaulin -vvv --ciserver circle-ci --coveralls $COVERALLS_TOKEN
+            cargo +nightly tarpaulin --no-count --skip-clean --out Xml
+            bash <(curl -s https://codecov.io/bash)
 
             echo "Uploaded code coverage"
       - save_cache:
