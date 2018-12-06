@@ -10,15 +10,5 @@ macro_rules! c_str {
 }
 
 pub fn codegen(block: ast::Block, out_name: &str) {
-    unsafe {
-        let context = LLVMContextCreate();
-        let module = LLVMModuleCreateWithName(c_str!("main"));
-        let builder = LLVMCreateBuilderInContext(context);
-
-        LLVMWriteBitcodeToFile(module, out_name);
-        LLVMDisposeBuilder(builder);
-
-        LLVMDisposeModule(module);
-        LLVMContextDispose(context);
-    }
+    // TODO
 }
