@@ -1,28 +1,31 @@
 use fnv::FnvHashMap;
-use lexer::symbol;
-use lexer::token;
 use std::rc::Rc;
+use syntax::token;
+use syntax::token::Symbol;
 
-use serde_derive::{Deserialize, Serialize};
+use syntax::source_map::Span;
 
-#[derive(Debug, Serialize, Deserialize)]
+/// A collection of statements
+#[derive(Clone, Debug)]
 pub struct Block {
-    pub elements: Vec<Box<BlockElement>>,
+    /// Statements and declarations in a block
+    pub elements: Vec<BlockElement>,
+    pub span: Span,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum BlockElement {
     Declaration(Declaration),
     Statement(Statement),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct Declaration {
     pub is_exported: bool,
     pub declarator: Declarator,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum Declarator {
     ConstantDeclarator(ConstantDeclarator),
     TypeDeclarator(TypeDeclarator),
@@ -32,26 +35,26 @@ pub enum Declarator {
     EnumDeclarator(EnumDeclarator),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ConstantDeclarator {
     pub identifier: Ident,
     pub expression: Expression,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct TypeDeclarator {
     pub identifier: Ident,
     pub type_expression: TypeExpression,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct VariableDeclarator {
     pub identifier: Ident,
     pub type_expression: Option<TypeExpression>,
     pub expression: Option<Expression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct FunctionDeclarator {
     pub identifier: Ident,
     pub parameters: Vec<Parameter>,
@@ -59,21 +62,21 @@ pub struct FunctionDeclarator {
     pub block: Block,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct Parameter {
     pub is_const: bool,
     pub identifier: Ident,
     pub type_expression: TypeExpression,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct StructDeclarator {
     pub identifier: Ident,
     pub is_soa: bool,
     pub members: Vec<StructMember>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct StructMember {
     pub identifier: Ident,
     pub is_owned: bool,
@@ -81,13 +84,13 @@ pub struct StructMember {
     pub default_value: Option<Expression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct EnumDeclarator {
     pub identifier: Ident,
     pub values: Vec<Ident>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum Statement {
     ImportStatement(ImportStatement),
     InnerBlock(Block),
@@ -97,33 +100,33 @@ pub enum Statement {
     Expression(Expression),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ImportStatement {
     pub is_reexport: bool,
     pub import_list: Vec<ImportIdentifier>,
-    pub path: symbol::Symbol,
+    pub path: Symbol,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ImportIdentifier {
     pub old_name: Ident,
     pub new_name: Ident,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct IfStatement {
     pub condition: Expression,
     pub true_block: Block,
     pub else_block: Option<Box<Conditional>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum Conditional {
     If(IfStatement),
     Else(Block),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum LoopStatement {
     ForLoop(ForLoop),
     ForInLoop(ForInLoop),
@@ -131,7 +134,7 @@ pub enum LoopStatement {
     DoWhileLoop(WhileLoop),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ForLoop {
     pub initial_expression: Option<Expression>,
     pub condition_expression: Option<Expression>,
@@ -139,27 +142,27 @@ pub struct ForLoop {
     pub block: Block,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ForInLoop {
     pub identifier: Ident,
     pub range: Expression,
     pub block: Block,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct WhileLoop {
     pub condition: Expression,
     pub block: Block,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum JumpStatement {
     Break,
     Continue,
     Return(Expression),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum TypeExpression {
     PointerType(Box<TypeExpression>),
     SizedArrayType(SizedArrayType),
@@ -170,19 +173,19 @@ pub enum TypeExpression {
     NamedType(Ident),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct SizedArrayType {
     pub size: Expression,
     pub type_expression: Box<TypeExpression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct TypeUnion {
     pub first_type: Box<TypeExpression>,
     pub second_type: Box<TypeExpression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum Expression {
     UnaryPrefixExpression(UnaryExpression),
     UnaryPostfixExpression(UnaryExpression),
@@ -191,27 +194,27 @@ pub enum Expression {
     PrimaryExpression(PrimaryExpression),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct UnaryExpression {
     pub operator: token::Token,
     pub expression: Box<Expression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct BinaryExpression {
     pub left_hand_side: Box<Expression>,
     pub operator: token::Token,
     pub right_hand_side: Box<Expression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct TernaryExpression {
     pub condition: Box<Expression>,
     pub true_value: Box<Expression>,
     pub false_value: Box<Expression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum PrimaryExpression {
     Literal(token::Token),
     Null,
@@ -220,13 +223,13 @@ pub enum PrimaryExpression {
     Reference(Reference),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct LambdaExpression {
     pub parameters: Vec<Parameter>,
     pub block: Block,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum Reference {
     Ident(Ident),
     AddressOf(Box<Reference>),
@@ -238,52 +241,52 @@ pub enum Reference {
     CastReference(CastReference),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct MemberAccess {
     pub reference: Box<Reference>,
     pub member_ident: Ident,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct FunctionCall {
     pub function: Box<Reference>,
     pub args: Vec<Expression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ConstructorCall {
     pub is_heap: bool,
     pub object_type: Box<Reference>,
     pub constructor_args: Option<Vec<Expression>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ArrayAccess {
     pub arr_reference: Box<Reference>,
     pub indices: Vec<Expression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct CastReference {
     pub is_unsafe: bool,
     pub reference: Box<Reference>,
     pub new_type: Box<TypeExpression>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct Ident {
-    pub name: symbol::Symbol,
+    pub name: Symbol,
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Object {
-    pub name: symbol::Symbol,
+    pub name: Symbol,
 }
 
 #[derive(Clone, Debug)]
 pub struct Scope {
     pub parent: Option<Rc<Scope>>,
-    table: FnvHashMap<symbol::Symbol, Object>,
+    table: FnvHashMap<Symbol, Object>,
 }
 
 impl Scope {
@@ -298,7 +301,7 @@ impl Scope {
         self.table.insert(ob.name, ob)
     }
 
-    pub fn lookup(&self, ident: &symbol::Symbol) -> Option<&Object> {
+    pub fn lookup(&self, ident: &Symbol) -> Option<&Object> {
         self.table.get(ident)
     }
 }

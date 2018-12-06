@@ -9,15 +9,20 @@ extern crate indicatif;
 extern crate log;
 extern crate serde_yaml;
 
-use catlang::lexer;
-use catlang::logger;
-use catlang::parser;
+use catlang::syntax::logger;
+// use catlang::syntax::parser;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use console::Emoji;
 use indicatif::{HumanBytes, HumanDuration};
 use std::fs;
 use std::io::prelude::*;
 use std::time::Instant;
+
+macro_rules! c_str {
+    ($s:expr) => (
+        concat!($s, "\0").as_ptr() as *const i8
+    );
+}
 
 fn main() {
     setup_panic!();
@@ -111,9 +116,12 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
-        let mut main_block = parser::Parser::parse_file(fname, &contents);
-        let s = serde_yaml::to_string(&main_block).unwrap();
-        info!("{}", s);
+        let mut context = catlang::syntax::context::Context::new();
+        let mut main_block = catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
+
+        let out_fname = m.value_of("output").unwrap_or("out.c");
+
+        catlang::syntax::codegen::llvm::codegen(main_block, );
     }
     Ok(())
 }
