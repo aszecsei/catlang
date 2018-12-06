@@ -243,7 +243,7 @@ impl<'a> Parser<'a> {
                 return Err(Error::new(String::from(format!(
                     "Expected either a return type or function start but got {}",
                     tok
-                ))))
+                ))));
             }
         };
         self.expect(token::Token::LCurlyB)?;
