@@ -121,7 +121,7 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
 
         let out_fname = m.value_of("output").unwrap_or("out.c");
 
-        catlang::syntax::codegen::llvm::codegen(main_block, );
+        catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
     }
     Ok(())
 }

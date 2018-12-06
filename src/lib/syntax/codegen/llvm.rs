@@ -9,7 +9,7 @@ macro_rules! c_str {
     );
 }
 
-pub fn codegen(block: ast::Block, out_name: *const i8) {
+pub fn codegen(block: ast::Block, out_name: &str) {
     unsafe {
         let context = LLVMContextCreate();
         let module = LLVMModuleCreateWithName(c_str!("main"));
