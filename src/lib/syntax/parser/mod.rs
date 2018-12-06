@@ -1,12 +1,12 @@
 use std::rc::Rc;
-use syntax::ast;
-use syntax::lexer;
-use syntax::token;
+use crate::syntax::ast;
+use crate::syntax::lexer;
+use crate::syntax::token;
 
 use log::{debug, error};
 
-use syntax::error::Error;
-use syntax::context::Context;
+use crate::syntax::error::Error;
+use crate::syntax::context::Context;
 
 pub struct Parser<'a> {
     fname: &'a str,

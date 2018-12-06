@@ -1,9 +1,9 @@
 use fnv::FnvHashMap;
 use std::rc::Rc;
-use syntax::token;
-use syntax::token::Symbol;
+use crate::syntax::token;
+use crate::syntax::token::Symbol;
 
-use syntax::source_map::Span;
+use crate::syntax::source_map::Span;
 
 /// A collection of statements
 #[derive(Clone, Debug)]

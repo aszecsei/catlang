@@ -4,10 +4,10 @@ use std::ops::Deref;
 use std::rc::Rc;
 use std::str::Chars;
 
-use syntax::context::Context;
-use syntax::source_map::DUMMY_SPAN;
-use syntax::source_map::{Pos, SourceFile, Span};
-use syntax::token::Token;
+use crate::syntax::context::Context;
+use crate::syntax::source_map::DUMMY_SPAN;
+use crate::syntax::source_map::{Pos, SourceFile, Span};
+use crate::syntax::token::Token;
 
 #[derive(Clone, Debug)]
 pub struct TokenAndSpan {

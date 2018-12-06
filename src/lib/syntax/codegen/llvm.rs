@@ -1,4 +1,4 @@
-use syntax::ast;
+use crate::syntax::ast;
 
 macro_rules! c_str {
     ($s:expr) => (
@@ -6,6 +6,6 @@ macro_rules! c_str {
     );
 }
 
-pub fn codegen(block: ast::Block, out_name: &str) {
+pub fn codegen(_block: ast::Block, _out_name: &str) {
     // TODO
 }

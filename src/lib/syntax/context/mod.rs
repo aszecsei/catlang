@@ -1,8 +1,8 @@
 use fnv::FnvHashMap;
 use id_arena::Arena;
 
-use syntax::source_map::SourceMap;
-use syntax::token::Symbol;
+use crate::syntax::source_map::SourceMap;
+use crate::syntax::token::Symbol;
 
 pub struct Context {
     strings: Arena<String>,
