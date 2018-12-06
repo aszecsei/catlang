@@ -1,12 +1,12 @@
-use std::rc::Rc;
 use crate::syntax::ast;
 use crate::syntax::lexer;
 use crate::syntax::token;
+use std::rc::Rc;
 
 use log::{debug, error};
 
-use crate::syntax::error::Error;
 use crate::syntax::context::Context;
+use crate::syntax::error::Error;
 
 pub struct Parser<'a> {
     fname: &'a str,
@@ -44,7 +44,12 @@ impl<'a> Parser<'a> {
         r
     }
 
-    fn new(fname: &'a str, src: &'a str, scope: Option<ast::Scope>, context: &'a mut Context) -> Self {
+    fn new(
+        fname: &'a str,
+        src: &'a str,
+        scope: Option<ast::Scope>,
+        context: &'a mut Context,
+    ) -> Self {
         let scope = match scope {
             Some(s) => s,
             None => ast::Scope::new(None),
@@ -121,10 +126,7 @@ impl<'a> Parser<'a> {
                 }
             }
         }
-        ast::Block {
-            elements,
-            span: sp,
-        }
+        ast::Block { elements, span: sp }
     }
 
     fn parse_declaration(&mut self) -> Result<ast::Declaration, Error> {
@@ -141,7 +143,7 @@ impl<'a> Parser<'a> {
                 let d = self.parse_declarator()?;
                 Ok(ast::Declaration {
                     is_exported: false,
-                    declarator: d
+                    declarator: d,
                 })
             }
         }
@@ -182,7 +184,7 @@ impl<'a> Parser<'a> {
 
         Ok(ast::ConstantDeclarator {
             identifier,
-            expression
+            expression,
         })
     }
 
@@ -221,7 +223,7 @@ impl<'a> Parser<'a> {
         Ok(ast::VariableDeclarator {
             identifier,
             type_expression,
-            expression
+            expression,
         })
     }
 
@@ -237,7 +239,12 @@ impl<'a> Parser<'a> {
                 self.next();
                 Some(self.parse_type()?)
             }
-            tok => return Err(Error::new(String::from(format!("Expected either a return type or function start but got {}", tok))))
+            tok => {
+                return Err(Error::new(String::from(format!(
+                    "Expected either a return type or function start but got {}",
+                    tok
+                ))))
+            }
         };
         self.expect(token::Token::LCurlyB)?;
         let block = self.parse_block();
@@ -283,8 +290,8 @@ impl<'a> Parser<'a> {
             token::Token::Const => {
                 self.next();
                 true
-            },
-            _ => false
+            }
+            _ => false,
         };
         let identifier = self.parse_identifier()?;
         self.expect(token::Token::Colon)?;
@@ -335,8 +342,8 @@ impl<'a> Parser<'a> {
             token::Token::Owned => {
                 self.next();
                 true
-            },
-            _ => false
+            }
+            _ => false,
         };
 
         let type_expression = self.parse_type()?;
@@ -783,10 +790,7 @@ impl<'a> Parser<'a> {
                 self.next();
                 Ok(ast::Ident { name: sym })
             }
-            tok => Err(Error::new(format!(
-                "Expected identifier but got {}",
-                tok
-            ))),
+            tok => Err(Error::new(format!("Expected identifier but got {}", tok))),
         }
     }
 }

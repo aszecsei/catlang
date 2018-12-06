@@ -19,9 +19,9 @@ use std::io::prelude::*;
 use std::time::Instant;
 
 macro_rules! c_str {
-    ($s:expr) => (
+    ($s:expr) => {
         concat!($s, "\0").as_ptr() as *const i8
-    );
+    };
 }
 
 fn main() {
@@ -117,7 +117,8 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
         file.read_to_string(&mut contents)?;
 
         let mut context = catlang::syntax::context::Context::new();
-        let mut main_block = catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
+        let mut main_block =
+            catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
 
         let out_fname = m.value_of("output").unwrap_or("out.c");
 

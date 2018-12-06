@@ -1,4 +1,4 @@
-use log::{error, debug};
+use log::{debug, error};
 use std::iter::Peekable;
 use std::ops::Deref;
 use std::rc::Rc;
@@ -102,7 +102,7 @@ impl<'a> StringReader<'a> {
         let res = self.src.peek();
         match res {
             Some(&peek_ch) => Some(peek_ch),
-            None => None
+            None => None,
         }
     }
 
@@ -177,7 +177,10 @@ impl<'a> StringReader<'a> {
 
                     Some(TokenAndSpan {
                         tok: Token::Comment,
-                        sp: Span { low: start_pos, high: self.pos },
+                        sp: Span {
+                            low: start_pos,
+                            high: self.pos,
+                        },
                     })
                 }
                 Some('*') => {
@@ -185,14 +188,15 @@ impl<'a> StringReader<'a> {
                     self.bump();
                     self.bump(); // Skip the /*
                     while !self.is_eof() {
-                        match self.ch.unwrap() { // TODO: Look into level-based block comments
+                        match self.ch.unwrap() {
+                            // TODO: Look into level-based block comments
                             '*' => {
                                 if self.nextch_is('/') {
                                     self.bump();
                                     self.bump();
                                     break;
                                 }
-                            },
+                            }
                             _ => (),
                         }
                         self.bump();
@@ -200,10 +204,13 @@ impl<'a> StringReader<'a> {
 
                     Some(TokenAndSpan {
                         tok: Token::Comment,
-                        sp: Span { low: start_pos, high: self.pos },
+                        sp: Span {
+                            low: start_pos,
+                            high: self.pos,
+                        },
                     })
                 }
-                _ => None
+                _ => None,
             }
         } else {
             None
@@ -216,7 +223,7 @@ impl<'a> StringReader<'a> {
                 let c = self.scan_comment();
                 debug!("Scanning a comment {:?}", c);
                 c
-            },
+            }
             c if c.is_whitespace() => {
                 let start_pos = self.pos;
                 while self.ch.map_or(false, |c| c.is_whitespace()) {
@@ -224,7 +231,10 @@ impl<'a> StringReader<'a> {
                 }
                 let c = Some(TokenAndSpan {
                     tok: Token::Whitespace,
-                    sp: Span { low: start_pos, high: self.pos },
+                    sp: Span {
+                        low: start_pos,
+                        high: self.pos,
+                    },
                 });
                 debug!("Scanning whitespace: {:?}", c);
                 c
@@ -266,7 +276,6 @@ impl<'a> StringReader<'a> {
                     Token::Ident(ident)
                 }
             };
-
 
             return Ok(result);
         }
@@ -518,7 +527,7 @@ impl<'a> StringReader<'a> {
             }
             '\'' => self.scan_char_literal(),
             '"' => self.scan_string_literal(),
-            _ => Err(())
+            _ => Err(()),
         }
     }
 
@@ -587,8 +596,5 @@ fn ident_continue(c: Option<char>) -> bool {
         None => return false,
     };
 
-    (c >= 'a' && c <= 'z')
-        || (c >= 'A' && c <= 'Z')
-        || (c >= '0' && c <= '9')
-        || c == '_' // TODO: Handle unicode
+    (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' // TODO: Handle unicode
 }

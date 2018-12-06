@@ -1,7 +1,7 @@
-use fnv::FnvHashMap;
-use std::rc::Rc;
 use crate::syntax::token;
 use crate::syntax::token::Symbol;
+use fnv::FnvHashMap;
+use std::rc::Rc;
 
 use crate::syntax::source_map::Span;
 

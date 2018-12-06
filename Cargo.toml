@@ -12,6 +12,7 @@ readme = "README.md"
 keywords = ["catlang", "compiler"]
 
 license = "MIT"
+edition = "2018"
 
 [dependencies]
 chrono = "0.4.6"
