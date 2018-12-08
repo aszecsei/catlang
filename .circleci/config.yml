@@ -15,15 +15,15 @@ jobs:
             rustup update
       - run:
           name: Install rustfmt
-          command: rustup component add rustfmt-preview --toolchain nightly
+          command: rustup component add rustfmt
       - restore_cache:
           keys:
             - rust-mod-v1-{{ checksum "Cargo.lock" }}
       - run:
           name: Check formatting
           command: |
-            cargo +nightly fmt --version
-            cargo +nightly fmt --all -- --check
+            cargo fmt --version
+            cargo fmt --all -- --check
       - run:
           name: Nightly Build
           command: |
