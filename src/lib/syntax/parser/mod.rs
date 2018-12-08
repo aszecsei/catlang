@@ -14,6 +14,7 @@ pub struct Parser<'a> {
     scanner: lexer::StringReader<'a>,
     current_scope: Rc<ast::Scope>,
     top_scope: Rc<ast::Scope>,
+    expected_tokens: Vec<token::Token>,
 }
 
 impl<'a> Parser<'a> {
@@ -25,23 +26,6 @@ impl<'a> Parser<'a> {
             error!("{}", e.get_msg());
         }
         res
-    }
-
-    fn expect(&mut self, tok: token::Token) -> Result<(), Error> {
-        let r = {
-            let lexeme = self.scanner.token().tok;
-
-            if lexeme != tok {
-                Err(Error::new(format!(
-                    "Expected '{}' but got '{}'",
-                    tok, lexeme
-                )))
-            } else {
-                Ok(())
-            }
-        };
-        self.next();
-        r
     }
 
     fn new(
@@ -68,13 +52,86 @@ impl<'a> Parser<'a> {
             scanner: lexer::StringReader::new(context, source_file.clone(), src),
             current_scope: rc_scope.clone(),
             top_scope: rc_scope,
+            expected_tokens: Vec::new(),
         };
-        p.next();
+        p.scanner.next(); // Initialize peek_token
+        p.bump();
         p
     }
 
-    fn next(&mut self) {
+    pub fn bump(&mut self) {
+        if self.scanner.token().tok == token::Token::EOF {
+            // error
+        }
         self.scanner.next();
+        // Skip whitespace and comments
+        while self.scanner.token().tok == token::Token::Whitespace
+            || self.scanner.token().tok == token::Token::Comment
+        {
+            self.scanner.next();
+        }
+        self.expected_tokens.clear();
+    }
+
+    /// Expect and consume the token `t`. Signal an error if
+    /// the next token is not t.
+    fn expect(&mut self, t: &token::Token) -> Result<(), Error> {
+        if self.expected_tokens.is_empty() {
+            if self.scanner.token().tok == *t {
+                self.bump();
+                Ok(())
+            } else {
+                let err = Error::new(format!(
+                    "expected {:?}, found {:?}",
+                    t,
+                    self.scanner.token().tok
+                ));
+                Err(err)
+            }
+        } else {
+            self.expect_one_of(&[*t], &[])
+        }
+    }
+
+    /// Expect next token to be edible or inedible token. If edible,
+    /// then consume it; if inedible, then return without consuming
+    /// anything. Signal a fatal error if next token is unexpected.
+    fn expect_one_of(
+        &mut self,
+        edible: &[token::Token],
+        inedible: &[token::Token],
+    ) -> Result<(), Error> {
+        if edible.contains(&self.scanner.token().tok) {
+            self.bump();
+            Ok(())
+        } else if inedible.contains(&self.scanner.token().tok) {
+            // leave it in the input
+            Ok(())
+        } else {
+            Err(Error::new("Uh-oh!".to_string())) // TODO: Improve error handling
+        }
+    }
+
+    /// Check if the next token is `tok` and return `true` if so.
+    ///
+    /// This method will automatically add `tok` to `expected_tokens` if `tok` is not
+    /// encountered.
+    fn check(&mut self, tok: &token::Token) -> bool {
+        let is_present = self.scanner.token().tok == *tok;
+        if !is_present {
+            self.expected_tokens.push(tok.clone());
+        }
+        is_present
+    }
+
+    /// Consume token `tok` if it exists. Returns true if the given
+    /// token was present, false otherwise.
+    fn eat(&mut self, tok: &token::Token) -> bool {
+        let is_present = self.check(tok);
+        if is_present {
+            self.bump()
+        }
+        is_present
     }
 
     fn open_scope(&mut self) {
@@ -103,7 +160,7 @@ impl<'a> Parser<'a> {
                 token::Token::EOF => break,
                 token::Token::RCurlyB => break,
                 token::Token::Semicolon => {
-                    self.next();
+                    self.bump();
                     continue;
                 }
                 tok => {
@@ -132,7 +189,7 @@ impl<'a> Parser<'a> {
     fn parse_declaration(&mut self) -> Result<ast::Declaration, Error> {
         match self.scanner.token().tok {
             token::Token::Export => {
-                self.next();
+                self.bump();
                 let d = self.parse_declarator()?;
                 Ok(ast::Declaration {
                     is_exported: true,
@@ -177,9 +234,9 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_const_declarator(&mut self) -> Result<ast::ConstantDeclarator, Error> {
-        self.expect(token::Token::Const)?;
+        self.expect(&token::Token::Const)?;
         let identifier = self.parse_identifier()?;
-        self.expect(token::Token::Assign)?;
+        self.expect(&token::Token::Assign)?;
         let expression = self.parse_expression()?;
 
         Ok(ast::ConstantDeclarator {
@@ -189,9 +246,9 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_type_declarator(&mut self) -> Result<ast::TypeDeclarator, Error> {
-        self.expect(token::Token::Type)?;
+        self.expect(&token::Token::Type)?;
         let identifier = self.parse_identifier()?;
-        self.expect(token::Token::Equals)?;
+        self.expect(&token::Token::Equals)?;
         let assigned_type = self.parse_type()?;
 
         Ok(ast::TypeDeclarator {
@@ -201,12 +258,12 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_variable_declarator(&mut self) -> Result<ast::VariableDeclarator, Error> {
-        self.expect(token::Token::Let)?;
+        self.expect(&token::Token::Let)?;
         let identifier = self.parse_identifier()?;
 
         let type_expression = match self.scanner.token().tok {
             token::Token::Colon => {
-                self.next();
+                self.bump();
                 Some(self.parse_type()?)
             }
             _ => None,
@@ -214,7 +271,7 @@ impl<'a> Parser<'a> {
 
         let expression = match self.scanner.token().tok {
             token::Token::Assign => {
-                self.next();
+                self.bump();
                 Some(self.parse_expression()?)
             }
             _ => None,
@@ -228,15 +285,15 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_function_declarator(&mut self) -> Result<ast::FunctionDeclarator, Error> {
-        self.expect(token::Token::Function)?;
+        self.expect(&token::Token::Function)?;
         let identifier = self.parse_identifier()?;
         let parameters = self.parse_formal_parameter_list()?;
-        self.expect(token::Token::Arrow)?;
+        self.expect(&token::Token::Arrow)?;
 
         let return_type = match self.scanner.token().tok {
             token::Token::LCurlyB => None,
             token::Token::Arrow => {
-                self.next();
+                self.bump();
                 Some(self.parse_type()?)
             }
             tok => {
@@ -246,9 +303,9 @@ impl<'a> Parser<'a> {
                 ))));
             }
         };
-        self.expect(token::Token::LCurlyB)?;
+        self.expect(&token::Token::LCurlyB)?;
         let block = self.parse_block();
-        self.expect(token::Token::RCurlyB)?;
+        self.expect(&token::Token::RCurlyB)?;
 
         Ok(ast::FunctionDeclarator {
             identifier,
@@ -260,11 +317,11 @@ impl<'a> Parser<'a> {
 
     fn parse_formal_parameter_list(&mut self) -> Result<Vec<ast::Parameter>, Error> {
         let mut params = vec![];
-        self.expect(token::Token::LParen)?;
+        self.expect(&token::Token::LParen)?;
 
         match self.scanner.token().tok {
             token::Token::RParen => {
-                self.next();
+                self.bump();
                 return Ok(params);
             }
             _ => params.push(self.parse_parameter()?),
@@ -274,13 +331,13 @@ impl<'a> Parser<'a> {
             match self.scanner.token().tok {
                 token::Token::RParen => break,
                 token::Token::Comma => {
-                    self.next();
+                    self.bump();
                     params.push(self.parse_parameter()?);
                 }
                 tok => return Err(Error::new(format!("Unexpected token {:?}", tok))),
             }
         }
-        self.expect(token::Token::RParen)?;
+        self.expect(&token::Token::RParen)?;
 
         Ok(params)
     }
@@ -288,13 +345,13 @@ impl<'a> Parser<'a> {
     fn parse_parameter(&mut self) -> Result<ast::Parameter, Error> {
         let is_const = match self.scanner.token().tok {
             token::Token::Const => {
-                self.next();
+                self.bump();
                 true
             }
             _ => false,
         };
         let identifier = self.parse_identifier()?;
-        self.expect(token::Token::Colon)?;
+        self.expect(&token::Token::Colon)?;
         let type_expression = self.parse_type()?;
 
         Ok(ast::Parameter {
@@ -305,7 +362,7 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_struct_declarator(&mut self) -> Result<ast::StructDeclarator, Error> {
-        self.expect(token::Token::Struct)?;
+        self.expect(&token::Token::Struct)?;
         let identifier = self.parse_identifier()?;
         let members = self.parse_struct_members()?;
 
@@ -318,29 +375,29 @@ impl<'a> Parser<'a> {
 
     fn parse_struct_members(&mut self) -> Result<Vec<ast::StructMember>, Error> {
         let mut members = vec![];
-        self.expect(token::Token::LCurlyB)?;
+        self.expect(&token::Token::LCurlyB)?;
 
         loop {
             match self.scanner.token().tok {
                 token::Token::RCurlyB => break,
                 _ => {
                     members.push(self.parse_struct_member()?);
-                    self.expect(token::Token::Semicolon)?;
+                    self.expect(&token::Token::Semicolon)?;
                 }
             }
         }
-        self.expect(token::Token::RCurlyB)?;
+        self.expect(&token::Token::RCurlyB)?;
 
         Ok(members)
     }
 
     fn parse_struct_member(&mut self) -> Result<ast::StructMember, Error> {
         let identifier = self.parse_identifier()?;
-        self.expect(token::Token::Colon)?;
+        self.expect(&token::Token::Colon)?;
 
         let is_owned = match self.scanner.token().tok {
             token::Token::Owned => {
-                self.next();
+                self.bump();
                 true
             }
             _ => false,
@@ -348,9 +405,7 @@ impl<'a> Parser<'a> {
 
         let type_expression = self.parse_type()?;
 
-        let has_default_value = self.scanner.token().tok == token::Token::Assign;
-        let default_value = if has_default_value {
-            self.next();
+        let default_value = if self.eat(&token::Token::Assign) {
             Some(self.parse_expression()?)
         } else {
             None
@@ -365,7 +420,7 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_enum_declarator(&mut self) -> Result<ast::EnumDeclarator, Error> {
-        self.expect(token::Token::Enum)?;
+        self.expect(&token::Token::Enum)?;
         let identifier = self.parse_identifier()?;
         let values = self.parse_enum_value_list()?;
 
@@ -374,18 +429,18 @@ impl<'a> Parser<'a> {
 
     fn parse_enum_value_list(&mut self) -> Result<Vec<ast::Ident>, Error> {
         let mut values = vec![];
-        self.expect(token::Token::LCurlyB)?;
+        self.expect(&token::Token::LCurlyB)?;
 
         loop {
             match self.scanner.token().tok {
                 token::Token::RCurlyB => break,
                 _ => {
                     values.push(self.parse_identifier()?);
-                    self.expect(token::Token::Semicolon)?;
+                    self.expect(&token::Token::Semicolon)?;
                 }
             }
         }
-        self.expect(token::Token::RCurlyB)?;
+        self.expect(&token::Token::RCurlyB)?;
 
         Ok(values)
     }
@@ -406,27 +461,32 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_import(&mut self) -> Result<ast::ImportStatement, Error> {
-        self.next();
+        self.bump();
+        // TODO
         Err(Error::new(String::from("Imports not implemented")))
     }
 
     fn parse_inner_block(&mut self) -> Result<ast::Block, Error> {
-        self.next();
+        self.bump();
+        // TODO
         Err(Error::new(String::from("Inner blocks not implemented")))
     }
 
     fn parse_if(&mut self) -> Result<ast::IfStatement, Error> {
-        self.next();
+        self.bump();
+        // TODO
         Err(Error::new(String::from("If statements not implemented")))
     }
 
     fn parse_loop(&mut self) -> Result<ast::LoopStatement, Error> {
-        self.next();
+        self.bump();
+        // TODO
         Err(Error::new(String::from("Loops not implemented")))
     }
 
     fn parse_jump(&mut self) -> Result<ast::JumpStatement, Error> {
-        self.next();
+        self.bump();
+        // TODO
         Err(Error::new(String::from("Jumps not implemented")))
     }
 
@@ -453,7 +513,7 @@ impl<'a> Parser<'a> {
         let tok = self.scanner.token().tok;
         if assignment_operators.contains(&tok) {
             let assignment_operator = tok;
-            self.next();
+            self.bump();
             let rhs = self.parse_expression()?;
             Ok(ast::Expression::BinaryExpression(ast::BinaryExpression {
                 left_hand_side: Box::new(lhs),
@@ -468,11 +528,9 @@ impl<'a> Parser<'a> {
     // Right-associative
     fn parse_conditional_expression(&mut self) -> Result<ast::Expression, Error> {
         let condition = self.parse_comparing_expression()?;
-        let tok = self.scanner.token().tok;
-        if tok == token::Token::Question {
-            self.next();
+        if self.eat(&token::Token::Question) {
             let true_value = Box::new(self.parse_expression()?);
-            self.expect(token::Token::Colon)?;
+            self.expect(&token::Token::Colon)?;
             let false_value = Box::new(self.parse_expression()?);
             Ok(ast::Expression::TernaryExpression(ast::TernaryExpression {
                 condition: Box::new(condition),
@@ -500,7 +558,7 @@ impl<'a> Parser<'a> {
         let tok = self.scanner.token().tok;
         if comparing_operators.contains(&tok) {
             let comparing_operator = tok;
-            self.next();
+            self.bump();
             let rhs = self.parse_expression()?;
             Ok(ast::Expression::BinaryExpression(ast::BinaryExpression {
                 left_hand_side: Box::new(lhs),
@@ -528,7 +586,7 @@ impl<'a> Parser<'a> {
             let tok = self.scanner.token().tok;
             if adding_operators.contains(&tok) {
                 let adding_operator = tok;
-                self.next();
+                self.bump();
 
                 let rhs = self.parse_term()?;
                 expr = ast::Expression::BinaryExpression(ast::BinaryExpression {
@@ -559,7 +617,7 @@ impl<'a> Parser<'a> {
             let tok = self.scanner.token().tok;
             if multiplying_operators.contains(&tok) {
                 let multiplying_operator = tok;
-                self.next();
+                self.bump();
                 let rhs = self.parse_factor()?;
 
                 expr = ast::Expression::BinaryExpression(ast::BinaryExpression {
@@ -568,6 +626,7 @@ impl<'a> Parser<'a> {
                     right_hand_side: Box::new(rhs),
                 });
             } else {
+                println!("Found {:?}", tok);
                 break;
             }
         }
@@ -585,7 +644,7 @@ impl<'a> Parser<'a> {
             let tok = self.scanner.token().tok;
             if shifting_operators.contains(&tok) {
                 let shifting_operator = tok;
-                self.next();
+                self.bump();
 
                 let rhs = self.parse_unary()?;
                 expr = ast::Expression::BinaryExpression(ast::BinaryExpression {
@@ -612,7 +671,7 @@ impl<'a> Parser<'a> {
 
         let tok = self.scanner.token().tok;
         if prefix_unary_operators.contains(&tok) {
-            self.next();
+            self.bump();
             let rhs = self.parse_unary()?;
             Ok(ast::Expression::UnaryPrefixExpression(
                 ast::UnaryExpression {
@@ -625,7 +684,7 @@ impl<'a> Parser<'a> {
             loop {
                 let tok = self.scanner.token().tok;
                 if postfix_unary_operators.contains(&tok) {
-                    self.next();
+                    self.bump();
                     expr = ast::Expression::UnaryPostfixExpression(ast::UnaryExpression {
                         operator: tok,
                         expression: Box::new(expr),
@@ -642,25 +701,25 @@ impl<'a> Parser<'a> {
         let tok = self.scanner.token().tok;
         match tok {
             token::Token::Integer(_x) => {
-                self.next();
+                self.bump();
                 Ok(ast::Expression::PrimaryExpression(
                     ast::PrimaryExpression::Literal(tok),
                 ))
             }
             token::Token::String(_x) => {
-                self.next();
+                self.bump();
                 Ok(ast::Expression::PrimaryExpression(
                     ast::PrimaryExpression::Literal(tok),
                 ))
             }
             token::Token::Null => {
-                self.next();
+                self.bump();
                 Ok(ast::Expression::PrimaryExpression(
                     ast::PrimaryExpression::Null,
                 ))
             }
             token::Token::LParen => {
-                self.next(); // Consume left paren
+                self.bump(); // Consume left paren
                              // Determine if this is a lambda or a subexpression
                 let x = self.scanner.peek().tok;
                 if x == token::Token::Colon {
@@ -668,7 +727,7 @@ impl<'a> Parser<'a> {
                     Err(Error::new(String::from("Lambdas are not yet supported")))
                 } else {
                     let r = self.parse_expression()?;
-                    self.expect(token::Token::RParen)?;
+                    self.expect(&token::Token::RParen)?;
                     Ok(ast::Expression::PrimaryExpression(
                         ast::PrimaryExpression::SubExpression(Box::new(r)),
                     ))
@@ -684,11 +743,11 @@ impl<'a> Parser<'a> {
         let tok = self.scanner.token().tok;
         let r = match tok {
             token::Token::At => {
-                self.next();
+                self.bump();
                 ast::Reference::AddressOf(Box::new(self.parse_reference()?))
             }
             token::Token::Mul => {
-                self.next();
+                self.bump();
                 ast::Reference::Dereference(Box::new(self.parse_reference()?))
             }
             _ => ast::Reference::Ident(self.parse_identifier()?),
@@ -710,7 +769,7 @@ impl<'a> Parser<'a> {
             match tok {
                 token::Token::BitOr => {
                     // Type union
-                    self.next();
+                    self.bump();
                     let other_type = self.parse_unary_type()?;
                     type_expr = ast::TypeExpression::TypeUnion(ast::TypeUnion {
                         first_type: Box::new(type_expr),
@@ -729,24 +788,24 @@ impl<'a> Parser<'a> {
         let tok = self.scanner.token().tok;
         let mut type_expr = match tok {
             token::Token::Mul => {
-                self.next();
+                self.bump();
                 ast::TypeExpression::PointerType(Box::new(self.parse_unary_type()?))
             }
             token::Token::LSquareB => {
-                self.next();
+                self.bump();
                 let tok = self.scanner.token().tok;
                 match tok {
                     token::Token::DotDot => {
                         // Unsized array
-                        self.next();
-                        self.expect(token::Token::RSquareB)?;
+                        self.bump();
+                        self.expect(&token::Token::RSquareB)?;
                         let array_type = self.parse_unary_type()?;
                         ast::TypeExpression::UnsizedArrayType(Box::new(array_type))
                     }
                     _ => {
                         // Sized array
                         let array_size = self.parse_expression()?;
-                        self.expect(token::Token::RSquareB)?;
+                        self.expect(&token::Token::RSquareB)?;
                         let array_type = self.parse_unary_type()?;
                         ast::TypeExpression::SizedArrayType(ast::SizedArrayType {
                             size: array_size,
@@ -756,14 +815,14 @@ impl<'a> Parser<'a> {
                 }
             }
             token::Token::Typeof => {
-                self.next();
+                self.bump();
                 let expr = self.parse_expression()?;
                 ast::TypeExpression::TypeofExpression(expr)
             }
             token::Token::LParen => {
-                self.next();
+                self.bump();
                 let t = self.parse_type()?;
-                self.expect(token::Token::RParen)?;
+                self.expect(&token::Token::RParen)?;
                 t
             }
             _ => ast::TypeExpression::NamedType(self.parse_identifier()?),
@@ -773,7 +832,7 @@ impl<'a> Parser<'a> {
             match tok {
                 token::Token::Question => {
                     // Optional type
-                    self.next();
+                    self.bump();
                     type_expr = ast::TypeExpression::OptionalType(Box::new(type_expr));
                 }
                 _ => {
@@ -787,7 +846,7 @@ impl<'a> Parser<'a> {
     fn parse_identifier(&mut self) -> Result<ast::Ident, Error> {
         match self.scanner.token().tok {
             token::Token::Ident(sym) => {
-                self.next();
+                self.bump();
                 Ok(ast::Ident { name: sym })
             }
             tok => Err(Error::new(format!("Expected identifier but got {}", tok))),
@@ -801,15 +860,57 @@ mod tests {
 
     #[test]
     fn test_expect() {
+        let src = "; 21";
         let mut context = Context::new();
-        let mut p = Parser::new("test.cat", "; 21", None, &mut context);
-        let res1 = p.expect(token::Token::Semicolon);
-        let res2 = p.expect(token::Token::Semicolon);
-        let res3 = p.expect(token::Token::Semicolon);
+        context
+            .get_source_map()
+            .add_file(String::from("test.cat"), String::from(src));
+        let mut p = Parser::new("test.cat", src, None, &mut context);
+
+        let res1 = p.expect(&token::Token::Semicolon);
+        let res2 = p.expect(&token::Token::Semicolon);
+        let res3 = p.expect(&token::Token::Semicolon);
 
         assert!(res1.is_ok());
         assert!(res2.is_err());
         assert!(res3.is_err());
+    }
+
+    #[test]
+    fn test_parse_expr() {
+        let src = "   5 /* Hello\nWorld*/ * 2; // Comment!\n";
+        let mut context = Context::new();
+        context
+            .get_source_map()
+            .add_file(String::from("test.cat"), String::from(src));
+        let mut p = Parser::new("test.cat", src, None, &mut context);
+
+        let res = p.parse_expression();
+        assert!(res.is_ok());
+        let v = res.ok().unwrap();
+        match v {
+            ast::Expression::BinaryExpression(b) => {
+                assert_eq!(b.operator, token::Token::Mul);
+                match *b.left_hand_side {
+                    ast::Expression::PrimaryExpression(ast::PrimaryExpression::Literal(
+                        token::Token::Integer(val),
+                    )) => {
+                        assert_eq!(val, 5);
+                    }
+                    other => assert!(false, "Expected primary expression but got: {:?}", other),
+                };
+
+                match *b.right_hand_side {
+                    ast::Expression::PrimaryExpression(ast::PrimaryExpression::Literal(
+                        token::Token::Integer(val),
+                    )) => {
+                        assert_eq!(val, 2);
+                    }
+                    other => assert!(false, "Expected primary expression but got: {:?}", other),
+                };
+            }
+            _ => assert!(false, "Expected binary expression but got: {:?}", v),
+        }
     }
 
     #[test]

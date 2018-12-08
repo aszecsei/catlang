@@ -75,6 +75,8 @@ impl<'a> StringReader<'a> {
     }
 
     pub fn next(&mut self) -> TokenAndSpan {
+        self.token = self.peek_tok;
+        self.span = self.peek_span;
         self.advance_token().expect("Failed to advance");
         self.token()
     }
@@ -597,4 +599,24 @@ fn ident_continue(c: Option<char>) -> bool {
     };
 
     (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' // TODO: Handle unicode
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_lexer() {
+        let src = "; 21";
+        let mut context = Context::new();
+        let sf = context
+            .get_source_map()
+            .add_file(String::from("test.cat"), String::from(src));
+
+        let mut sr = StringReader::new(&mut context, sf, src);
+        sr.next();
+        assert_eq!(sr.next().tok, Token::Semicolon);
+        assert_eq!(sr.next().tok, Token::Whitespace);
+        assert_eq!(sr.next().tok, Token::Integer(21));
+    }
 }
