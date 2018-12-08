@@ -1,11 +1,15 @@
-use lexer::symbol::Symbol;
-use serde_derive::{Deserialize, Serialize};
+use id_arena::Id;
 use std::fmt;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
+/// A symbol is an interned or gensymed string.
+pub type Symbol = Id<String>;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum Token {
     Illegal(char),
     EOF,
+    Whitespace,
+    Comment,
 
     // Literals
     Bool(bool),
@@ -111,12 +115,14 @@ impl fmt::Display for Token {
         match *self {
             Token::Illegal(ch) => write!(f, "Illegal character '{}'", ch),
             Token::EOF => write!(f, "EOF"),
+            Token::Whitespace => write!(f, "Whitespace"),
+            Token::Comment => write!(f, "Comment"),
 
             // Literals
             Token::Bool(b) => write!(f, "{}", b),
-            Token::Ident(sym) => write!(f, "{}", sym),
+            Token::Ident(sym) => write!(f, "{:?}", sym),
             Token::Integer(val) => write!(f, "{}", val),
-            Token::String(sym) => write!(f, "{}", sym),
+            Token::String(sym) => write!(f, "{:?}", sym),
             Token::Char(ch) => write!(f, "{}", ch),
 
             // Operators
@@ -208,80 +214,40 @@ impl fmt::Display for Token {
 }
 
 impl Token {
-    pub fn lookup_ident(ident: &str) -> Token {
+    pub fn keyword_lookup(ident: &str) -> Option<Token> {
         match ident {
-            "let" => Token::Let,
-            "const" => Token::Const,
-            "new" => Token::New,
-            "delete" => Token::Delete,
-            "typeof" => Token::Typeof,
-            "is" => Token::Is,
-            "as" => Token::As,
-            "in" => Token::In,
-            "function" => Token::Function,
-            "return" => Token::Return,
-            "struct" => Token::Struct,
-            "type" => Token::Type,
-            "enum" => Token::Enum,
-            "SOA" => Token::SOA,
-            "owned" => Token::Owned,
-            "import" => Token::Import,
-            "export" => Token::Export,
-            "from" => Token::From,
-            "for" => Token::For,
-            "while" => Token::While,
-            "do" => Token::Do,
-            "if" => Token::If,
-            "else" => Token::Else,
-            "break" => Token::Break,
-            "continue" => Token::Continue,
-            "null" => Token::Null,
-            _ => Token::Ident(Symbol::intern(ident)),
+            "let" => Some(Token::Let),
+            "const" => Some(Token::Const),
+            "new" => Some(Token::New),
+            "delete" => Some(Token::Delete),
+            "typeof" => Some(Token::Typeof),
+            "is" => Some(Token::Is),
+            "as" => Some(Token::As),
+            "in" => Some(Token::In),
+            "function" => Some(Token::Function),
+            "return" => Some(Token::Return),
+            "struct" => Some(Token::Struct),
+            "type" => Some(Token::Type),
+            "enum" => Some(Token::Enum),
+            "SOA" => Some(Token::SOA),
+            "owned" => Some(Token::Owned),
+            "import" => Some(Token::Import),
+            "export" => Some(Token::Export),
+            "from" => Some(Token::From),
+            "for" => Some(Token::For),
+            "while" => Some(Token::While),
+            "do" => Some(Token::Do),
+            "if" => Some(Token::If),
+            "else" => Some(Token::Else),
+            "break" => Some(Token::Break),
+            "continue" => Some(Token::Continue),
+            "null" => Some(Token::Null),
+            _ => None,
         }
     }
 }
 
 #[test]
-fn lookup_ident_test() {
-    assert_eq!(Token::lookup_ident("function"), Token::Function);
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
-pub enum Pos {
-    NoPos,
-    Pos(u32),
-}
-
-impl Default for Pos {
-    fn default() -> Pos {
-        Pos::NoPos
-    }
-}
-
-impl Pos {
-    fn is_valid(self) -> bool {
-        self != Pos::NoPos
-    }
-
-    fn to_int(self) -> i32 {
-        match self {
-            Pos::NoPos => 0,
-            Pos::Pos(x) => x as i32,
-        }
-    }
-}
-
-pub struct Position {
-    filename: String,
-    col: i32,
-    row: i32,
-}
-
-impl fmt::Display for Position {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match &*self.filename {
-            "" => write!(f, "{}:{}", self.row, self.col),
-            fname => write!(f, "{}:{}:{}", fname, self.row, self.col),
-        }
-    }
+fn test_keyword_lookup() {
+    assert_eq!(Token::keyword_lookup("function"), Some(Token::Function));
 }
