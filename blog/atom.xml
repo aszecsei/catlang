@@ -2,12 +2,25 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://aszecsei.github.io/catlang/blog</id>
     <title>Catlang Blog</title>
-    <updated>2018-10-17T06:00:00Z</updated>
+    <updated>2018-12-16T06:00:00Z</updated>
     <generator>Feed for Node.js</generator>
     <link rel="alternate" href="https://aszecsei.github.io/catlang/blog"/>
     <subtitle>The best place to stay up-to-date with the latest Catlang news and events.</subtitle>
     <logo>https://aszecsei.github.io/catlang/img/docusaurus.svg</logo>
     <rights>Copyright © 2018 Alic Szecsei</rights>
+    <entry>
+        <title type="html"><![CDATA[Roadmap]]></title>
+        <id>https://aszecsei.github.io/catlang/blog/2018/12/16/roadmap.html</id>
+        <link href="https://aszecsei.github.io/catlang/blog/2018/12/16/roadmap.html">
+        </link>
+        <updated>2018-12-16T06:00:00Z</updated>
+        <summary type="html"><![CDATA[<p>We're fast approaching the release of version 0.1! The lexer and parser are mostly complete, barring a few additional features. In this post, I'll talk about how far the compiler has come - and where continued efforts are going.</p>
+]]></summary>
+        <author>
+            <name>Alic Szecsei</name>
+            <uri>https://alic-szecsei.com/</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Hello, World!]]></title>
         <id>https://aszecsei.github.io/catlang/blog/2018/10/17/hello-world.html</id>
