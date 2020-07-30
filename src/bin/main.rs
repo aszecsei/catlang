@@ -18,12 +18,6 @@ use std::fs;
 use std::io::prelude::*;
 use std::time::Instant;
 
-macro_rules! c_str {
-    ($s:expr) => {
-        concat!($s, "\0").as_ptr() as *const i8
-    };
-}
-
 fn main() {
     setup_panic!();
     let started = Instant::now();

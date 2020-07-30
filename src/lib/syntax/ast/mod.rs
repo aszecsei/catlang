@@ -1,22 +1,25 @@
-mod expression;
-mod function;
 #[macro_use]
 mod impl_from;
+
+mod attribute;
+mod declaration;
+mod expression;
 mod node;
 mod source;
 mod statement;
-mod type_name;
+mod types;
 
 use std::marker::PhantomData;
 use toolshed::list::{List, UnsafeList};
 use toolshed::Arena;
 
+pub use self::attribute::*;
+pub use self::declaration::*;
 pub use self::expression::*;
-pub use self::function::*;
 pub use self::node::{Node, NodeInner, OptionalLocation};
 pub use self::source::*;
 pub use self::statement::*;
-pub use self::type_name::*;
+pub use self::types::*;
 
 /// Useful for boolean flags that need location information via FlagNode
 #[derive(Clone, Copy, Debug, PartialEq)]

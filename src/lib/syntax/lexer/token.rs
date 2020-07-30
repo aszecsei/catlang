@@ -29,6 +29,8 @@ pub enum Token {
     LCurlyB,
     #[token("}")]
     RCurlyB,
+    #[token("#[")]
+    LAttr,
     #[token("[")]
     LSquareB,
     #[token("]")]
