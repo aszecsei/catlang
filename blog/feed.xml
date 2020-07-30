@@ -5,14 +5,14 @@
         <link>https://aszecsei.github.io/catlang/blog</link>
         <description>The best place to stay up-to-date with the latest Catlang news and events.</description>
         <lastBuildDate>Sun, 16 Dec 2018 06:00:00 GMT</lastBuildDate>
-        <docs>http://blogs.law.harvard.edu/tech/rss</docs>
-        <generator>Feed for Node.js</generator>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
         <image>
             <title>Catlang Blog</title>
             <url>https://aszecsei.github.io/catlang/img/docusaurus.svg</url>
             <link>https://aszecsei.github.io/catlang/blog</link>
         </image>
-        <copyright>Copyright © 2018 Alic Szecsei</copyright>
+        <copyright>Copyright © 2020 Alic Szecsei</copyright>
         <item>
             <title><![CDATA[Roadmap]]></title>
             <link>https://aszecsei.github.io/catlang/blog/2018/12/16/roadmap.html</link>
