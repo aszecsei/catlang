@@ -6,6 +6,6 @@ macro_rules! c_str {
     };
 }
 
-pub fn codegen(_block: ast::Block, _out_name: &str) {
+pub fn codegen(_block: ast::Program, _out_name: &str) {
     // TODO
 }

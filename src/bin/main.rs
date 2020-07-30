@@ -116,13 +116,13 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
-        let mut context = catlang::syntax::context::Context::new();
-        let mut main_block =
-            catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
+        // let mut context = catlang::syntax::context::Context::new();
+        // let mut main_block =
+        // catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
 
-        let out_fname = m.value_of("output").unwrap_or("out.c");
+        let _out_fname = m.value_of("output").unwrap_or("out.c");
 
-        catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
+        // catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
     }
     Ok(())
 }
