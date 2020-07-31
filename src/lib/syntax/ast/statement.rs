@@ -8,6 +8,7 @@ pub enum Statement<'ast> {
     Loop(LoopStatement<'ast>),
     Jump(JumpStatement<'ast>),
     Expression(ExpressionNode<'ast>),
+    Delete(DeleteStatement<'ast>),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -66,6 +67,11 @@ pub enum JumpStatement<'ast> {
     Return(ExpressionNode<'ast>),
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct DeleteStatement<'ast> {
+    pub deleted: ExpressionNode<'ast>,
+}
+
 pub type StatementNode<'ast> = Node<'ast, Statement<'ast>>;
 
 impl_from! {
@@ -75,6 +81,7 @@ impl_from! {
     LoopStatement => Statement::Loop,
     JumpStatement => Statement::Jump,
     ExpressionNode => Statement::Expression,
+    DeleteStatement => Statement::Delete,
 
     ForLoop => LoopStatement::ForLoop,
     ForInLoop => LoopStatement::ForInLoop,

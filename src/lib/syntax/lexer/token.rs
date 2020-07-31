@@ -93,6 +93,8 @@ pub enum Token {
     BitOrAssign,
     #[token("!")]
     Not,
+    #[token("~")]
+    BitNot,
     #[token("^")]
     Xor,
     #[token("^=")]
@@ -190,6 +192,38 @@ pub enum Token {
     Continue,
     #[token("null")]
     Null,
+
+    // Type Primitives
+    #[token("s8")]
+    S8,
+    #[token("u8")]
+    U8,
+    #[token("s16")]
+    S16,
+    #[token("u16")]
+    U16,
+    #[token("s32")]
+    S32,
+    #[token("u32")]
+    U32,
+    #[token("s64")]
+    S64,
+    #[token("u64")]
+    U64,
+    #[token("char")]
+    Char,
+    #[token("short")]
+    Short,
+    #[token("int")]
+    Int,
+    #[token("long")]
+    Long,
+    #[token("bool")]
+    BoolType,
+    #[token("float")]
+    Float,
+    #[token("double")]
+    Double,
 }
 
 impl Default for Token {

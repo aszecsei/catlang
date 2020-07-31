@@ -17,6 +17,7 @@ impl<'ast> Parser<'ast> {
             Token::Break => self.jump_statement()?,
             Token::Continue => self.jump_statement()?,
             Token::Return => self.jump_statement()?,
+            Token::Delete => self.delete_statement()?,
             _ => self.expression_statement()?,
         };
         let end = self.last_span.end as u32;
@@ -161,6 +162,12 @@ impl<'ast> Parser<'ast> {
             }
             _ => Err(Error::NotImplementedError),
         }
+    }
+
+    fn delete_statement(&mut self) -> Result<Statement<'ast>> {
+        self.expect(Token::Delete);
+        let expr = self.expression_node()?;
+        Ok(DeleteStatement { deleted: expr }.into())
     }
 
     fn expression_statement(&mut self) -> Result<Statement<'ast>> {

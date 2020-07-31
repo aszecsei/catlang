@@ -9,7 +9,7 @@ sidebar_label: Native Types
 1. Integer numbers
    1. `s8` (1 byte, signed)
    1. `u8` (1 byte, unsigned)
-   1. `u16` (2 bytes, signed)
+   1. `s16` (2 bytes, signed)
    1. `u16` (2 bytes, unsigned)
    1. `s32` (4 bytes, signed)
    1. `u32` (4 bytes, unsigned)
@@ -79,7 +79,7 @@ const myPrint = (num: int?) -> {
 }
 ```
 
-If a user wishes to force-unwrap an optional value, they can use the `!` operation to do so. This is not recommended as it may lead to null-pointer exceptions.
+If a user wishes to force-unwrap an optional value, they can use the null-forgiving (`!`) operation to do so. This is not recommended as it may lead to null-pointer exceptions.
 
 ```catlang
 const myPrint = (num: int?) -> {

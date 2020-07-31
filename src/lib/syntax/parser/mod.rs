@@ -39,7 +39,7 @@ impl<'ast> Parser<'ast> {
         let peek_slice = lexer.slice().into();
         let peek_span = lexer.span();
 
-        let mut p = Parser {
+        Parser {
             arena,
             lexer,
             errors: vec![],
@@ -51,9 +51,7 @@ impl<'ast> Parser<'ast> {
             peek_token,
             peek_slice,
             peek_span,
-        };
-
-        p
+        }
     }
 
     fn bump(&mut self) {

@@ -7,14 +7,13 @@ pub enum Expression<'ast> {
     PostfixExpression(PostfixExpression<'ast>),
     PrefixExpression(PrefixExpression<'ast>),
     AssignmentExpression(AssignmentExpression<'ast>),
-    TupleExpression(TupleExpression<'ast>),
     PrimitiveExpression(Primitive<'ast>),
     CallExpression(CallExpression<'ast>),
     ConstructorCallExpression(ConstructorCallExpression<'ast>),
     IndexExpression(IndexExpression<'ast>),
     CastExpression(CastExpression<'ast>),
     MemberAccessExpression(MemberAccessExpression<'ast>),
-    IdentifierExpression(Identifier<'ast>),
+    IdentifierExpression(IdentifierNode<'ast>),
     LambdaExpression(LambdaExpression<'ast>),
 }
 
@@ -83,15 +82,13 @@ pub enum PrefixOperator {
     Decrement,
     Plus,
     Minus,
-    AddressOf,
-    PointerDeref,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PostfixOperator {
     Increment,
     Decrement,
-    NullCoersion,
+    NullForgiving,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -104,31 +101,26 @@ pub struct TernaryExpression<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct BinaryExpression<'ast> {
     pub left: ExpressionNode<'ast>,
-    pub operator: Node<'ast, BinaryOperator>,
+    pub operator: BinaryOperator,
     pub right: ExpressionNode<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct PostfixExpression<'ast> {
     pub operand: ExpressionNode<'ast>,
-    pub operator: Node<'ast, PostfixOperator>,
+    pub operator: PostfixOperator,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct PrefixExpression<'ast> {
-    pub operator: Node<'ast, PrefixOperator>,
+    pub operator: PrefixOperator,
     pub operand: ExpressionNode<'ast>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct TupleExpression<'ast> {
-    pub expressions: ExpressionList<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct AssignmentExpression<'ast> {
     pub left: ExpressionNode<'ast>,
-    pub operator: Node<'ast, AssignmentOperator>,
+    pub operator: AssignmentOperator,
     pub right: ExpressionNode<'ast>,
 }
 
@@ -179,12 +171,11 @@ impl_from! {
     PostfixExpression => Expression::PostfixExpression,
     PrefixExpression => Expression::PrefixExpression,
     AssignmentExpression => Expression::AssignmentExpression,
-    TupleExpression => Expression::TupleExpression,
     Primitive => Expression::PrimitiveExpression,
     CallExpression => Expression::CallExpression,
     ConstructorCallExpression => Expression::ConstructorCallExpression,
     IndexExpression => Expression::IndexExpression,
     CastExpression => Expression::CastExpression,
     MemberAccessExpression => Expression::MemberAccessExpression,
-    Identifier => Expression::IdentifierExpression,
+    IdentifierNode => Expression::IdentifierExpression,
 }
