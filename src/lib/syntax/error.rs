@@ -1,22 +1,32 @@
-use std::fmt;
+use crate::syntax::lexer::Token;
+use std::fmt::Debug;
+use std::ops::Range;
+use thiserror::Error;
 
-pub struct Error {
-    // TODO: Add position information
-    msg: String,
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("expected {:?} but got {:?} ({:?}) at {}:{}", expected_token, token, raw, span.start, span.end)]
+    ExpectedButGot {
+        expected_token: Token,
+        token: Token,
+        raw: Box<str>,
+        span: Range<usize>,
+    },
+
+    #[error("expected one of {:?} but got {:?} ({:?}) at {}:{}", expected_tokens, token, raw, span.start, span.end)]
+    ExpectedOneOfButGot {
+        expected_tokens: Vec<Token>,
+        token: Token,
+        raw: Box<str>,
+        span: Range<usize>,
+    },
+
+    #[error("parser requested token beyond end of file")]
+    ExtendedBeyondEndOfFile,
+    #[error("duplicate flag error at {}:{}", span.start, span.end)]
+    DuplicateFlagError { span: Range<usize> },
+    #[error("functionality not implemented")]
+    NotImplementedError,
 }
 
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.msg)
-    }
-}
-
-impl Error {
-    pub fn new(msg: String) -> Error {
-        Error { msg }
-    }
-
-    pub fn get_msg(&self) -> &str {
-        &self.msg
-    }
-}
+pub type Result<T> = std::result::Result<T, Error>;

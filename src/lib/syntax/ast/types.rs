@@ -1,4 +1,3 @@
-#[macro_use]
 use super::*;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -9,7 +8,7 @@ pub enum TypeExpression<'ast> {
     TypeUnion(TypeUnionExpression<'ast>),
     TypeofExpression(ExpressionNode<'ast>),
     OptionalType(TypeExpressionNode<'ast>),
-    NamedType(&'ast str),
+    NamedType(IdentifierNode<'ast>),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -23,4 +22,5 @@ pub type TypeExpressionList<'ast> = NodeList<'ast, TypeExpression<'ast>>;
 
 impl_from! {
     TypeUnionExpression => TypeExpression::TypeUnion,
+    IdentifierNode => TypeExpression::NamedType,
 }

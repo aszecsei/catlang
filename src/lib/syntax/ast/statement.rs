@@ -21,13 +21,7 @@ pub struct ImportStatement<'ast> {
 pub struct IfStatement<'ast> {
     pub condition: ExpressionNode<'ast>,
     pub true_block: BlockNode<'ast>,
-    pub else_block: Option<Conditional<'ast>>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum Conditional<'ast> {
-    If(Node<'ast, IfStatement<'ast>>),
-    Else(BlockNode<'ast>),
+    pub else_block: Option<StatementNode<'ast>>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -35,7 +29,6 @@ pub enum LoopStatement<'ast> {
     ForLoop(ForLoop<'ast>),
     ForInLoop(ForInLoop<'ast>),
     WhileLoop(WhileLoop<'ast>),
-    DoWhileLoop(WhileLoop<'ast>),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -55,6 +48,7 @@ pub struct ForInLoop<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WhileLoop<'ast> {
+    pub is_do_while: bool,
     pub condition: ExpressionNode<'ast>,
     pub block: BlockNode<'ast>,
 }
@@ -67,3 +61,17 @@ pub enum JumpStatement<'ast> {
 }
 
 pub type StatementNode<'ast> = Node<'ast, Statement<'ast>>;
+
+impl_from! {
+    ImportStatement => Statement::Import,
+    BlockNode => Statement::InnerBlock,
+    IfStatement => Statement::If,
+    LoopStatement => Statement::Loop,
+    JumpStatement => Statement::Jump,
+    ExpressionNode => Statement::Expression,
+
+    ForLoop => LoopStatement::ForLoop,
+    ForInLoop => LoopStatement::ForInLoop,
+
+    ExpressionNode => JumpStatement::Return,
+}

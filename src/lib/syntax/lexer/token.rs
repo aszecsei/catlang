@@ -7,6 +7,7 @@ pub enum Token {
     #[regex(r"//[^\n]*", logos::skip)]
     #[regex(r"/\*", skip_block_comment)]
     Error,
+    EndOfFile,
 
     // Literals
     #[regex("false|true", |lex| lex.slice() == "true")]

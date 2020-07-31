@@ -1,19 +1,12 @@
 extern crate catlang;
-#[macro_use]
-extern crate clap;
-extern crate console;
-#[macro_use]
-extern crate human_panic;
-extern crate indicatif;
-#[macro_use]
-extern crate log;
-extern crate serde_yaml;
 
-use catlang::syntax::logger;
-// use catlang::syntax::parser;
+use catlang::logger;
+use clap::crate_version;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use console::Emoji;
+use human_panic::setup_panic;
 use indicatif::{HumanBytes, HumanDuration};
+use log::info;
 use std::fs;
 use std::io::prelude::*;
 use std::time::Instant;

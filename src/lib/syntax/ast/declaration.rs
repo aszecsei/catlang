@@ -72,3 +72,12 @@ pub struct EnumDeclarator<'ast> {
 }
 
 pub type DeclarationNode<'ast> = Node<'ast, Declaration<'ast>>;
+
+impl_from! {
+    ConstantDeclarator => Declarator::Constant,
+    TypeDeclarator => Declarator::Type,
+    VariableDeclarator => Declarator::Variable,
+    FunctionDeclarator => Declarator::Function,
+    StructDeclarator => Declarator::Struct,
+    EnumDeclarator => Declarator::Enum,
+}

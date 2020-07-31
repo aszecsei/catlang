@@ -1,4 +1,3 @@
-#[macro_use]
 use super::*;
 
 #[derive(Clone, Copy, Debug, PartialEq)]

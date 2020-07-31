@@ -3,17 +3,16 @@ use crate::syntax::ast::*;
 /// A `SourceUnit` is the top level construct of the grammar.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SourceUnit<'ast> {
-    pub blocks: NodeList<'ast, Block<'ast>>,
+    pub block: BlockNode<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Import<'ast> {
-    pub symbol: IdentifierNode<'ast>,
-    pub alias: Option<IdentifierNode<'ast>>,
+pub struct Block<'ast> {
+    pub elements: NodeList<'ast, BlockElement<'ast>>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum Block<'ast> {
+pub enum BlockElement<'ast> {
     Declaration(DeclarationNode<'ast>),
     Statement(StatementNode<'ast>),
 }

@@ -29,6 +29,8 @@ serde_yaml = "0.8.13"
 logos = "0.11.4"
 lazy_static = "1.4.0"
 toolshed = "0.8.1"
+thiserror = "1.0.20"
+symbol-map = "1.0.2"
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"
