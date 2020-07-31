@@ -154,6 +154,7 @@
 <loop> ::= <for>
         |  <while>
         |  <do while>
+        |  "loop" "{" <block> "}"
 
 <for> ::= "for" "(" [ <expression> ] ";" [ <expression> ] ";" [ <expression> ] ")" "{" <block> "}"
        |  "for" "(" <identifier> "in" <expression> ")" "{" <block> "}"
@@ -171,6 +172,8 @@
         |  <typeof expression>
         |  <optional type>
         |  <named type>
+        |  "any"
+        |  "null"
 
 <pointer type> ::= "*" <type>
 <sized array type> ::= "[" <expression> "]" <type>
@@ -202,15 +205,16 @@
                    |  "-" [ "=" ]
                    |  "|" [ "=" ]
                    |  "^" [ "=" ]
-                   |  "||"
+                   |  "||" [ "=" ]
 
 <multiplying operator> ::= "*" [ "=" ]
                         |  "/" [ "=" ]
                         |  "%" [ "=" ]
                         |  "&" [ "=" ]
-                        |  "&&"
+                        |  "&&" [ "=" ]
+                        |  "??" [ "=" ]
 
-<factor> ::= [ "-" | "!" ] <primary expression>
+<factor> ::= [ "-" | "!" | "+" ] <primary expression> [ "!" ]
 
 <primary expression> ::= <number>
                       |  <string constant>

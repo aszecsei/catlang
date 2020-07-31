@@ -15,7 +15,7 @@ impl<'ast> Parser<'ast> {
             Token::Export => {
                 let start = self.start_then_advance();
                 let d = self.declarator_node()?;
-                let end = self.loc().1;
+                let end = self.last_span.end as u32;
                 Ok(self.node_at(
                     start,
                     end,
@@ -29,7 +29,7 @@ impl<'ast> Parser<'ast> {
             _ => {
                 let start = self.loc().0;
                 let d = self.declarator_node()?;
-                let end = self.loc().1;
+                let end = self.last_span.end as u32;
                 Ok(self.node_at(
                     start,
                     end,
@@ -53,7 +53,7 @@ impl<'ast> Parser<'ast> {
                 self.expect_one_of(&[Token::Comma], &[Token::LParen]);
             }
         }
-        let end = self.loc().1;
+        let end = self.last_span.end as u32;
         Ok(self.node_at(
             start,
             end,
@@ -89,26 +89,175 @@ impl<'ast> Parser<'ast> {
     }
 
     fn const_declarator(&mut self) -> Result<Declarator<'ast>> {
-        Err(Error::NotImplementedError)
+        self.expect(Token::Const);
+        let identifier = self.identifier_node()?;
+        self.expect(Token::Assign);
+        let expression = self.expression_node()?;
+
+        Ok(ConstantDeclarator {
+            identifier,
+            expression,
+        }
+        .into())
     }
 
     fn type_declarator(&mut self) -> Result<Declarator<'ast>> {
-        Err(Error::NotImplementedError)
+        self.expect(Token::Type);
+        let identifier = self.identifier_node()?;
+        self.expect(Token::Assign);
+        let type_expression = self.type_node()?;
+
+        Ok(TypeDeclarator {
+            identifier,
+            type_expression,
+        }
+        .into())
     }
 
     fn variable_declarator(&mut self) -> Result<Declarator<'ast>> {
-        Err(Error::NotImplementedError)
+        self.expect(Token::Let);
+        let identifier = self.identifier_node()?;
+        let type_expression = match self.current_token {
+            Token::Colon => {
+                self.bump();
+                Some(self.type_node()?)
+            }
+            _ => None,
+        };
+        let expression = match self.current_token {
+            Token::Assign => {
+                self.bump();
+                Some(self.expression_node()?)
+            }
+            _ => None,
+        };
+
+        Ok(VariableDeclarator {
+            identifier,
+            type_expression,
+            expression,
+        }
+        .into())
     }
 
     fn function_declarator(&mut self) -> Result<Declarator<'ast>> {
-        Err(Error::NotImplementedError)
+        self.expect(Token::Function);
+        let identifier = self.identifier_node()?;
+        self.expect(Token::LParen);
+        let parameters = self.formal_parameter_list()?;
+        self.expect(Token::RParen);
+
+        let return_type = match self.current_token {
+            Token::LCurlyB => None,
+            Token::Arrow => {
+                self.bump();
+                Some(self.type_node()?)
+            }
+            token => return Err(Error::ExpectedFunctionButGot { token }),
+        };
+        self.expect(Token::LCurlyB);
+        let block = self.block_node();
+        self.expect(Token::RCurlyB);
+
+        Ok(FunctionDeclarator {
+            identifier,
+            parameters,
+            return_type,
+            block,
+        }
+        .into())
+    }
+
+    fn formal_parameter_list(&mut self) -> Result<NodeList<'ast, Parameter<'ast>>> {
+        let param_list = GrowableList::new();
+        while self.current_token != Token::RParen {
+            let start = self.loc().0;
+            let is_const = self.eat(Token::Const);
+            let identifier = self.identifier_node()?;
+            self.expect(Token::Colon);
+            let type_expression = self.type_node()?;
+            let end = type_expression.end;
+            param_list.push(
+                self.arena,
+                self.node_at(
+                    start,
+                    end,
+                    Parameter {
+                        identifier,
+                        is_const,
+                        type_expression,
+                    },
+                ),
+            );
+            self.expect_one_of(&[Token::Comma], &[Token::RParen]);
+        }
+
+        Ok(param_list.as_list())
     }
 
     fn struct_declarator(&mut self) -> Result<Declarator<'ast>> {
-        Err(Error::NotImplementedError)
+        self.expect(Token::Struct);
+        let identifier = self.identifier_node()?;
+        self.expect(Token::LCurlyB);
+        let members = self.struct_member_list()?;
+        self.expect(Token::RCurlyB);
+
+        Ok(StructDeclarator {
+            identifier,
+            members,
+        }
+        .into())
+    }
+
+    fn struct_member_list(&mut self) -> Result<NodeList<'ast, StructMember<'ast>>> {
+        let member_list = GrowableList::new();
+        while self.current_token != Token::RCurlyB {
+            let start = self.loc().0;
+            let is_owned = self.eat(Token::Owned);
+            let identifier = self.identifier_node()?;
+            self.expect(Token::Colon);
+            let type_expression = self.type_node()?;
+            let mut end = type_expression.end;
+            let default_value = if self.eat(Token::Assign) {
+                let expr = self.expression_node()?;
+                end = expr.end;
+                Some(expr)
+            } else {
+                None
+            };
+            member_list.push(
+                self.arena,
+                self.node_at(
+                    start,
+                    end,
+                    StructMember {
+                        identifier,
+                        is_owned,
+                        type_expression,
+                        default_value,
+                    },
+                ),
+            );
+            self.expect_one_of(&[Token::Comma], &[Token::RCurlyB]);
+        }
+
+        Ok(member_list.as_list())
     }
 
     fn enum_declarator(&mut self) -> Result<Declarator<'ast>> {
-        Err(Error::NotImplementedError)
+        self.expect(Token::Enum);
+        let identifier = self.identifier_node()?;
+        self.expect(Token::LCurlyB);
+        let values = GrowableList::new();
+        while self.current_token != Token::RCurlyB {
+            values.push(self.arena, self.identifier_node()?);
+            self.expect_one_of(&[Token::Comma], &[Token::RCurlyB]);
+        }
+
+        Ok(EnumDeclarator {
+            identifier,
+            values: values.as_list(),
+        }
+        .into())
     }
 }

@@ -55,7 +55,7 @@ const d = 'abc'; // ERROR!
 Catlang allows users to write shorthands to refer to complex types. For example:
 
 ```catlang
-type number = S8 | U8 | S16 | U16 | S32 | U32 | S64 | U64 | float | double;
+type number = s8 | u8 | s16 | u16 | s32 | u32 | s64 | u64 | float | double;
 const genericFunction = (input: number) -> {
   return input * 2;
 }
@@ -67,10 +67,10 @@ The `any` type is the equivalent of C's `void*` type. It can be used to escape C
 
 ## Optionals
 
-Catlang includes an "optional" tye, equivalent to `type | null`, to help avoid null-pointer exceptions. Any function that requires a non-Optional value must be enclosed in a conditional to ensure that the Optional value exists, or an error will be thrown.
+Catlang includes an "optional" type, equivalent to `type | null`, to help avoid null-pointer exceptions. Any function that requires a non-Optional value must be enclosed in a conditional to ensure that the Optional value exists, or an error will be thrown.
 
 ```catlang
-const myPrint = (num?: int) -> {
+const myPrint = (num: int?) -> {
   if (num) {
     print(num);
   } else {
@@ -82,8 +82,26 @@ const myPrint = (num?: int) -> {
 If a user wishes to force-unwrap an optional value, they can use the `!` operation to do so. This is not recommended as it may lead to null-pointer exceptions.
 
 ```catlang
-const myPrint = (num?: int) -> {
+const myPrint = (num: int?) -> {
   print(num!);
+}
+```
+
+To reduce if-statements, null-coalescing and null-conditional operators are provided.
+
+```catlang
+const myPrint = (obj: MyStruct?) -> {
+  if (obj) {
+    obj.DoMethod();
+  }
+  // is equivalent to this using the null-conditional operator:
+  obj?.DoMethod();
+
+  if (!obj) {
+    obj = defaultValue;
+  }
+  // is equivalent to this using the null coalescing assignment operator
+  obj ??= defaultValue;
 }
 ```
 

@@ -9,11 +9,11 @@ impl<'ast> Parser<'ast> {
     pub fn source_unit(&mut self) -> SourceUnitNode<'ast> {
         let start = self.loc().0;
         let block = self.block_node();
-        let end = self.loc().1;
+        let end = self.last_span.end as u32;
         self.node_at(start, end, SourceUnit { block })
     }
 
-    fn block_node(&mut self) -> BlockNode<'ast> {
+    pub fn block_node(&mut self) -> BlockNode<'ast> {
         let start = self.loc().0;
         let elements = GrowableList::new();
         loop {
@@ -31,7 +31,7 @@ impl<'ast> Parser<'ast> {
                 }
             }
         }
-        let end = self.loc().1;
+        let end = self.last_span.end as u32;
         self.node_at(
             start,
             end,
@@ -48,7 +48,7 @@ impl<'ast> Parser<'ast> {
         } else {
             BlockElement::Statement(self.statement_node()?)
         };
-        let end = self.loc().1;
+        let end = self.last_span.end as u32;
         Ok(self.node_at(start, end, block_element))
     }
 }

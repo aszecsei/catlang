@@ -20,7 +20,7 @@ pub struct ImportStatement<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct IfStatement<'ast> {
     pub condition: ExpressionNode<'ast>,
-    pub true_block: BlockNode<'ast>,
+    pub true_block: StatementNode<'ast>,
     pub else_block: Option<StatementNode<'ast>>,
 }
 
@@ -29,6 +29,7 @@ pub enum LoopStatement<'ast> {
     ForLoop(ForLoop<'ast>),
     ForInLoop(ForInLoop<'ast>),
     WhileLoop(WhileLoop<'ast>),
+    InfiniteLoop(InfiniteLoop<'ast>),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -36,21 +37,26 @@ pub struct ForLoop<'ast> {
     pub initial: Option<ExpressionNode<'ast>>,
     pub condition: Option<ExpressionNode<'ast>>,
     pub update: Option<ExpressionNode<'ast>>,
-    pub block: BlockNode<'ast>,
+    pub statement: StatementNode<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ForInLoop<'ast> {
     pub identifier: IdentifierNode<'ast>,
     pub range: ExpressionNode<'ast>,
-    pub block: BlockNode<'ast>,
+    pub statement: StatementNode<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WhileLoop<'ast> {
     pub is_do_while: bool,
     pub condition: ExpressionNode<'ast>,
-    pub block: BlockNode<'ast>,
+    pub statement: StatementNode<'ast>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct InfiniteLoop<'ast> {
+    pub statement: StatementNode<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -72,6 +78,8 @@ impl_from! {
 
     ForLoop => LoopStatement::ForLoop,
     ForInLoop => LoopStatement::ForInLoop,
+    WhileLoop => LoopStatement::WhileLoop,
+    InfiniteLoop => LoopStatement::InfiniteLoop,
 
     ExpressionNode => JumpStatement::Return,
 }

@@ -53,6 +53,7 @@ pub enum BinaryOperator {
     LogicalAnd,
     BitShiftLeft,
     BitShiftRight,
+    NullCoalesce,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -70,6 +71,7 @@ pub enum AssignmentOperator {
     BitOr,
     LogicalAnd,
     LogicalOr,
+    NullCoalesce,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -89,6 +91,7 @@ pub enum PrefixOperator {
 pub enum PostfixOperator {
     Increment,
     Decrement,
+    NullCoersion,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -157,6 +160,7 @@ pub struct CastExpression<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MemberAccessExpression<'ast> {
     pub object: ExpressionNode<'ast>,
+    pub null_condition: bool,
     pub member: IdentifierNode<'ast>,
 }
 

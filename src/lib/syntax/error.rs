@@ -27,6 +27,8 @@ pub enum Error {
     DuplicateFlagError { span: Range<usize> },
     #[error("functionality not implemented")]
     NotImplementedError,
+    #[error("expected either a return type or function start but got {:?}", token)]
+    ExpectedFunctionButGot { token: Token },
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

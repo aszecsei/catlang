@@ -123,6 +123,10 @@ pub enum Token {
     Arrow,
     #[token("?")]
     Question,
+    #[token("??")]
+    NullCoalesce,
+    #[token("??=")]
+    NullCoalesceAssign,
 
     #[token(".")]
     Dot,
@@ -130,6 +134,8 @@ pub enum Token {
     DotDot,
 
     // Keywords
+    #[token("any")]
+    Any,
     #[token("let")]
     Let,
     #[token("const")]
@@ -172,6 +178,8 @@ pub enum Token {
     While,
     #[token("do")]
     Do,
+    #[token("loop")]
+    Loop,
     #[token("if")]
     If,
     #[token("else")]

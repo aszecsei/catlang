@@ -3,6 +3,7 @@ mod expression;
 mod primitive;
 mod source;
 mod statement;
+mod types;
 
 use crate::syntax::ast::*;
 use crate::syntax::error::*;
@@ -16,7 +17,13 @@ pub struct Parser<'ast> {
     errors: Vec<Error>,
     body: SourceUnitList<'ast>,
 
+    last_span: std::ops::Range<usize>,
     current_token: Token,
+    current_slice: &'ast str,
+    current_span: std::ops::Range<usize>,
+    peek_token: Token,
+    peek_slice: &'ast str,
+    peek_span: std::ops::Range<usize>,
 }
 
 impl<'ast> Parser<'ast> {
@@ -25,16 +32,26 @@ impl<'ast> Parser<'ast> {
 
         let mut lexer = Token::lexer(&source);
         let current_token = lexer.next().unwrap_or(Token::EndOfFile);
+        let current_slice = lexer.slice().into();
+        let current_span = lexer.span();
+
+        let peek_token = lexer.next().unwrap_or(Token::EndOfFile);
+        let peek_slice = lexer.slice().into();
+        let peek_span = lexer.span();
 
         let mut p = Parser {
             arena,
             lexer,
             errors: vec![],
             body: NodeList::empty(),
+            last_span: 0..0,
             current_token,
+            current_slice,
+            current_span,
+            peek_token,
+            peek_slice,
+            peek_span,
         };
-
-        p.bump();
 
         p
     }
@@ -43,7 +60,14 @@ impl<'ast> Parser<'ast> {
         if self.current_token == Token::EndOfFile {
             return self.errors.push(Error::ExtendedBeyondEndOfFile);
         }
-        self.current_token = self.lexer.next().unwrap_or(Token::EndOfFile);
+        self.last_span = self.current_span.clone();
+        self.current_token = self.peek_token;
+        self.current_slice = self.peek_slice;
+        self.current_span = self.peek_span.clone();
+
+        self.peek_token = self.lexer.next().unwrap_or(Token::EndOfFile);
+        self.peek_slice = self.lexer.slice().into();
+        self.peek_span = self.lexer.span();
     }
 
     #[inline]
