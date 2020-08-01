@@ -80,22 +80,70 @@ impl<'ast> Parser<'ast> {
 
     fn primitive_type(&mut self) -> Result<PrimitiveType<'ast>> {
         match self.current_token {
-            Token::S8 => Ok(PrimitiveType::S8),
-            Token::U8 => Ok(PrimitiveType::U8),
-            Token::S16 => Ok(PrimitiveType::S16),
-            Token::U16 => Ok(PrimitiveType::U16),
-            Token::S32 => Ok(PrimitiveType::S32),
-            Token::U32 => Ok(PrimitiveType::U32),
-            Token::S64 => Ok(PrimitiveType::S64),
-            Token::U64 => Ok(PrimitiveType::U64),
-            Token::Char => Ok(PrimitiveType::U8),
-            Token::Short => Ok(PrimitiveType::S16),
-            Token::Int => Ok(PrimitiveType::S32),
-            Token::Long => Ok(PrimitiveType::S64),
-            Token::BoolType => Ok(PrimitiveType::Bool),
-            Token::Float => Ok(PrimitiveType::Float),
-            Token::Double => Ok(PrimitiveType::Double),
-            Token::Null => Ok(PrimitiveType::Null),
+            Token::S8 => {
+                self.bump();
+                Ok(PrimitiveType::S8)
+            }
+            Token::U8 => {
+                self.bump();
+                Ok(PrimitiveType::U8)
+            }
+            Token::S16 => {
+                self.bump();
+                Ok(PrimitiveType::S16)
+            }
+            Token::U16 => {
+                self.bump();
+                Ok(PrimitiveType::U16)
+            }
+            Token::S32 => {
+                self.bump();
+                Ok(PrimitiveType::S32)
+            }
+            Token::U32 => {
+                self.bump();
+                Ok(PrimitiveType::U32)
+            }
+            Token::S64 => {
+                self.bump();
+                Ok(PrimitiveType::S64)
+            }
+            Token::U64 => {
+                self.bump();
+                Ok(PrimitiveType::U64)
+            }
+            Token::Char => {
+                self.bump();
+                Ok(PrimitiveType::U8)
+            }
+            Token::Short => {
+                self.bump();
+                Ok(PrimitiveType::S16)
+            }
+            Token::Int => {
+                self.bump();
+                Ok(PrimitiveType::S32)
+            }
+            Token::Long => {
+                self.bump();
+                Ok(PrimitiveType::S64)
+            }
+            Token::BoolType => {
+                self.bump();
+                Ok(PrimitiveType::Bool)
+            }
+            Token::Float => {
+                self.bump();
+                Ok(PrimitiveType::Float)
+            }
+            Token::Double => {
+                self.bump();
+                Ok(PrimitiveType::Double)
+            }
+            Token::Null => {
+                self.bump();
+                Ok(PrimitiveType::Null)
+            }
             _ => Ok(self.identifier_node()?.into()),
         }
     }

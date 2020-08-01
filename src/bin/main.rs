@@ -103,6 +103,11 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
+        let parsed = catlang::syntax::parser::parse(&contents).unwrap();
+        let body = parsed.body();
+
+        info!("Body: {:?}", body);
+
         // let mut context = catlang::syntax::context::Context::new();
         // let mut main_block =
         // catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);

@@ -7,14 +7,14 @@ use crate::syntax::parser::Parser;
 
 impl<'ast> Parser<'ast> {
     pub fn source_unit(&mut self) -> SourceUnitNode<'ast> {
-        let start = self.loc().0;
+        let start = self.current_span.start as u32;
         let block = self.block_node();
         let end = self.last_span.end as u32;
         self.node_at(start, end, SourceUnit { block })
     }
 
     pub fn block_node(&mut self) -> BlockNode<'ast> {
-        let start = self.loc().0;
+        let start = self.current_span.start as u32;
         let elements = GrowableList::new();
         loop {
             match self.current_token {
@@ -42,7 +42,7 @@ impl<'ast> Parser<'ast> {
     }
 
     fn block_element_node(&mut self) -> Result<Node<'ast, BlockElement<'ast>>> {
-        let start = self.loc().0;
+        let start = self.current_span.start as u32;
         let block_element = if is_declaration_starter(self.current_token) {
             BlockElement::Declaration(self.declaration_node()?)
         } else {

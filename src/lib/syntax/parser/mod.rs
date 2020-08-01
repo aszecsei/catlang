@@ -86,8 +86,8 @@ impl<'ast> Parser<'ast> {
             self.errors.push(Error::ExpectedButGot {
                 expected_token: token,
                 token: self.current_token,
-                raw: self.lexer.slice().into(),
-                span: self.lexer.span(),
+                raw: self.current_slice.into(),
+                span: self.current_span.clone(),
             })
         }
     }
@@ -107,8 +107,8 @@ impl<'ast> Parser<'ast> {
             self.errors.push(Error::ExpectedOneOfButGot {
                 expected_tokens: expected,
                 token: self.current_token,
-                raw: self.lexer.slice().into(),
-                span: self.lexer.span(),
+                raw: self.current_slice.into(),
+                span: self.current_span.clone(),
             })
         }
     }
@@ -119,22 +119,22 @@ impl<'ast> Parser<'ast> {
             self.errors.push(Error::ExpectedButGot {
                 expected_token: Token::EndOfFile,
                 token: self.current_token,
-                raw: self.lexer.slice().into(),
-                span: self.lexer.span(),
+                raw: self.current_slice.into(),
+                span: self.current_span.clone(),
             })
         }
     }
 
     #[inline]
     fn expect_exact(&mut self, token: Token, expected: &str) {
-        if self.current_token == token && self.lexer.slice() == expected {
+        if self.current_token == token && self.current_slice == expected {
             self.bump();
         } else {
             self.errors.push(Error::ExpectedButGot {
                 expected_token: token,
                 token: self.current_token,
-                raw: self.lexer.slice().into(),
-                span: self.lexer.span(),
+                raw: self.current_slice.into(),
+                span: self.current_span.clone(),
             })
         }
     }
@@ -183,7 +183,7 @@ impl<'ast> Parser<'ast> {
 
     #[inline]
     fn loc(&mut self) -> (u32, u32) {
-        let range = self.lexer.span();
+        let range = self.current_span.clone();
         (range.start as u32, range.end as u32)
     }
 
@@ -239,8 +239,8 @@ impl<'ast> Parser<'ast> {
         I: Into<T>,
         R: From<Node<'ast, T>>,
     {
-        let slice = self.lexer.slice();
-        let (start, end) = self.loc();
+        let slice = self.current_slice;
+        let (start, end) = (self.current_span.start as u32, self.current_span.end as u32);
         self.bump();
         self.node_at(start, end, func(slice))
     }
@@ -264,7 +264,7 @@ impl<'ast> Parser<'ast> {
         if at.is_some() {
             self.bump();
             return self.errors.push(Error::DuplicateFlagError {
-                span: self.lexer.span(),
+                span: self.current_span.clone(),
             });
         }
 

@@ -27,7 +27,7 @@ impl<'ast> Parser<'ast> {
                 ))
             }
             _ => {
-                let start = self.loc().0;
+                let start = self.current_span.start as u32;
                 let d = self.declarator_node()?;
                 let end = self.last_span.end as u32;
                 Ok(self.node_at(
@@ -149,6 +149,10 @@ impl<'ast> Parser<'ast> {
 
         let return_type = match self.current_token {
             Token::LCurlyB => None,
+            Token::Arrow if self.peek_token == Token::LCurlyB => {
+                self.bump();
+                None
+            }
             Token::Arrow => {
                 self.bump();
                 Some(self.type_node()?)
@@ -171,7 +175,7 @@ impl<'ast> Parser<'ast> {
     fn formal_parameter_list(&mut self) -> Result<NodeList<'ast, Parameter<'ast>>> {
         let param_list = GrowableList::new();
         while self.current_token != Token::RParen {
-            let start = self.loc().0;
+            let start = self.current_span.start as u32;
             let is_const = self.eat(Token::Const);
             let identifier = self.identifier_node()?;
             self.expect(Token::Colon);
@@ -212,7 +216,7 @@ impl<'ast> Parser<'ast> {
     fn struct_member_list(&mut self) -> Result<NodeList<'ast, StructMember<'ast>>> {
         let member_list = GrowableList::new();
         while self.current_token != Token::RCurlyB {
-            let start = self.loc().0;
+            let start = self.current_span.start as u32;
             let is_owned = self.eat(Token::Owned);
             let identifier = self.identifier_node()?;
             self.expect(Token::Colon);
