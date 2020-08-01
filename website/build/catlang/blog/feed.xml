@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Catlang Blog</title>
+        <link>https://aszecsei.github.io/catlang/blog</link>
+        <description>The best place to stay up-to-date with the latest Catlang news and events.</description>
+        <lastBuildDate>Sun, 16 Dec 2018 06:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <image>
+            <title>Catlang Blog</title>
+            <url>https://aszecsei.github.io/catlang/img/docusaurus.svg</url>
+            <link>https://aszecsei.github.io/catlang/blog</link>
+        </image>
+        <copyright>Copyright © 2020 Alic Szecsei</copyright>
+        <item>
+            <title><![CDATA[Roadmap]]></title>
+            <link>https://aszecsei.github.io/catlang/blog/2018/12/16/roadmap.html</link>
+            <guid>https://aszecsei.github.io/catlang/blog/2018/12/16/roadmap.html</guid>
+            <pubDate>Sun, 16 Dec 2018 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>We're fast approaching the release of version 0.1! The lexer and parser are mostly complete, barring a few additional features. In this post, I'll talk about how far the compiler has come - and where continued efforts are going.</p>
+]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Hello, World!]]></title>
+            <link>https://aszecsei.github.io/catlang/blog/2018/10/17/hello-world.html</link>
+            <guid>https://aszecsei.github.io/catlang/blog/2018/10/17/hello-world.html</guid>
+            <pubDate>Wed, 17 Oct 2018 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>While much of Catlang is progressing nicely (the grammar is almost entirely fleshed out!) there have been a few setbacks. Namely, we're switching from Go to Rust - which is a net positive, but requires re-writing some of the existing code.</p>
+]]></description>
+        </item>
+    </channel>
+</rss>

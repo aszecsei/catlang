@@ -78,7 +78,6 @@
                  |  "struct"
                  |  "type"
                  |  "enum"
-                 |  "SOA"
                  |  "owned"
                  |  "import"
                  |  "export"
@@ -89,6 +88,7 @@
                  |  "else"
                  |  "break"
                  |  "continue"
+                 |  "this"
 
 <catlang program> ::= <file> { <file> }
 
@@ -98,13 +98,19 @@
 <block element> ::= <declaration>
                  |  <statement>
 
-<declaration> ::= [ "export" ] <declarator>
+<declaration> ::= [ <attribute> ] [ "export" ] <declarator>
 <declarator> ::= <constant declarator>
               |  <type declarator>
               |  <variable declarator>
               |  <function declarator>
               |  <struct declarator>
               |  <enum declarator>
+
+<attribute> ::= "#[" { <attribute list> "]"
+<attribute list> ::= <attribute element> { "," <attribute element> }
+<attribute element> ::= <ident> [ "(" <attribute parameter list> ")" ]
+<attribute parameter list> ::= <attribute parameter> { "," <attribute parameter> }
+<attribute parameter> ::= <expression>
 
 <constant declarator> ::= "const" <identifier> "=" <expression>
 
@@ -114,7 +120,8 @@
                        |  "let" <identifier> "=" <expression>
 
 <function declarator> ::= "function" <identifier> "(" [ <formal parameter list> ] ")" "{" <block> "}"
-<formal parameter list> ::= <parameter> { "," <parameter> }
+<formal parameter list> ::= "this" { "," <parameter> }
+                         |  <parameter> { "," <parameter> }
 <parameter> ::= [ "const" ] <identifier> ":" <type>
 
 <struct declarator> ::= "struct" <identifier> "{" <struct parameter list> "}"
@@ -147,6 +154,7 @@
 <loop> ::= <for>
         |  <while>
         |  <do while>
+        |  "loop" "{" <block> "}"
 
 <for> ::= "for" "(" [ <expression> ] ";" [ <expression> ] ";" [ <expression> ] ")" "{" <block> "}"
        |  "for" "(" <identifier> "in" <expression> ")" "{" <block> "}"
@@ -164,6 +172,8 @@
         |  <typeof expression>
         |  <optional type>
         |  <named type>
+        |  "any"
+        |  "null"
 
 <pointer type> ::= "*" <type>
 <sized array type> ::= "[" <expression> "]" <type>
@@ -176,7 +186,7 @@
 
 <expression> ::= <assignment expression>
 
-<assignment expression> ::= [ <identifier> "=" ] <ternary expression>
+<assignment expression> ::= [ <identifier> <assignment operator> ] <ternary expression>
 <ternary expression> ::= <comparing expression> [ "?" <comparing expression> ":" <comparing expression> ]
 <comparing expression> ::= <comparand> [<comparing operator> <comparand>]
 <comparand> ::= <term> ::= { <adding operator> <term> }
@@ -195,15 +205,16 @@
                    |  "-" [ "=" ]
                    |  "|" [ "=" ]
                    |  "^" [ "=" ]
-                   |  "||"
+                   |  "||" [ "=" ]
 
 <multiplying operator> ::= "*" [ "=" ]
                         |  "/" [ "=" ]
                         |  "%" [ "=" ]
                         |  "&" [ "=" ]
-                        |  "&&"
+                        |  "&&" [ "=" ]
+                        |  "??" [ "=" ]
 
-<factor> ::= [ "-" | "!" ] <primary expression>
+<factor> ::= [ "-" | "!" | "+" ] <primary expression> [ "!" ]
 
 <primary expression> ::= <number>
                       |  <string constant>
@@ -215,6 +226,7 @@
 <subexpression> ::= "(" <expression> ")"
 <lambda expression> ::= "(" [ <formal parameter list> ] ")" "->" "{" <block> "}"
 <reference> ::= <identifier>
+             |  "this"
              |  "@" <reference> /* address-of operator */
              |  "*" <reference> /* pointer dereferencing */
              |  <reference> "." <identifier>
@@ -223,9 +235,9 @@
              |  <array reference>
              |  <cast reference>
 
-<function call> ::= <reference> "(" [ <expressions> ] ")" /* reference is a function type */
-<constructor call> ::= [ "new" ] <reference> [ "(" [ <expressions> ] ")" ] /* reference is a struct type */
-<array reference> ::= <reference> "[" <expressions> "]" /* reference is a variable of array type */
+<function call> ::= <reference> "(" [ <expressions> ] ")"
+<constructor call> ::= [ "new" ] <type> [ "(" [ <expressions> ] ")" ]
+<array reference> ::= <reference> "[" <expressions> "]"
 <cast reference> ::= <reference> "as" [ "!" ] <type>
 
 <expression list> ::= <expression> { "," <expression> }

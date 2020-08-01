@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Casting · Catlang</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Casting is a way to check the type of an instance or to treat an instance of one type as another. There is no implicit casting in Catlang."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Casting · Catlang"/><meta property="og:type" content="website"/><meta property="og:url" content="https://aszecsei.github.io/catlang/"/><meta property="og:description" content="Casting is a way to check the type of an instance or to treat an instance of one type as another. There is no implicit casting in Catlang."/><meta property="og:image" content="https://aszecsei.github.io/catlang/img/docusaurus.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://aszecsei.github.io/catlang/img/docusaurus.png"/><link rel="shortcut icon" href="/catlang/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><link rel="alternate" type="application/atom+xml" href="https://aszecsei.github.io/catlang/blog/atom.xml" title="Catlang Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://aszecsei.github.io/catlang/blog/feed.xml" title="Catlang Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/catlang/js/scrollSpy.js"></script><link rel="stylesheet" href="/catlang/css/main.css"/><script src="/catlang/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/catlang/"><img class="logo" src="/catlang/img/docusaurus.svg" alt="Catlang"/><h2 class="headerTitleWithLogo">Catlang</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/catlang/docs/what-and-why" target="_self">Docs</a></li><li class=""><a href="/catlang/docs/api-index" target="_self">API</a></li><li class=""><a href="/catlang/blog/" target="_self">Blog</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Language Basics</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Intro</h3><ul class=""><li class="navListItem"><a class="navItem" href="/catlang/docs/what-and-why">What &amp; Why</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Setup</h3><ul class=""><li class="navListItem"><a class="navItem" href="/catlang/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/editor-plugins">Editor Plugins</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Language Basics</h3><ul class=""><li class="navListItem"><a class="navItem" href="/catlang/docs/overview">Overview</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/functions">Functions</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/catlang/docs/casting">Casting</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/native-types">Native Types</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/generics">Generics</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/project-structure">Project Structure</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/build-system">Build System</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Casting</h1></header><article><div><span><p>Casting is a way to check the type of an instance or to treat an instance of one type as another. There is no implicit casting in Catlang.</p>
+<h2><a class="anchor" aria-hidden="true" id="type-checking"></a><a href="#type-checking" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type Checking</h2>
+<p>Type checking is performed with the <code>is</code> operator:</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> x: <span class="hljs-keyword">int</span> | <span class="hljs-built_in">string</span> = otherFunction();
+<span class="hljs-keyword">if</span> (x is <span class="hljs-keyword">int</span>) {
+  <span class="hljs-built_in">print</span>(<span class="hljs-string">"x is an int!"</span>);
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-built_in">print</span>(<span class="hljs-string">"x is a string!"</span>);
+}
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="safe-casting"></a><a href="#safe-casting" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Safe Casting</h2>
+<p>Safe casting returns an optional type, equivalent to <code>type | null</code>; safe casting must be evaluated at run-time. If run-time type information indicates that the variable's <em>actual value</em> is of the casted type, the cast will succeed. Otherwise, the cast will return <code>null</code>.</p>
+<pre><code class="hljs">const x: <span class="hljs-built_in">int</span> <span class="hljs-pattern-match">| <span class="hljs-built_in">string</span> = other<span class="hljs-constructor">Function()</span>;
+const my<span class="hljs-constructor">Func</span> = (i: <span class="hljs-built_in">int</span>) -&gt; {
+  <span class="hljs-operator">/</span><span class="hljs-operator">/</span> <span class="hljs-constructor">Something</span>
+}
+
+my<span class="hljs-constructor">Func(<span class="hljs-params">x</span>)</span>; <span class="hljs-operator">/</span><span class="hljs-operator">/</span> <span class="hljs-constructor">ERROR</span>!
+my<span class="hljs-constructor">Func(<span class="hljs-params">x</span> <span class="hljs-params">as</span> <span class="hljs-params">int</span>)</span>; <span class="hljs-operator">/</span><span class="hljs-operator">/</span> <span class="hljs-constructor">ERROR</span>!
+<span class="hljs-keyword">let</span> cast<span class="hljs-constructor">X</span> = x <span class="hljs-keyword">as</span> <span class="hljs-built_in">int</span>;
+<span class="hljs-keyword">if</span> (cast<span class="hljs-constructor">X</span>) {
+  my<span class="hljs-constructor">Func(<span class="hljs-params">castX</span>)</span>; <span class="hljs-operator">/</span><span class="hljs-operator">/</span> <span class="hljs-constructor">OK</span>
+}
+</span></code></pre>
+<p>Since an assignment operator returns the object that was assigned, the previous example can be condensed:</p>
+<pre><code class="hljs"><span class="hljs-keyword">if</span> (<span class="hljs-keyword">let</span> castX = x <span class="hljs-keyword">as</span> <span class="hljs-built_in">int</span>) {
+  my<span class="hljs-constructor">Func(<span class="hljs-params">castX</span>)</span>; <span class="hljs-comment">// OK</span>
+}
+</code></pre>
+<p>This has the twofold benefit of being more concise and scoping the <code>castX</code> variable to the <code>if</code> block.</p>
+<p>Internally, numbers can be safely cast to any number type that is guaranteed not to lose data. For example:</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> = <span class="hljs-string">'a'</span>;
+<span class="hljs-keyword">const</span> xInt = xChar <span class="hljs-keyword">as</span> <span class="hljs-keyword">int</span>; <span class="hljs-comment">// OK!</span>
+<span class="hljs-keyword">const</span> yInt = <span class="hljs-number">-2</span>;
+<span class="hljs-keyword">const</span> yChar = yInt <span class="hljs-keyword">as</span> <span class="hljs-keyword">char</span>; <span class="hljs-comment">// ERROR!</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="unsafe-casting"></a><a href="#unsafe-casting" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unsafe Casting</h2>
+<p>Unsafe casting is used to force a cast from one value to another. While this can be used to avoid type lookups at run-time, it is not recommended for standard use. This is equivalent to a C-style cast.</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> x: <span class="hljs-keyword">long</span> = <span class="hljs-number">5000000000</span>;
+<span class="hljs-keyword">const</span> y = x <span class="hljs-keyword">as</span>! <span class="hljs-keyword">int</span>; <span class="hljs-comment">// 705032704</span>
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/catlang/docs/typing"><span class="arrow-prev">← </span><span>Previous</span></a><a class="docs-next button" href="/catlang/docs/native-types"><span>Native Types</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#type-checking">Type Checking</a></li><li><a href="#safe-casting">Safe Casting</a></li><li><a href="#unsafe-casting">Unsafe Casting</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/catlang/" class="nav-home"><img src="/catlang/img/docusaurus.svg" alt="Catlang" width="66" height="58"/></a><div><h5>Docs</h5><a href="/catlang/docs/en/what-and-why.html">Intro</a><a href="/catlang/docs/en/installation.html">Setup</a><a href="/catlang/docs/en/overview.html">Language Basics</a><a href="/catlang/docs/en/api-index.html">API Reference</a></div><div><h5>Community</h5><a href="/catlang/en/users.html">User Showcase</a><a href="http://stackoverflow.com/questions/tagged/catlang" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://twitter.com/aszecsei" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/catlang/blog">Blog</a><a class="github-button" href="https://github.com/aszecsei/catlang" data-icon="octicon-mark-github" data-count-href="/aszecsei/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Catlang</a></div></section><section class="copyright">Copyright © 2020 Alic Szecsei</section></footer></div></body></html>

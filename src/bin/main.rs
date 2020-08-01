@@ -1,28 +1,15 @@
 extern crate catlang;
-#[macro_use]
-extern crate clap;
-extern crate console;
-#[macro_use]
-extern crate human_panic;
-extern crate indicatif;
-#[macro_use]
-extern crate log;
-extern crate serde_yaml;
 
-use catlang::syntax::logger;
-// use catlang::syntax::parser;
+use catlang::logger;
+use clap::crate_version;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use console::Emoji;
+use human_panic::setup_panic;
 use indicatif::{HumanBytes, HumanDuration};
+use log::info;
 use std::fs;
 use std::io::prelude::*;
 use std::time::Instant;
-
-macro_rules! c_str {
-    ($s:expr) => {
-        concat!($s, "\0").as_ptr() as *const i8
-    };
-}
 
 fn main() {
     setup_panic!();
@@ -116,13 +103,18 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
-        let mut context = catlang::syntax::context::Context::new();
-        let mut main_block =
-            catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
+        let parsed = catlang::syntax::parser::parse(&contents).unwrap();
+        let body = parsed.body();
 
-        let out_fname = m.value_of("output").unwrap_or("out.c");
+        info!("Body: {:?}", body);
 
-        catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
+        // let mut context = catlang::syntax::context::Context::new();
+        // let mut main_block =
+        // catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
+
+        let _out_fname = m.value_of("output").unwrap_or("out.c");
+
+        // catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
     }
     Ok(())
 }
