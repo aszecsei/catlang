@@ -55,25 +55,25 @@
               }
             });
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Functions</h1></header><article><div><span><p>Functions can be defined in a C-like fashion:</p>
-<pre><code class="hljs"><span class="hljs-keyword">function</span> <span class="hljs-title">timesTwo</span>(num: int) -&gt; int {
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">function</span> <span class="hljs-title">timesTwo</span>(num: int) -&gt; int {
   <span class="hljs-keyword">return</span> <span class="hljs-type">num</span> * <span class="hljs-number">2</span>;
 }
 </code></pre>
 <p>This is syntactically equivalent to a second, more functional approach:</p>
-<pre><code class="hljs"><span class="hljs-keyword">const</span> timesTwo = (<span class="hljs-built_in">num</span>: <span class="hljs-built_in">int</span>) -&gt; <span class="hljs-built_in">int</span> {
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> timesTwo = (<span class="hljs-built_in">num</span>: <span class="hljs-built_in">int</span>) -&gt; <span class="hljs-built_in">int</span> {
   <span class="hljs-keyword">return</span> <span class="hljs-built_in">num</span> * <span class="hljs-number">2</span>;
 }
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="global-functions"></a><a href="#global-functions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Global Functions</h2>
 <p>Global functions are defined without any namespace.</p>
-<pre><code class="hljs"><span class="hljs-keyword">const</span> timesTwo = (num: <span class="hljs-built_in">int</span>) -&gt; {
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> timesTwo = (num: <span class="hljs-built_in">int</span>) -&gt; {
   <span class="hljs-keyword">return</span> num * <span class="hljs-number">2</span>;
 }
 <span class="hljs-keyword">const</span> value = timesTwo(<span class="hljs-number">4</span>);
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="static-functions"></a><a href="#static-functions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Static Functions</h2>
 <p>Static functions are attached to a struct, but not an instance of that struct. They <em>cannot</em> use the keyword <code>this</code> in their parameter list.</p>
-<pre><code class="hljs">Vector3::dot = (<span class="hljs-built_in">first</span>: Vector3, <span class="hljs-built_in">second</span>: Vector3) -&gt; {
+<pre><code class="hljs css language-catlang">Vector3::dot = (<span class="hljs-built_in">first</span>: Vector3, <span class="hljs-built_in">second</span>: Vector3) -&gt; {
   <span class="hljs-built_in">return</span> <span class="hljs-built_in">first</span>.x * <span class="hljs-built_in">second</span>.x + <span class="hljs-built_in">first</span>.y * <span class="hljs-built_in">second</span>.y + <span class="hljs-built_in">first</span>.z * <span class="hljs-built_in">second</span>.z;
 }
 const v1 = Vector3;
@@ -82,7 +82,7 @@ const dot = Vector3::dot(v1, v2);
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="instance-functions"></a><a href="#instance-functions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Instance Functions</h2>
 <p>Instance functions are attached to an instance of a struct. They <em>must</em> include the keyword <code>this</code> as their first parameter.</p>
-<pre><code class="hljs">Vector3::toString = (<span class="hljs-keyword">this</span>) -&gt; {
+<pre><code class="hljs css language-catlang">Vector3::toString = (<span class="hljs-keyword">this</span>) -&gt; {
   <span class="hljs-keyword">return</span> <span class="hljs-string">"(<span class="hljs-subst">${<span class="hljs-keyword">this</span>.x}</span>, <span class="hljs-subst">${<span class="hljs-keyword">this</span>.y}</span>, <span class="hljs-subst">${<span class="hljs-keyword">this</span>.z}</span>)"</span>;
 <span class="hljs-keyword">const</span> v1 = Vector3;
 <span class="hljs-built_in">print</span>(v1.toString());
