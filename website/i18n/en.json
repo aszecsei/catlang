@@ -9,6 +9,10 @@
         "title": "Index",
         "sidebar_label": "Index"
       },
+      "arrays": {
+        "title": "Arrays",
+        "sidebar_label": "Arrays"
+      },
       "build-system": {
         "title": "Build System",
         "sidebar_label": "Build System"
@@ -17,9 +21,21 @@
         "title": "Casting",
         "sidebar_label": "Casting"
       },
+      "control-flow": {
+        "title": "Control Flow",
+        "sidebar_label": "Control Flow"
+      },
       "editor-plugins": {
         "title": "Editor Plugins",
         "sidebar_label": "Editor Plugins"
+      },
+      "enums": {
+        "title": "Enums",
+        "sidebar_label": "Enums"
+      },
+      "error-handling": {
+        "title": "Error Handling",
+        "sidebar_label": "Error Handling"
       },
       "functions": {
         "title": "Functions",
@@ -33,6 +49,14 @@
         "title": "Installation",
         "sidebar_label": "Installation"
       },
+      "interfaces": {
+        "title": "Interfaces",
+        "sidebar_label": "Interfaces"
+      },
+      "method-calls": {
+        "title": "Method Calls",
+        "sidebar_label": "Method Calls"
+      },
       "native-types": {
         "title": "Native Types",
         "sidebar_label": "Native Types"
@@ -45,9 +69,21 @@
         "title": "Project Structure",
         "sidebar_label": "Project Structure"
       },
-      "Typing": {
+      "structs": {
+        "title": "Structs",
+        "sidebar_label": "Structs"
+      },
+      "syntax": {
+        "title": "Syntax",
+        "sidebar_label": "Syntax"
+      },
+      "typing": {
         "title": "Typing",
         "sidebar_label": "Typing"
+      },
+      "variables": {
+        "title": "Variables",
+        "sidebar_label": "Variables"
       },
       "what-and-why": {
         "title": "What & Why",

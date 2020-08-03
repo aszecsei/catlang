@@ -192,6 +192,8 @@ pub enum Token {
     Continue,
     #[token("null")]
     Null,
+    #[token("this")]
+    This,
 
     // Type Primitives
     #[token("s8")]

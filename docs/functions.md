@@ -51,8 +51,8 @@ Instance functions are attached to an instance of a struct. They _must_ include 
 ```catlang
 Vector3::toString = (this) -> {
   return "(${this.x}, ${this.y}, ${this.z})";
-const v1 = Vector3;
-print(v1.toString());
+  const v1 = Vector3;
+  print(v1.toString());
 }
 ```
 

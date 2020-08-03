@@ -4,11 +4,20 @@
     "Setup": ["installation", "editor-plugins"],
     "Language Basics": [
       "overview",
+      "syntax",
+      "native-types",
+      "arrays",
+      "method-calls",
+      "control-flow",
+      "variables",
       "functions",
+      "structs",
+      "enums",
+      "interfaces",
       "typing",
       "casting",
-      "native-types",
       "generics",
+      "error-handling",
       "project-structure",
       "build-system"
     ]

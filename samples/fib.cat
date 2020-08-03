@@ -12,13 +12,14 @@ export function fibIter(n: int) -> {
   return a;
 }
 
-struct SOA Vector3 {
+#[SOA]
+struct Vector3 {
   x: float = 1;
   y: float = 2;
   z: float = 3;
 }
 
-enum Alignment: U32 {
+enum Alignment: u32 {
   Left,
   Right,
   Center,
