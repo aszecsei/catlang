@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Typing · Catlang</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Basic Types"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Typing · Catlang"/><meta property="og:type" content="website"/><meta property="og:url" content="https://aszecsei.github.io/catlang/"/><meta property="og:description" content="## Basic Types"/><meta property="og:image" content="https://aszecsei.github.io/catlang/img/docusaurus.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://aszecsei.github.io/catlang/img/docusaurus.png"/><link rel="shortcut icon" href="/catlang/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><link rel="alternate" type="application/atom+xml" href="https://aszecsei.github.io/catlang/blog/atom.xml" title="Catlang Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://aszecsei.github.io/catlang/blog/feed.xml" title="Catlang Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/catlang/js/scrollSpy.js"></script><link rel="stylesheet" href="/catlang/css/main.css"/><script src="/catlang/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/catlang/"><img class="logo" src="/catlang/img/docusaurus.svg" alt="Catlang"/><h2 class="headerTitleWithLogo">Catlang</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/catlang/docs/what-and-why" target="_self">Docs</a></li><li class=""><a href="/catlang/docs/api-index" target="_self">API</a></li><li class=""><a href="/catlang/blog/" target="_self">Blog</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Language Basics</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Intro</h3><ul class=""><li class="navListItem"><a class="navItem" href="/catlang/docs/what-and-why">What &amp; Why</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Setup</h3><ul class=""><li class="navListItem"><a class="navItem" href="/catlang/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/editor-plugins">Editor Plugins</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Language Basics</h3><ul class=""><li class="navListItem"><a class="navItem" href="/catlang/docs/overview">Overview</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/syntax">Syntax</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/native-types">Native Types</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/arrays">Arrays</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/method-calls">Method Calls</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/control-flow">Control Flow</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/variables">Variables</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/functions">Functions</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/structs">Structs</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/enums">Enums</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/interfaces">Interfaces</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/catlang/docs/typing">Typing</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/casting">Casting</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/generics">Generics</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/error-handling">Error Handling</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/project-structure">Project Structure</a></li><li class="navListItem"><a class="navItem" href="/catlang/docs/build-system">Build System</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Typing</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="basic-types"></a><a href="#basic-types" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Basic Types</h2>
+<h3><a class="anchor" aria-hidden="true" id="arrays"></a><a href="#arrays" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Arrays</h3>
+<p>Array types are prefixed with either <code>[]</code> or <code>[..]</code>, for static- or dynamically-sized arrays, respectively.</p>
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">let</span> arr1: []<span class="hljs-keyword">int</span> = [<span class="hljs-number">3</span>]<span class="hljs-keyword">int</span>;
+<span class="hljs-keyword">let</span> arr2: [..]<span class="hljs-keyword">int</span> = [..]<span class="hljs-keyword">int</span>;
+</code></pre>
+<p>There is also a type <code>Array&lt;T&gt;</code> for cases where either a static- or dynamically-sized array may be used:</p>
+<pre><code class="hljs css language-catlang"><span class="hljs-built_in">type</span> Array&lt;<span class="hljs-built_in">T</span>&gt; = []<span class="hljs-built_in">T</span> | [..]<span class="hljs-built_in">T</span>;
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="pointers"></a><a href="#pointers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Pointers</h3>
+<p>Pointer types are prefixed with a <code>*</code>:</p>
+<pre><code class="hljs css language-catlang">let <span class="hljs-string">i:</span> *<span class="hljs-keyword">int</span> = <span class="hljs-meta">@myInt</span>;
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="type-unions"></a><a href="#type-unions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type Unions</h2>
+<p>Types can be composed through unions; this means that a value can be one of the listed types. For example:</p>
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> <span class="hljs-literal">false</span>IfEven = (num: <span class="hljs-built_in">int</span>) -&gt; <span class="hljs-built_in">bool</span> | <span class="hljs-built_in">int</span> {
+  <span class="hljs-keyword">if</span> (num % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  }
+  <span class="hljs-keyword">return</span> num;
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="type-union-propagation"></a><a href="#type-union-propagation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type Union Propagation</h3>
+<p>Most type operators (the pointer-to operator <code>*</code>, for example) propagate through type unions; that is, the following are equivalent:</p>
+<pre><code class="hljs css language-catlang">type a = *(x | y);<span class="hljs-built_in">
+type </span>b = *x | *y;
+</code></pre>
+<p>However, the array-of operator (<code>[]</code>) is not equivalent when propagated. It is, however, contained:</p>
+<pre><code class="hljs css language-catlang"><span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">a</span> </span>= [](x | y); <span class="hljs-comment">// not contained in b</span>
+<span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">b</span> </span>= []x | []y; <span class="hljs-comment">// contained in a</span>
+</code></pre>
+<p>In this example, <code>b</code> is contained in <code>a</code>, but they are not equivalent:</p>
+<pre><code class="hljs css language-catlang">let c: [](<span class="hljs-built_in">float</span> | <span class="hljs-built_in">int</span>) = [] { <span class="hljs-number">1</span>, <span class="hljs-number">2.4</span> }; <span class="hljs-comment">// OK</span>
+let d: []<span class="hljs-built_in">float</span> | []<span class="hljs-built_in">int</span> = [] { <span class="hljs-number">1</span>, <span class="hljs-number">2.4</span> }; <span class="hljs-comment">// ERROR</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="type-definitions"></a><a href="#type-definitions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type Definitions</h2>
+<p>Catlang allows users to write shorthands to refer to complex types. For example:</p>
+<pre><code class="hljs css language-catlang">type number = s8 | <span class="hljs-type">u8</span> | <span class="hljs-type">s16</span> | <span class="hljs-type">u16</span> | <span class="hljs-type">s32</span> | <span class="hljs-type">u32</span> | <span class="hljs-type">s64</span> | <span class="hljs-type">u64</span> | <span class="hljs-type">float</span> | <span class="hljs-type">double</span>;
+const genericFunction = (input: number) -&gt; {
+  <span class="hljs-keyword">return</span> input * <span class="hljs-number">2</span>;
+}
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="any"></a><a href="#any" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Any</h2>
+<p>The <code>any</code> type is the equivalent of C's <code>void*</code> type. It can be used to escape Catlang's type safety requirements.</p>
+<h2><a class="anchor" aria-hidden="true" id="optionals"></a><a href="#optionals" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Optionals</h2>
+<p>Catlang includes an &quot;optional&quot; type, equivalent to <code>type | null</code>, to help avoid null-pointer exceptions. Any function that requires a non-Optional value must be enclosed in a conditional to ensure that the Optional value exists, or an error will be thrown.</p>
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> myPrint = (<span class="hljs-built_in">num</span>: <span class="hljs-built_in">int</span>?) -&gt; {
+  <span class="hljs-keyword">if</span> (<span class="hljs-built_in">num</span>) {
+    <span class="hljs-built_in">print</span>(<span class="hljs-built_in">num</span>);
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"Nope!"</span>);
+  }
+}
+</code></pre>
+<p>If a user wishes to force-unwrap an optional value, they can use the null-forgiving (<code>!</code>) operation to do so. This is not recommended as it may lead to null-pointer exceptions.</p>
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> myPrint = (<span class="hljs-built_in">num</span>: <span class="hljs-built_in">int</span>?) -&gt; {
+  <span class="hljs-built_in">print</span>(<span class="hljs-built_in">num</span>!);
+}
+</code></pre>
+<p>To reduce if-statements, null-coalescing and null-conditional operators are provided.</p>
+<pre><code class="hljs css language-catlang">const myPrint = <span class="hljs-function"><span class="hljs-params">(obj: MyStruct?)</span> -&gt;</span> {
+  <span class="hljs-keyword">if</span> (obj) {
+    obj.DoMethod();
+  }
+  <span class="hljs-regexp">//</span> <span class="hljs-keyword">is</span> equivalent to <span class="hljs-keyword">this</span> using the <span class="hljs-literal">null</span>-conditional operator:
+  obj?.DoMethod();
+
+  <span class="hljs-keyword">if</span> (!obj) {
+    obj = defaultValue;
+  }
+  <span class="hljs-regexp">//</span> <span class="hljs-keyword">is</span> equivalent to <span class="hljs-keyword">this</span> using the <span class="hljs-literal">null</span> coalescing assignment operator
+  obj ??= defaultValue;
+}
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="type-inference"></a><a href="#type-inference" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type Inference</h2>
+<h3><a class="anchor" aria-hidden="true" id="function-arguments"></a><a href="#function-arguments" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Function Arguments</h3>
+<p>Function arguments can not be inferred. Function return types, however, can be inferred.</p>
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> timesTwo = (<span class="hljs-built_in">num</span>) -&gt; {
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">num</span> * <span class="hljs-number">2</span>;
+} <span class="hljs-comment">// ERROR! Argument types cannot be inferred</span>
+
+<span class="hljs-keyword">const</span> timesTwo = (<span class="hljs-built_in">num</span>: <span class="hljs-built_in">int</span>) -&gt; {
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">num</span> * <span class="hljs-number">2</span>;
+} <span class="hljs-comment">// OK!</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="variables"></a><a href="#variables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Variables</h3>
+<p>Variable types can be inferred, so long as an initial value is provided.</p>
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> PI = <span class="hljs-number">3.14159265</span>; <span class="hljs-comment">// OK!</span>
+<span class="hljs-keyword">let</span> x; <span class="hljs-comment">// ERROR!</span>
+<span class="hljs-keyword">let</span> x: <span class="hljs-keyword">int</span>; <span class="hljs-comment">// OK!</span>
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/catlang/docs/interfaces"><span class="arrow-prev">← </span><span>Interfaces</span></a><a class="docs-next button" href="/catlang/docs/casting"><span>Casting</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#basic-types">Basic Types</a><ul class="toc-headings"><li><a href="#arrays">Arrays</a></li><li><a href="#pointers">Pointers</a></li></ul></li><li><a href="#type-unions">Type Unions</a><ul class="toc-headings"><li><a href="#type-union-propagation">Type Union Propagation</a></li></ul></li><li><a href="#type-definitions">Type Definitions</a></li><li><a href="#any">Any</a></li><li><a href="#optionals">Optionals</a></li><li><a href="#type-inference">Type Inference</a><ul class="toc-headings"><li><a href="#function-arguments">Function Arguments</a></li><li><a href="#variables">Variables</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/catlang/" class="nav-home"><img src="/catlang/img/docusaurus.svg" alt="Catlang" width="66" height="58"/></a><div><h5>Docs</h5><a href="/catlang/docs/en/what-and-why.html">Intro</a><a href="/catlang/docs/en/installation.html">Setup</a><a href="/catlang/docs/en/overview.html">Language Basics</a><a href="/catlang/docs/en/api-index.html">API Reference</a></div><div><h5>Community</h5><a href="/catlang/en/users.html">User Showcase</a><a href="http://stackoverflow.com/questions/tagged/catlang" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://twitter.com/aszecsei" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/catlang/blog">Blog</a><a class="github-button" href="https://github.com/aszecsei/catlang" data-icon="octicon-mark-github" data-count-href="/aszecsei/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Catlang</a></div></section><section class="copyright">Copyright © 2020 Alic Szecsei</section></footer></div></body></html>
