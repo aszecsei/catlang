@@ -92,6 +92,40 @@ let arr2sum = sum2(arr2); // ERROR: Array is not either an array of floats or an
 
 The typically-desired behavior is the former. This behavior is what occurs when a developer creates a type definition for a type union and then creates an array of that type definition; this is the recommended practice, to avoid unintended behavior.
 
+## Const Types
+
+Types can be marked as const to indicate that they are immutable. This attribute is applied to any `const` declarations; for example, in
+
+```catlang
+const x: int = 0;
+```
+
+The type of `x` is `const int`. This normally has no impact when passing `x` to functions, as pass-by-value copying means that the `const` attribute can be safely removed:
+
+```catlang
+function timesTwo(a: int) -> int {
+  return a * 2;
+}
+
+const x: int = 16;
+let y = timesTwo(x);
+```
+
+However, if a pointer to `x` were to be passed, that type would be `*const int`, which would restrict modifications to `x`:
+
+```catlang
+function timesTwo(a: *int) -> {
+  *a *= 2;
+}
+
+const x: int = 16;
+timesTwo(@x); // ERROR!
+```
+
+## Volatile Types
+
+The `volatile` type modifier indicates to the compiler that variables of this type may be modified by external sources, most commonly via memory-mapped I/O or multithreading.
+
 ## Type Definitions
 
 Catlang allows users to write shorthands to refer to complex types. For example:
@@ -146,6 +180,10 @@ const myPrint = (obj: MyStruct?) -> {
   obj ??= defaultValue;
 }
 ```
+
+## Tuples
+
+> TODO
 
 ## Type Inference
 

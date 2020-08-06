@@ -92,23 +92,23 @@ impl<T: Debug> Debug for NodeInner<T> {
 }
 
 #[cfg(test)]
-mod node {
+mod tests {
     use super::*;
 
     #[test]
     fn ptr() {
-        let foo = NodeInner::new(0, 0, "foo");
-        let bar = NodeInner::new(0, 0, "bar");
+        let node1 = NodeInner::new(0, 0, "foo");
+        let node2 = NodeInner::new(0, 0, "bar");
 
-        let foo_ptr = Node::new(&foo);
-        let bar_ptr = foo_ptr.clone();
+        let node1_ptr = Node::new(&node1);
+        let node2_ptr = node1_ptr;
 
-        assert_eq!(*foo_ptr, NodeInner::new(0, 0, "foo"));
-        assert_eq!(*bar_ptr, NodeInner::new(0, 0, "foo"));
+        assert_eq!(*node1_ptr, NodeInner::new(0, 0, "foo"));
+        assert_eq!(*node2_ptr, NodeInner::new(0, 0, "foo"));
 
-        bar_ptr.set(&bar);
+        node2_ptr.set(&node2);
 
-        assert_eq!(*foo_ptr, NodeInner::new(0, 0, "foo"));
-        assert_eq!(*bar_ptr, NodeInner::new(0, 0, "bar"));
+        assert_eq!(*node1_ptr, NodeInner::new(0, 0, "foo"));
+        assert_eq!(*node2_ptr, NodeInner::new(0, 0, "bar"));
     }
 }
