@@ -54,7 +54,8 @@ jobs:
           name: Install kcov
           command: |
             sudo apt-get update
-            sudo apt-get install -y cmake binutils-dev libcurl4-openssl-dev libiberty-dev libelf-dev libdw-dev python3
+            sudo apt-get install -y cmake binutils-dev libcurl4-openssl-dev libiberty-dev libelf-dev libdw-dev
+            pyenv global 3.8.5
             cargo install cargo-kcov
             cargo kcov --print-install-kcov-sh | sh
       - run:
