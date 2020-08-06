@@ -1,15 +1,12 @@
 version: 2.1
 jobs:
   build:
-    machine: true
+    docker:
+      # specify the version
+      - image: circleci/rust:latest
     working_directory: ~/catlang
     steps:
       - checkout
-      - run:
-          name: Install rustup
-          command: |
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-            echo 'export PATH=$HOME/.cargo/bin:$PATH' >> $BASH_ENV
       - run:
           name: Install nightly & stable
           command: |
@@ -50,25 +47,27 @@ jobs:
       - run:
           name: Test
           command: rustup run stable cargo test --no-run
-      - run:
-          name: Install kcov
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y cmake binutils-dev libcurl4-openssl-dev libiberty-dev libelf-dev libdw-dev
-            pyenv global 3.5.2
-            cargo install cargo-kcov
-            cargo kcov --print-install-kcov-sh | sh
-      - run:
-          name: Upload Coverage
-          command: |
-            cargo kcov --all -v
-            bash <(curl -s https://codecov.io/bash)
-            echo "Uploaded code coverage"
       - save_cache:
           key: rust-mod-v1-{{ checksum "Cargo.lock" }}
           paths:
             - "~/.cargo"
             - "./target"
+  code-coverage:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Pull xd009642/tarpaulin
+          command: docker pull xd009642/tarpaulin:latest
+      - run:
+          name: Generate report
+          command: >
+            docker run --security-opt seccomp=unconfined -e CODECOV_TOKEN=${CODECOV_TOKEN}
+            -v $PWD:/volume xd009642/tarpaulin cargo tarpaulin -v --ciserver circle-ci
+            --out Xml --all-features
+      - run:
+          name: Upload
+          command: bash <(curl -s https://codecov.io/bash) -Z -f cobertura.xml
   deploy-website:
     docker:
       # specify the version you desire here
@@ -88,6 +87,11 @@ workflows:
   build_and_deploy:
     jobs:
       - build:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+      - code-coverage:
           filters:
             branches:
               ignore:
