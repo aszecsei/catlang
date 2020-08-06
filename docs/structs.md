@@ -26,12 +26,12 @@ struct Vector3 {
 }
 ```
 
-To denote an "owned" property in a struct, use the `owned` keyword. When a struct is deleted, all owned properties are also deleted.
+To denote an "owned" pointer in a struct, use the `owned` keyword. When a struct is deleted, all owned pointers are also deleted.
 
 ```catlang
 struct Transform {
-  owned position: Vector3;
-  owned rotation: Quaternion;
+  owned position: *Vector3;
+  owned rotation: *Quaternion;
 }
 ```
 

@@ -62,6 +62,7 @@ Thus, you can easily comment out an entire block of code, even if the code alrea
 - `true`
 - `false`
 - `this`
+- `volatile`
 
 ## Identifiers
 
