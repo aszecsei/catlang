@@ -1,12 +1,14 @@
 version: 2.1
 jobs:
   build:
-    docker:
-      # specify the version
-      - image: circleci/rust:latest
+    machine: true
     working_directory: ~/catlang
     steps:
       - checkout
+      - run:
+          name: Install rustup
+          command: |
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
       - run:
           name: Install nightly & stable
           command: |
