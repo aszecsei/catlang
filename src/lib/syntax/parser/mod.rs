@@ -32,11 +32,11 @@ impl<'ast> Parser<'ast> {
 
         let mut lexer = Token::lexer(&source);
         let current_token = lexer.next().unwrap_or(Token::EndOfFile);
-        let current_slice = lexer.slice().into();
+        let current_slice = lexer.slice();
         let current_span = lexer.span();
 
         let peek_token = lexer.next().unwrap_or(Token::EndOfFile);
-        let peek_slice = lexer.slice().into();
+        let peek_slice = lexer.slice();
         let peek_span = lexer.span();
 
         Parser {
@@ -64,7 +64,7 @@ impl<'ast> Parser<'ast> {
         self.current_span = self.peek_span.clone();
 
         self.peek_token = self.lexer.next().unwrap_or(Token::EndOfFile);
-        self.peek_slice = self.lexer.slice().into();
+        self.peek_slice = self.lexer.slice();
         self.peek_span = self.lexer.span();
     }
 

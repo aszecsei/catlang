@@ -241,5 +241,5 @@ fn skip_block_comment<'source>(lex: &mut Lexer<'source, Token>) -> logos::Filter
         return logos::Filter::Skip;
     }
     lex.bump(remainder.len());
-    return logos::Filter::Emit(());
+    logos::Filter::Emit(())
 }
