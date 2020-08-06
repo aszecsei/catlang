@@ -82,7 +82,7 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
         1 => log::LevelFilter::Warn,
         2 => log::LevelFilter::Info,
         3 => log::LevelFilter::Debug,
-        4 | _ => log::LevelFilter::Trace,
+        _ => log::LevelFilter::Trace,
     };
 
     let _res = logger::init_with_max_level(max_log_level);
