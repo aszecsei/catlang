@@ -1,0 +1,92 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version
+      - image: circleci/rust:latest
+    working_directory: ~/catlang
+    steps:
+      - checkout
+      - run:
+          name: Install nightly & stable
+          command: |
+            rustup install nightly
+            rustup install stable
+            rustup update
+      - run:
+          name: Install rustfmt
+          command: rustup component add rustfmt
+      - run:
+          name: Install clippy
+          command: rustup component add clippy
+      - restore_cache:
+          keys:
+            - rust-mod-v1-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Check formatting
+          command: |
+            cargo fmt --version
+            cargo fmt --all -- --check
+      - run:
+          name: Lint
+          command: |
+            cargo clippy --version
+            cargo clippy
+      - run:
+          name: Nightly Build
+          command: |
+            rustup run nightly rustc --version --verbose
+            rustup run nightly cargo --version --verbose
+            rustup run nightly cargo build
+      - run:
+          name: Stable Build
+          command: |
+            rustup run stable rustc --version --verbose
+            rustup run stable cargo --version --verbose
+            rustup run stable cargo build
+      - run:
+          name: Test
+          command: rustup run stable cargo test --no-run
+      - run:
+          name: Upload Coverage
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libssl-dev pkg-config cmake zlib1g-dev
+            RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo +nightly install cargo-tarpaulin
+            cargo +nightly tarpaulin --version
+            cargo +nightly tarpaulin --out Xml
+            bash <(curl -s https://codecov.io/bash)
+            echo "Uploaded code coverage"
+      - save_cache:
+          key: rust-mod-v1-{{ checksum "Cargo.lock" }}
+          paths:
+            - "~/.cargo"
+            - "./target"
+  deploy-website:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8.11.1
+
+    steps:
+      - checkout
+      - run:
+          name: Deploying to GitHub Pages
+          command: |
+            git config --global user.email "aszecsei@users.noreply.github.com"
+            git config --global user.name "Alic Szecsei"
+            echo "machine github.com login aszecsei password $GITHUB_TOKEN" > ~/.netrc
+            cd website && npm install && GIT_USER=aszecsei npm run publish-gh-pages
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+      - deploy-website:
+          filters:
+            branches:
+              only:
+                - master

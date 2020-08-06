@@ -1,5 +1,4 @@
 use console::{style, Emoji, Style, Term};
-use log;
 
 fn get_date() -> impl ::std::fmt::Display {
     extern crate chrono;

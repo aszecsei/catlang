@@ -44,7 +44,7 @@ impl<'ast> Parser<'ast> {
             lexer,
             errors: vec![],
             body: NodeList::empty(),
-            last_span: 0..0,
+            last_span: 0..1,
             current_token,
             current_slice,
             current_span,
