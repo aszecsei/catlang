@@ -9,6 +9,7 @@ jobs:
           name: Install rustup
           command: |
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            echo 'export PATH=$HOME/.cargo/bin:$PATH' >> $BASH_ENV
       - run:
           name: Install nightly & stable
           command: |
