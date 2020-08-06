@@ -4,4 +4,4 @@ title: Overview
 sidebar_label: Overview
 ---
 
-Hello, world!
+Catlang is a low-level, data-oriented programming language.

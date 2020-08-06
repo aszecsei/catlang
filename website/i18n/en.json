@@ -53,6 +53,10 @@
         "title": "Interfaces",
         "sidebar_label": "Interfaces"
       },
+      "iterators": {
+        "title": "Iterators",
+        "sidebar_label": "Iterators"
+      },
       "method-calls": {
         "title": "Method Calls",
         "sidebar_label": "Method Calls"

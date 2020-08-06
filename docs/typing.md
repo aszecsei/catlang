@@ -65,6 +65,33 @@ let c: [](float | int) = [] { 1, 2.4 }; // OK
 let d: []float | []int = [] { 1, 2.4 }; // ERROR
 ```
 
+This has some implications for implicit casting to type unions:
+
+```catlang
+function sum1(arr: [](int | float)) -> float {
+  let res: float = 0;
+  for (num in arr) {
+    res += num as float;
+  }
+  return res;
+}
+
+let arr1 = []float { 2.4, 1.2 };
+let arr1sum = sum1(arr1); // OK
+
+function sum2(arr: []int | []float) -> float {
+  let res: float = 0;
+  for (num in arr) {
+    res += num as float;
+  }
+  return res;
+}
+let arr2 = [](int | float) { 2, 2.4 };
+let arr2sum = sum2(arr2); // ERROR: Array is not either an array of floats or an array of ints
+```
+
+The typically-desired behavior is the former. This behavior is what occurs when a developer creates a type definition for a type union and then creates an array of that type definition; this is the recommended practice, to avoid unintended behavior.
+
 ## Type Definitions
 
 Catlang allows users to write shorthands to refer to complex types. For example:
@@ -78,7 +105,7 @@ const genericFunction = (input: number) -> {
 
 ## Any
 
-The `any` type is the equivalent of C's `void*` type. It can be used to escape Catlang's type safety requirements.
+The `any` type is the equivalent of C's `void*` type. It can be used to escape Catlang's type system - `any` types can be cast to any type without any analysis. Note that this will _not_ perform any transformations on numeric types - a `float` cast to `any` and then cast to `int` will be an integer representation of the bits of that float, which is unlikely to be the desired behavior of such a casting operation. Be very careful when using this feature!
 
 ## Optionals
 
@@ -122,26 +149,44 @@ const myPrint = (obj: MyStruct?) -> {
 
 ## Type Inference
 
-### Function Arguments
-
-Function arguments can not be inferred. Function return types, however, can be inferred.
+Catlang does its best to infer type information where appropriate. For example, in this code
 
 ```catlang
-const timesTwo = (num) -> {
-  return num * 2;
-} // ERROR! Argument types cannot be inferred
-
-const timesTwo = (num: int) -> {
-  return num * 2;
-} // OK!
+let x = 3;
 ```
 
-### Variables
+The type of the `x` variable is inferred to be `int`. This kind of inference takes place when initializing variables, creating arrays, and determining function return types.
 
-Variable types can be inferred, so long as an initial value is provided.
+In most cases, type inference is straightforward. In the following sections, we'll explore some of the nuances in how type inference occurs.
+
+### Best Common Type
+
+When multiple types are in use, Catlang attempts to find a "best common type" for those types. This usually creates the smallest type union possible to encompass all values used. For example, in this code
 
 ```catlang
-const PI = 3.14159265; // OK!
-let x; // ERROR!
-let x: int; // OK!
+let x = [] { 1, 2, null };
 ```
+
+The type of the `x` variable would be inferred to be `[](int | null)` - or, equivalently, `[](int?)`.
+
+### Contextual Typing
+
+In some cases, type inference can occur in the opposite direction - that is, the declared type influences the type of the expression. For example:
+
+```catlang
+function floatMap(fun: (float) -> float, arr: []float) -> []float {
+  let res = new [arr.length]float;
+  for (i = 0; i < arr.length; ++i) {
+    res[i] = fun(arr[i]);
+  }
+  return res;
+}
+
+floatMap((f) -> {
+  return f * 2;
+}, [] { 2.4, 3 })
+```
+
+Catlang is able to infer two things that it normally would not do: first, that the argument `f` in the anonymous function argument is a `float` type, and second, that the value `3` in the array argument should be considered `float` type.
+
+Without the contextual information provided, Catlang would throw an error regarding the lack of type information for the `f` argument, and would interpret the array as being of type `[](int | float)`.

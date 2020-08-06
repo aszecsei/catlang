@@ -14,6 +14,7 @@
       "structs",
       "enums",
       "interfaces",
+      "iterators",
       "typing",
       "casting",
       "generics",

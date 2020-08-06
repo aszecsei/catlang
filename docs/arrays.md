@@ -10,8 +10,6 @@ Catlang's arrays differ from C-style arrays in that they contain information abo
 const finalElement = myArray[myArray.length - 1];
 ```
 
-Arrays also include convenience methods for a more functional style of programming: namely `map`, `filter`, `each`, and `reduce`.
-
 Arrays are instantiated using a syntax similar to C, and can be either static- or dynamically-sized:
 
 ```catlang
@@ -52,7 +50,7 @@ const whoops = [5]int { 0, 1, 2 }; // ERROR: size of initialization does not mat
 
 ## Iteration
 
-Arrays can be iterated over:
+Arrays can be iterated over using a foreach-style loop (via the [Iterator](iterators) interface):
 
 ```catlang
 const arr = []int { 1, 2, 3, 4, 5 };
@@ -61,21 +59,14 @@ for (x in arr) {
 }
 ```
 
-They can also iterate over inner properties of structs; in the following example, loops A and B are equivalent:
+They can also be iterated over with a C-style for loop:
 
 ```catlang
-struct Vector3 {
-  x: float;
-  y: float;
-  z: float;
+const arr = []int { 1, 2, 3, 4, 5 };
+for (i = 0; i < arr.length; ++i) {
+  let x = arr[i];
+  print(x);
 }
-const arr = []Vector3 { ... };
-for (xVal in arr.x) {
-  print(xVal);
-} // A
-for (vec in arr) {
-  print(vec.x);
-} // B
 ```
 
 ## Accessing Elements

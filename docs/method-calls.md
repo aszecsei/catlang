@@ -35,3 +35,7 @@ const printMe = (times: int) -> { // ERROR: Re-definition of constant!
 ## Properties
 
 ## Operators
+
+### Subscript Operator
+
+### Deconstruction Operator
