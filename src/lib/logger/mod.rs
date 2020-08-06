@@ -1,7 +1,5 @@
 mod io;
 
-use log;
-
 pub struct Logger;
 
 impl Logger {
