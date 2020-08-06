@@ -69,10 +69,10 @@
   <span class="hljs-attribute">z</span>: float = <span class="hljs-number">1.0</span>;
 }
 </code></pre>
-<p>To denote an &quot;owned&quot; property in a struct, use the <code>owned</code> keyword. When a struct is deleted, all owned properties are also deleted.</p>
+<p>To denote an &quot;owned&quot; pointer in a struct, use the <code>owned</code> keyword. When a struct is deleted, all owned pointers are also deleted.</p>
 <pre><code class="hljs css language-catlang">struct <span class="hljs-attribute">Transform</span> {
-  owned <span class="hljs-attribute">position</span>: Vector3;
-  owned rotation: Quaternion;
+  owned <span class="hljs-attribute">position</span>: *Vector3;
+  owned rotation: *Quaternion;
 }
 </code></pre>
 <p>To allocate memory on the stack, users should declare variables <em>without</em> the <code>new</code> keyword. If the <code>new</code> keyword is used, the variable is allocated on the heap and must be freed later with the <code>delete</code> keyword.</p>
