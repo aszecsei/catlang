@@ -255,6 +255,8 @@ impl<'ast> Parser<'ast> {
     }
 
     fn reference(&mut self) -> Result<ExpressionNode<'ast>> {
+        // TODO: Remove this exception
+        #[allow(clippy::match_single_binding)]
         match self.current_token {
             // Token::At => Address-of reference
             // Token::Mul => Dereference
