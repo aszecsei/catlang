@@ -83,16 +83,16 @@ byte character
     ;
 
 ascii escape
-    = "\x" , 2*( hexadecimal digit ) /* 7-bit character code (exactly 2 digits, up to 0x7F) */
-    | "\n" /* newline */
-    | "\r" /* carriage return */
-    | "\t" /* tab */
-    | "\\" /* backslash */
-    | "\0" /* null */
+    = "\x" , 2*( hexadecimal digit ) (* 7-bit character code (exactly 2 digits, up to 0x7F) *)
+    | "\n" (* newline *)
+    | "\r" (* carriage return *)
+    | "\t" (* tab *)
+    | "\\" (* backslash *)
+    | "\0" (* null *)
     ;
 
 byte escape
-    = "\x" , 2*( hexadecimal digit ) /* 8-bit character code (exactly two digits) */
+    = "\x" , 2*( hexadecimal digit ) (* 8-bit character code (exactly two digits) *)
     | "\n"
     | "\r"
     | "\t"
@@ -101,7 +101,7 @@ byte escape
     ;
 
 unicode escape
-    = "\u{" , 6*( hexadecimal digit ) , "}" /* 24-bit Unicode character code (up to 6 digits) */
+    = "\u{" , 6*( hexadecimal digit ) , "}" (* 24-bit Unicode character code (up to 6 digits) *)
     ;
 
 quote escape
@@ -232,9 +232,9 @@ import
     ;
 
 export
-    = { attribute } , "export" , declaration /* export declaration */
-    | "export" , identifier , [ "as" , identifier ] /* export statement */
-    | "export" , import list , "from" , string literal /* re-export */
+    = { attribute } , "export" , declaration (* export declaration *)
+    | "export" , identifier , [ "as" , identifier ] (* export statement *)
+    | "export" , import list , "from" , string literal (* re-export *)
     ;
 
 import list
@@ -272,7 +272,7 @@ variable declaration
     ;
 
 function declaration
-    = "function" , scoped value , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
+    = "function" , scoped value , [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
     ;
 
 formal parameter list
@@ -285,7 +285,7 @@ parameter
     ;
 
 struct declaration
-    = "struct" , identifier , "{" , struct parameter list , "}"
+    = "struct" , identifier , [ generic parameter list ] , "{" , struct parameter list , "}"
     ;
 
 struct parameter list
@@ -295,6 +295,9 @@ struct parameter list
 struct parameter
     = identifier , ":" , [ "owned" , "*" ] , type expression , [ "=" , expression ]
     ;
+
+generic parameter list
+    = "<" , identifier , { "," , identifier } , ">"
 
 enum declaration
     = "enum" , identifier , [ ":" , enum representation ] , "{" , [ enum value list ] , "}"
@@ -609,7 +612,7 @@ value
     ;
 
 lambda expression
-    = "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
+    = [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
     ;
 
 reference
