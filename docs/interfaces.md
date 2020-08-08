@@ -8,7 +8,7 @@ Interfaces work much the same as Rust's trait system. Interfaces are a list of r
 
 ```catlang
 interface ICollection<T> {
-
+  function operator[]()
 }
 
 impl<T> ICollection<T> for ([]T | [..]T) {

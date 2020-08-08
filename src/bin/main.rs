@@ -6,7 +6,7 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 use console::Emoji;
 use human_panic::setup_panic;
 use indicatif::{HumanBytes, HumanDuration};
-use log::info;
+use log::{info, warn};
 use std::fs;
 use std::io::prelude::*;
 use std::time::Instant;
@@ -58,6 +58,11 @@ fn main() {
                         .help("LLVM optimization level"),
                 ),
         )
+        .subcommand(SubCommand::with_name("fmt").about("format catlang code"))
+        .subcommand(
+            SubCommand::with_name("start-language-server")
+                .about("start the catlang language server"),
+        )
         .get_matches();
 
     if let Err(e) = run(&matches) {
@@ -88,33 +93,35 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
     let _res = logger::init_with_max_level(max_log_level);
     println!("Log level: {}", max_log_level);
 
-    if let Some(_m) = matches.subcommand_matches("init") {
-        info!("Initializing...");
-    }
-
-    if let Some(m) = matches.subcommand_matches("build") {
-        info!("Building...");
-        let fname = m.value_of("INPUT").unwrap_or("main.cat");
-
-        let file_metadata = fs::metadata(fname)?;
-        info!("File size: {}", HumanBytes(file_metadata.len()));
-
-        let mut file = fs::File::open(fname)?;
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
-
-        let parsed = catlang::syntax::parser::parse(&contents).unwrap();
-        let body = parsed.body();
-
-        info!("Body: {:?}", body);
-
-        // let mut context = catlang::syntax::context::Context::new();
-        // let mut main_block =
-        // catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
-
-        let _out_fname = m.value_of("output").unwrap_or("out.c");
-
-        // catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
+    match matches.subcommand() {
+        ("init", Some(_m)) => {
+            info!("Initializing...");
+        }
+        ("build", Some(m)) => {
+            info!("Building...");
+            let fname = m.value_of("INPUT").unwrap_or("main.cat");
+            let file_metadata = fs::metadata(fname)?;
+            info!("File size: {}", HumanBytes(file_metadata.len()));
+            let mut file = fs::File::open(fname)?;
+            let mut contents = String::new();
+            file.read_to_string(&mut contents)?;
+            let parsed = catlang::syntax::parser::parse(&contents).unwrap();
+            let body = parsed.body();
+            info!("Body: {:?}", body);
+            // let mut context = catlang::syntax::context::Context::new();
+            // let mut main_block =
+            // catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
+            let _out_fname = m.value_of("output").unwrap_or("out.c");
+            // catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
+        }
+        ("fmt", Some(_m)) => {
+            info!("Formatting...");
+        }
+        ("start-language-server", Some(_m)) => {
+            // TODO: Better error handling
+            catlang::language_server::LanguageServer::run().unwrap();
+        }
+        _ => warn!("Unrecognized subcommand"),
     }
     Ok(())
 }
