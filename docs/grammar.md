@@ -517,6 +517,7 @@ comparison operator
     | "<="
     | ">"
     | ">="
+    | "in"
     ;
 
 bitwise or expression (* left-associative *)
@@ -566,7 +567,7 @@ multiplying operator
 
 factor (* right-associative *)
     = prefix operator , factor
-    | suffix expression , "as" , factor
+    | suffix expression , "as" , ["!"] , factor
     | suffix expression , "??" , factor
     | suffix expression
     ;
