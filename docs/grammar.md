@@ -298,6 +298,7 @@ struct parameter
 
 generic parameter list
     = "<" , identifier , { "," , identifier } , ">"
+    ;
 
 enum declaration
     = "enum" , identifier , [ ":" , enum representation ] , "{" , [ enum value list ] , "}"
