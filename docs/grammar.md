@@ -374,6 +374,14 @@ named type
     = identifier
     ;
 primitive type
+    = integer type
+    | boolean type
+    | floating point type
+    | unvalued type
+    | "type"
+    ;
+
+integer type
     = "s8"
     | "u8"
     | "s16"
@@ -382,8 +390,36 @@ primitive type
     | "u32"
     | "s64"
     | "u64"
-    | "f32"
+    | "char"
+    | "short"
+    | "int"
+    | "long"
+    | "c_short"
+    | "c_ushort"
+    | "c_int"
+    | "c_uint"
+    | "c_long"
+    | "c_ulong"
+    | "c_longlong"
+    | "c_ulonglong"
+    | "c_longdouble"
+    ;
+
+boolean type
+    = "bool"
+    ;
+
+floating point type
+    = "f32"
     | "f64"
+    | "float"
+    | "double"
+    ;
+
+unvalued type
+    = "null"
+    | "noreturn"
+    | "c_void"
     ;
 
 expression
