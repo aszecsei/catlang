@@ -27,18 +27,18 @@ number
     = decimal integer
     | decimal float
     | "0x" , hexadecimal integer
-    | 0o , octal integer
-    | 0b , binary integer
+    | "0o" , octal integer
+    | "0b" , binary integer
     ;
 
 decimal integer
-    = [ "+" | "-" ] , digit , { digit }
+    = [ "+" | "-" ] , digit , { digit } [ integer type ]
     ;
 
 decimal float
-    = [ "+" | "-" ] , digit , { digit } , "f"
-    | [ "+" | "-" ] , digit , { digit } , "." , { digit } [ "f" ]
-    | [ "+" | "-" ] , "." , digit , { digit } [ "f" ]
+    = [ "+" | "-" ] , digit , { digit } , floating point type
+    | [ "+" | "-" ] , digit , { digit } , "." , { digit } [ floating point type ]
+    | [ "+" | "-" ] , "." , digit , { digit } [ floating point type ]
     ;
 
 hexadecimal integer
@@ -114,6 +114,7 @@ punctuation
     | ")"
     | "{"
     | "}"
+    | "#["
     | "["
     | "]"
     | ":"
@@ -159,10 +160,38 @@ punctuation
     | "??"
     | "."
     | ".."
+    | "..."
     ;
 
 reserved words
-    = "let"
+    = "any"
+    | "let"
+    | "const"
+    | "new"
+    | "delete"
+    | "typeof"
+    | "is"
+    | "as"
+    | "in"
+    | "function"
+    | "return"
+    | "struct"
+    | "type"
+    | "enum"
+    | "SOA"
+    | "owned"
+    | "import"
+    | "export"
+    | "from"
+    | "for"
+    | "while"
+    | "do"
+    | "loop"
+    | "if"
+    | "else"
+    | "break"
+    | "continue"
+    | "this"
     ;
 
 catlang file
@@ -591,7 +620,6 @@ reference
 ## TODO
 
 - float exponents (`0.2e1`)
-- integer type suffixes (`1u8`)
-- more enum representations (`int`? `c_int`?)
+- more enum representations (`c_int`?)
 - let loops have return types via break/continue/etc?
 - `suffix expression` feels poorly-defined

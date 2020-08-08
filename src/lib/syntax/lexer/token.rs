@@ -134,6 +134,8 @@ pub enum Token {
     Dot,
     #[token("..")]
     DotDot,
+    #[token("...")]
+    DotDotDot,
 
     // Keywords
     #[token("any")]
@@ -190,8 +192,6 @@ pub enum Token {
     Break,
     #[token("continue")]
     Continue,
-    #[token("null")]
-    Null,
     #[token("this")]
     This,
 
@@ -220,12 +220,40 @@ pub enum Token {
     Int,
     #[token("long")]
     Long,
+    #[token("c_short")]
+    CShort,
+    #[token("c_ushort")]
+    CUShort,
+    #[token("c_int")]
+    CInt,
+    #[token("c_uint")]
+    CUInt,
+    #[token("c_long")]
+    CLong,
+    #[token("c_ulong")]
+    CULong,
+    #[token("c_longlong")]
+    CLongLong,
+    #[token("c_ulonglong")]
+    CULongLong,
+    #[token("c_longdouble")]
+    CLongDouble,
     #[token("bool")]
     BoolType,
     #[token("float")]
     Float,
     #[token("double")]
     Double,
+    #[token("null")]
+    Null,
+    #[token("f32")]
+    F32,
+    #[token("f64")]
+    F64,
+    #[token("noreturn")]
+    NoReturn,
+    #[token("c_void")]
+    CVoid,
 }
 
 impl Default for Token {
