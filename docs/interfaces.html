@@ -55,14 +55,14 @@
               }
             });
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Interfaces</h1></header><article><div><span><p>Interfaces work much the same as Rust's trait system. Interfaces are a list of required methods, and can be implemented by any struct. Even structs defined externally can have interfaces added (although duplicate interface implementations will throw an error).</p>
-<pre><code class="hljs css language-catlang"><span class="xml">interface ICollection<span class="hljs-tag">&lt;<span class="hljs-name">T</span>&gt;</span> </span><span class="hljs-template-variable">{
+<pre><code class="hljs css language-catlang">interface ICollection&lt;<span class="hljs-literal">T</span>&gt; {
+  <span class="hljs-keyword">function</span> operator[]()
+}
 
-}</span><span class="xml">
+impl&lt;<span class="hljs-literal">T</span>&gt; ICollection&lt;<span class="hljs-literal">T</span>&gt; <span class="hljs-keyword">for</span> ([]<span class="hljs-literal">T</span> | [..]<span class="hljs-literal">T</span>) {
 
-impl<span class="hljs-tag">&lt;<span class="hljs-name">T</span>&gt;</span> ICollection<span class="hljs-tag">&lt;<span class="hljs-name">T</span>&gt;</span> for ([]T | [..]T) </span><span class="hljs-template-variable">{
-
-}</span><span class="xml">
-</span></code></pre>
+}
+</code></pre>
 <h2><a class="anchor" aria-hidden="true" id="interfaces-on-type-unions"></a><a href="#interfaces-on-type-unions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Interfaces on Type Unions</h2>
 <p>Implementing an interface for a type union implements the interface for all types in the union.</p>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/catlang/docs/enums"><span class="arrow-prev">← </span><span>Enums</span></a><a class="docs-next button" href="/catlang/docs/iterators"><span>Iterators</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#interfaces-on-type-unions">Interfaces on Type Unions</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/catlang/" class="nav-home"><img src="/catlang/img/docusaurus.svg" alt="Catlang" width="66" height="58"/></a><div><h5>Docs</h5><a href="/catlang/docs/en/what-and-why.html">Intro</a><a href="/catlang/docs/en/installation.html">Setup</a><a href="/catlang/docs/en/overview.html">Language Basics</a><a href="/catlang/docs/en/api-index.html">API Reference</a></div><div><h5>Community</h5><a href="/catlang/en/users.html">User Showcase</a><a href="http://stackoverflow.com/questions/tagged/catlang" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://twitter.com/aszecsei" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/catlang/blog">Blog</a><a class="github-button" href="https://github.com/aszecsei/catlang" data-icon="octicon-mark-github" data-count-href="/aszecsei/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Catlang</a></div></section><section class="copyright">Copyright © 2020 Alic Szecsei</section></footer></div></body></html>
