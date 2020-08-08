@@ -131,16 +131,16 @@
     ;
 
 <span class="hljs-attribute">ascii escape</span>
-    = <span class="hljs-string">"\x"</span> , 2*( hexadecimal digit ) /* 7-bit character code (exactly 2 digits, up to 0x7F) */
-    | <span class="hljs-string">"\n"</span> /* newline */
-    | <span class="hljs-string">"\r"</span> /* carriage return */
-    | <span class="hljs-string">"\t"</span> /* tab */
-    | <span class="hljs-string">"\\"</span> /* backslash */
-    | <span class="hljs-string">"\0"</span> /* null */
+    = <span class="hljs-string">"\x"</span> , 2*( hexadecimal digit ) <span class="hljs-comment">(* 7-bit character code (exactly 2 digits, up to 0x7F) *)</span>
+    | <span class="hljs-string">"\n"</span> <span class="hljs-comment">(* newline *)</span>
+    | <span class="hljs-string">"\r"</span> <span class="hljs-comment">(* carriage return *)</span>
+    | <span class="hljs-string">"\t"</span> <span class="hljs-comment">(* tab *)</span>
+    | <span class="hljs-string">"\\"</span> <span class="hljs-comment">(* backslash *)</span>
+    | <span class="hljs-string">"\0"</span> <span class="hljs-comment">(* null *)</span>
     ;
 
 <span class="hljs-attribute">byte escape</span>
-    = <span class="hljs-string">"\x"</span> , 2*( hexadecimal digit ) /* 8-bit character code (exactly two digits) */
+    = <span class="hljs-string">"\x"</span> , 2*( hexadecimal digit ) <span class="hljs-comment">(* 8-bit character code (exactly two digits) *)</span>
     | <span class="hljs-string">"\n"</span>
     | <span class="hljs-string">"\r"</span>
     | <span class="hljs-string">"\t"</span>
@@ -149,7 +149,7 @@
     ;
 
 <span class="hljs-attribute">unicode escape</span>
-    = <span class="hljs-string">"\u{"</span> , 6*( hexadecimal digit ) , <span class="hljs-string">"}"</span> /* 24-bit Unicode character code (up to 6 digits) */
+    = <span class="hljs-string">"\u{"</span> , 6*( hexadecimal digit ) , <span class="hljs-string">"}"</span> <span class="hljs-comment">(* 24-bit Unicode character code (up to 6 digits) *)</span>
     ;
 
 <span class="hljs-attribute">quote escape</span>
@@ -280,9 +280,9 @@
     ;
 
 <span class="hljs-attribute">export</span>
-    = { attribute } , <span class="hljs-string">"export"</span> , declaration /* export declaration */
-    | <span class="hljs-string">"export"</span> , identifier , [ <span class="hljs-string">"as"</span> , identifier ] /* export statement */
-    | <span class="hljs-string">"export"</span> , import list , <span class="hljs-string">"from"</span> , string literal /* re-export */
+    = { attribute } , <span class="hljs-string">"export"</span> , declaration <span class="hljs-comment">(* export declaration *)</span>
+    | <span class="hljs-string">"export"</span> , identifier , [ <span class="hljs-string">"as"</span> , identifier ] <span class="hljs-comment">(* export statement *)</span>
+    | <span class="hljs-string">"export"</span> , import list , <span class="hljs-string">"from"</span> , string literal <span class="hljs-comment">(* re-export *)</span>
     ;
 
 <span class="hljs-attribute">import list</span>
@@ -320,7 +320,7 @@
     ;
 
 <span class="hljs-attribute">function declaration</span>
-    = <span class="hljs-string">"function"</span> , scoped value , <span class="hljs-string">"("</span> , [ formal parameter list ] , <span class="hljs-string">")"</span> , [ <span class="hljs-string">"-&gt;"</span> , [ type expression ] ] , block
+    = <span class="hljs-string">"function"</span> , scoped value , [ generic parameter list ] , <span class="hljs-string">"("</span> , [ formal parameter list ] , <span class="hljs-string">")"</span> , [ <span class="hljs-string">"-&gt;"</span> , [ type expression ] ] , block
     ;
 
 <span class="hljs-attribute">formal parameter list</span>
@@ -333,7 +333,7 @@
     ;
 
 <span class="hljs-attribute">struct declaration</span>
-    = <span class="hljs-string">"struct"</span> , identifier , <span class="hljs-string">"{"</span> , struct parameter list , <span class="hljs-string">"}"</span>
+    = <span class="hljs-string">"struct"</span> , identifier , [ generic parameter list ] , <span class="hljs-string">"{"</span> , struct parameter list , <span class="hljs-string">"}"</span>
     ;
 
 <span class="hljs-attribute">struct parameter list</span>
@@ -344,7 +344,10 @@
     = identifier , <span class="hljs-string">":"</span> , [ <span class="hljs-string">"owned"</span> , <span class="hljs-string">"*"</span> ] , type expression , [ <span class="hljs-string">"="</span> , expression ]
     ;
 
-<span class="hljs-attribute">enum declaration</span>
+<span class="hljs-attribute">generic parameter list</span>
+    = <span class="hljs-string">"&lt;"</span> , identifier , { <span class="hljs-string">","</span> , identifier } , <span class="hljs-string">"&gt;"</span>
+
+enum declaration
     = <span class="hljs-string">"enum"</span> , identifier , [ <span class="hljs-string">":"</span> , enum representation ] , <span class="hljs-string">"{"</span> , [ enum value list ] , <span class="hljs-string">"}"</span>
     ;
 
@@ -657,7 +660,7 @@ unary type expression
     ;
 
 <span class="hljs-attribute">lambda expression</span>
-    = <span class="hljs-string">"("</span> , [ formal parameter list ] , <span class="hljs-string">")"</span> , [ <span class="hljs-string">"-&gt;"</span> , [ type expression ] ] , block
+    = [ generic parameter list ] , <span class="hljs-string">"("</span> , [ formal parameter list ] , <span class="hljs-string">")"</span> , [ <span class="hljs-string">"-&gt;"</span> , [ type expression ] ] , block
     ;
 
 <span class="hljs-attribute">reference</span>
