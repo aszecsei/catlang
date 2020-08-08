@@ -29,6 +29,8 @@ Pointer types are prefixed with a `*`:
 let i: *int = @myInt;
 ```
 
+Pointers cannot be `null`. To use a null pointer, it must be of type `*T?`. The size of an optional pointer is guaranteed to be the same as the size of the pointer, and the value of the null pointer is guaranteed to be 0.
+
 ## Type Unions
 
 Types can be composed through unions; this means that a value can be one of the listed types. For example:

@@ -19,13 +19,28 @@ sidebar_label: Native Types
    1. `short` (equivalent to `s16`)
    1. `int` (equivalent to `s32`)
    1. `long` (equivalent to `s64`)
+   1. `c_short` (for ABI compatibility with C)
+   1. `c_ushort` (for ABI compatibility with C)
+   1. `c_int` (for ABI compatibility with C)
+   1. `c_uint` (for ABI compatibility with C)
+   1. `c_long` (for ABI compatibility with C)
+   1. `c_ulong` (for ABI compatibility with C)
+   1. `c_longlong` (for ABI compatibility with C)
+   1. `c_ulonglong` (for ABI compatibility with C)
+   1. `c_longdouble` (for ABI compatibility with C)
 1. Booleans
    1. `bool` (1 byte)
 1. Floating-Point Numbers
-   1. `float` (4 bytes)
-   1. `double` (8 bytes)
+   1. `f32` (4 bytes)
+   1. `f64` (8 bytes)
+   1. `float` (equivalent to `f32`)
+   1. `double` (equivalent to `f64`)
 1. Unvalued
    1. `null`
+   1. `noreturn`
+   1. `c_void` (for ABI compatibility with C)
+1. Miscellaneous
+   1. `type`
 
 ## Number Literals
 
