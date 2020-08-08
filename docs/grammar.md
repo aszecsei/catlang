@@ -343,27 +343,36 @@ unary type expression
     = pointer to
     | sized array
     | unsized array
+    | const type
+    | volatile type
     | optional type
     | simple type expression
     ;
 
 pointer to
-    = "*" , type expression
+    = "*" , unary type expression
     ;
 sized array
-    = "[" , expression , "]" , type expression
+    = "[" , expression , "]" , unary type expression
     ;
 unsized array
-    = "[" , ".." , "]" , type expression
+    = "[" , ".." , "]" , unary type expression
+    ;
+const type
+    = "const" , unary type expression
+    ;
+volatile type
+    = "volatile" , unary type expression
     ;
 optional type
-    = type expression , "?"
+    = "?" , unary type expression
     ;
 
 simple type expression
     = typeof expression
     | named type
     | primitive type
+    | "(" type expression ")"
     | "any"
     ;
 
@@ -371,7 +380,7 @@ typeof expression
     = "typeof" , expression
     ;
 named type
-    = identifier
+    = identifier { "::" , identifier } (* scoped types *)
     ;
 primitive type
     = integer type
@@ -544,11 +553,11 @@ prefix operator
     ;
 
 suffix expression (* left-associative *)
-    = scoped value , suffix operator
-    | scoped value , "(" , [ expression list ] , ")" (* function call *)
-    | scoped value , "[" , [ expression list ] , "]" (* subscript *)
-    | scoped value , { "." , suffix expression } (* member access *)
-    | scoped value
+    = value , suffix operator
+    | value , "(" , [ expression list ] , ")" (* function call *)
+    | value , "[" , [ expression list ] , "]" (* subscript *)
+    | value , { "." , suffix expression } (* member access *)
+    | value
     ;
 suffix operator
     = "++"
@@ -557,14 +566,10 @@ suffix operator
     | "?"
     ;
 
-scoped value (* left-associative *)
-    = value , { "::" , identifier }
-    ;
-
 value
-    = "typeof" , "(" , expression , ")"
-    | "sizeof" , "(" , type expression , ")"
+    = "sizeof" , "(" , type expression , ")"
     | lambda expression
+    | type expression [ "::" identifier ]
     | number
     | string literal
     | character literal
