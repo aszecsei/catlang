@@ -414,7 +414,7 @@ typeof expression
     = "typeof" , expression
     ;
 named type
-    = identifier { "::" , identifier } (* scoped types *)
+    = identifier { "::" , identifier } [ generic type list ] (* scoped types *)
     ;
 primitive type
     = integer type
@@ -463,6 +463,10 @@ unvalued type
     = "null"
     | "noreturn"
     | "c_void"
+    ;
+
+generic type list
+    = "<" , type expression , { "," , type expression } >
     ;
 
 expression
@@ -589,7 +593,7 @@ prefix operator
 
 suffix expression (* left-associative *)
     = value , suffix operator
-    | value , "(" , [ expression list ] , ")" (* function call *)
+    | value , [ generic type list ] , "(" , [ expression list ] , ")" (* function call *)
     | value , "[" , [ expression list ] , "]" (* subscript *)
     | value , { "." , suffix expression } (* member access *)
     | value
@@ -604,13 +608,21 @@ suffix operator
 value
     = "sizeof" , "(" , type expression , ")"
     | lambda expression
-    | type expression [ "::" identifier ]
+    | [ "new" ] , type expression , [ struct initializer ] (* struct allocation via initializer or empty *)
+    | type expression , "::" , identifier (* scoped value *)
     | number
     | string literal
     | character literal
     | byte literal
     | byte string literal
     | reference
+    ;
+
+struct initializer
+    = "{" , [ { struct initializer param , "," } , struct initializer param , [ "," ] ] "}"
+    ;
+struct initializer param
+    = identifier , ":" , expression
     ;
 
 lambda expression
