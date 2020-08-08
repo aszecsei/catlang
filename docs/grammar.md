@@ -371,6 +371,7 @@ type expression
 
 type union
     = unary type expression , "|" , type expression
+    ;
 
 unary type expression
     = pointer to
