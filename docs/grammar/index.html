@@ -462,7 +462,7 @@
     = <span class="hljs-string">"typeof"</span> , expression
     ;
 <span class="hljs-attribute">named type</span>
-    = identifier { <span class="hljs-string">"::"</span> , identifier } <span class="hljs-comment">(* scoped types *)</span>
+    = identifier { <span class="hljs-string">"::"</span> , identifier } [ generic type list ] <span class="hljs-comment">(* scoped types *)</span>
     ;
 <span class="hljs-attribute">primitive type</span>
     = integer type
@@ -511,6 +511,10 @@
     = <span class="hljs-string">"null"</span>
     | <span class="hljs-string">"noreturn"</span>
     | <span class="hljs-string">"c_void"</span>
+    ;
+
+<span class="hljs-attribute">generic type list</span>
+    = <span class="hljs-string">"&lt;"</span> , type expression , { <span class="hljs-string">","</span> , type expression } &gt;
     ;
 
 <span class="hljs-attribute">expression</span>
@@ -637,7 +641,7 @@
 
 <span class="hljs-attribute">suffix expression</span> <span class="hljs-comment">(* left-associative *)</span>
     = value , suffix operator
-    | value , <span class="hljs-string">"("</span> , [ expression list ] , <span class="hljs-string">")"</span> <span class="hljs-comment">(* function call *)</span>
+    | value , [ generic type list ] , <span class="hljs-string">"("</span> , [ expression list ] , <span class="hljs-string">")"</span> <span class="hljs-comment">(* function call *)</span>
     | value , <span class="hljs-string">"["</span> , [ expression list ] , <span class="hljs-string">"]"</span> <span class="hljs-comment">(* subscript *)</span>
     | value , { <span class="hljs-string">"."</span> , suffix expression } <span class="hljs-comment">(* member access *)</span>
     | value
@@ -652,13 +656,21 @@
 <span class="hljs-attribute">value</span>
     = <span class="hljs-string">"sizeof"</span> , <span class="hljs-string">"("</span> , type expression , <span class="hljs-string">")"</span>
     | lambda expression
-    | type expression [ <span class="hljs-string">"::"</span> identifier ]
+    | [ <span class="hljs-string">"new"</span> ] , type expression , [ struct initializer ] <span class="hljs-comment">(* struct allocation via initializer or empty *)</span>
+    | type expression , <span class="hljs-string">"::"</span> , identifier <span class="hljs-comment">(* scoped value *)</span>
     | number
     | string literal
     | character literal
     | byte literal
     | byte string literal
     | reference
+    ;
+
+<span class="hljs-attribute">struct initializer</span>
+    = <span class="hljs-string">"{"</span> , [ { struct initializer param , <span class="hljs-string">","</span> } , struct initializer param , [ <span class="hljs-string">","</span> ] ] <span class="hljs-string">"}"</span>
+    ;
+<span class="hljs-attribute">struct initializer param</span>
+    = identifier , <span class="hljs-string">":"</span> , expression
     ;
 
 <span class="hljs-attribute">lambda expression</span>
