@@ -69,7 +69,7 @@ const y = x as! int; // 705032704
 
 ## Type Coercion
 
-A limited amount of type coercion is permitted.
+A limited amount of type coercion is permitted - namely, when it is completely unambiguous how to get from one type to another, and the transformation is guaranteed to be safe.
 
 ### Stricter Qualification
 

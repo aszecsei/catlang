@@ -45,6 +45,10 @@
         "title": "Generics",
         "sidebar_label": "Generics"
       },
+      "grammar": {
+        "title": "Grammar",
+        "sidebar_label": "Grammar"
+      },
       "installation": {
         "title": "Installation",
         "sidebar_label": "Installation"
@@ -52,6 +56,10 @@
       "interfaces": {
         "title": "Interfaces",
         "sidebar_label": "Interfaces"
+      },
+      "interop": {
+        "title": "Interop",
+        "sidebar_label": "Interop"
       },
       "iterators": {
         "title": "Iterators",

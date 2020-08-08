@@ -37,7 +37,7 @@ An optional list of keywords describing your project.
 
 The URL to the project homepage. Example:
 
-```
+```yaml
 homepage: https://github.com/owner/project#readme
 ```
 
@@ -47,15 +47,29 @@ homepage: https://github.com/owner/project#readme
 
 ### authors
 
-### files
+### scripts
 
 ### main
+
+### paths
 
 ### repository
 
 ### dependencies
 
 ### devDependencies
+
+### link
+
+A dictionary with two valid keys: `c` and `obj`. These keys should be arrays of paths or a single path.
+
+```yaml
+link:
+  - c: src/clib/hello.c
+  - obj: ["src/lib/world.o", "src/lib/other.o"]
+```
+
+Files in the `c` section will be compiled and linked; pre-compiled object files in the `obj` section will simply be linked in the program.
 
 ### private
 
@@ -77,10 +91,11 @@ authors:
   - name: Alic Szecsei
 email: aszecsei@gmail.com
 url: https://alic-szecsei.com
-files:
-  - src/**/*.cat
-  - test/**/*.cat
+scripts:
+  - src/scripts/**/*.cat
 main: src/main.cat
+paths:
+  - "@workers": src/utils/workers/
 repository: github:aszecsei/catlang
 dependencies:
   - "@guyfieri/project": ^2.3.1
