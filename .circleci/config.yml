@@ -68,10 +68,7 @@ jobs:
           name: Install LLVM
           command: |
             sudo apt-get update
-            sudo apt-get install -y lsb-release software-properties-common
-            wget https://apt.llvm.org/llvm.sh
-            chmod +x llvm.sh
-            sudo ./llvm.sh 10
+            sudo apt-get install -y apt-get install libllvm10 llvm-10 llvm-10-dev llvm-10-runtime
       - run:
           name: Pull xd009642/tarpaulin
           command: docker pull xd009642/tarpaulin:latest
