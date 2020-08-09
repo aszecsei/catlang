@@ -23,6 +23,9 @@ enum Command {
         /// optimization level
         #[structopt(short = "O", default_value = "2", possible_values = &["0", "1", "2", "3"])]
         optimization: u8,
+        /// LLVM target triple
+        #[structopt(long, default_value = &catlang::codegen::DEFAULT_TARGET_TRIPLE)]
+        target: String,
         /// application entry point
         #[structopt(name = "INPUT", parse(from_os_str))]
         input: PathBuf,
@@ -91,6 +94,7 @@ fn run(opt: &Opt) -> anyhow::Result<()> {
             output: _output,
             optimization,
             input,
+            target,
         } => {
             info!("Building...");
             let file_metadata = fs::metadata(input.clone())?;
@@ -105,7 +109,7 @@ fn run(opt: &Opt) -> anyhow::Result<()> {
             // catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
 
             // codegen
-            println!("{}", catlang::codegen::run(*optimization));
+            println!("{}", catlang::codegen::run(*optimization, target)?);
         }
         Command::Fmt {} => {
             info!("Formatting...");
