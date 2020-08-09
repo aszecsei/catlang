@@ -1,71 +1,60 @@
 extern crate catlang;
 
 use catlang::logger;
-use clap::crate_version;
-use clap::{App, Arg, ArgMatches, SubCommand};
 use console::Emoji;
 use human_panic::setup_panic;
 use indicatif::{HumanBytes, HumanDuration};
-use log::{info, warn};
+use log::info;
 use std::fs;
 use std::io::prelude::*;
+use std::path::PathBuf;
 use std::time::Instant;
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+enum Command {
+    /// initialize a catlang project
+    Init {},
+    /// build a catlang project
+    Build {
+        /// output binary name
+        #[structopt(short, long, parse(from_os_str))]
+        output: Option<PathBuf>,
+        /// optimization level
+        #[structopt(short = "O", default_value = "2", possible_values = &["0", "1", "2", "3"])]
+        optimization: u8,
+        /// application entry point
+        #[structopt(name = "INPUT", parse(from_os_str))]
+        input: PathBuf,
+    },
+    /// auto-format a catlang project
+    Fmt {},
+    /// start the catlang language server
+    #[structopt(name = "start-language-server")]
+    LanguageServer {},
+}
+
+#[derive(StructOpt)]
+#[structopt(name = "catlang")]
+/// compiler for the catlang programming language
+struct Opt {
+    /// verbose mode (-v, -vv, -vvv, etc.)
+    #[structopt(short, long, parse(from_occurrences), conflicts_with = "quiet")]
+    pub verbose: u8,
+    /// quiet output
+    #[structopt(long)]
+    pub quiet: bool,
+    #[structopt(subcommand)]
+    pub command: Command,
+}
 
 fn main() {
     setup_panic!();
     let started = Instant::now();
 
-    const AUTHOR: &str = "Alic Szecsei <aszecsei@gmail.com>";
-    let matches = App::new("catlang")
-        .version(crate_version!())
-        .author(AUTHOR)
-        .about("Compiler for the Catlang programming language.")
-        .arg(
-            Arg::with_name("verbose")
-                .short("v")
-                .multiple(true)
-                .help("sets the level of verbosity")
-                .global(true)
-                .conflicts_with("quiet"),
-        )
-        .arg(
-            Arg::with_name("quiet")
-                .long("quiet")
-                .help("Quiet output")
-                .global(true),
-        )
-        .subcommand(SubCommand::with_name("init").about("initialize a new catlang project"))
-        .subcommand(
-            SubCommand::with_name("build")
-                .about("build an executable")
-                .arg(
-                    Arg::with_name("output")
-                        .short("o")
-                        .default_value("main")
-                        .help("output binary name"),
-                )
-                .arg(
-                    Arg::with_name("INPUT")
-                        .required(true)
-                        .index(1)
-                        .help("application entry point"),
-                )
-                .arg(
-                    Arg::with_name("optimization")
-                        .short("O")
-                        .default_value("2")
-                        .possible_values(&["0", "1", "2", "3"])
-                        .help("LLVM optimization level"),
-                ),
-        )
-        .subcommand(SubCommand::with_name("fmt").about("format catlang code"))
-        .subcommand(
-            SubCommand::with_name("start-language-server")
-                .about("start the catlang language server"),
-        )
-        .get_matches();
+    let opt = Opt::from_args();
 
-    if let Err(e) = run(&matches) {
+    if let Err(e) = run(&opt) {
         panic!("Application error: {}", e);
     }
 
@@ -76,12 +65,8 @@ fn main() {
     );
 }
 
-fn run(matches: &ArgMatches) -> std::io::Result<()> {
-    let verbose_num = if matches.is_present("quiet") {
-        0
-    } else {
-        matches.occurrences_of("verbose") + 1
-    };
+fn run(opt: &Opt) -> anyhow::Result<()> {
+    let verbose_num = if opt.quiet { 0 } else { opt.verbose + 1 };
     let max_log_level = match verbose_num {
         0 => log::LevelFilter::Off,
         1 => log::LevelFilter::Warn,
@@ -91,37 +76,34 @@ fn run(matches: &ArgMatches) -> std::io::Result<()> {
     };
 
     let _res = logger::init_with_max_level(max_log_level);
-    println!("Log level: {}", max_log_level);
 
-    match matches.subcommand() {
-        ("init", Some(_m)) => {
+    match &opt.command {
+        Command::Init {} => {
             info!("Initializing...");
         }
-        ("build", Some(m)) => {
+        Command::Build {
+            output: _output,
+            optimization: _optimization,
+            input,
+        } => {
             info!("Building...");
-            let fname = m.value_of("INPUT").unwrap_or("main.cat");
-            let file_metadata = fs::metadata(fname)?;
+            let file_metadata = fs::metadata(input.clone())?;
             info!("File size: {}", HumanBytes(file_metadata.len()));
-            let mut file = fs::File::open(fname)?;
+            let mut file = fs::File::open(input)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
             let parsed = catlang::syntax::parser::parse(&contents).unwrap();
             let body = parsed.body();
             info!("Body: {:?}", body);
-            // let mut context = catlang::syntax::context::Context::new();
-            // let mut main_block =
-            // catlang::syntax::parser::Parser::parse_file(fname, &contents, &mut context);
-            let _out_fname = m.value_of("output").unwrap_or("out.c");
+            // let _out_fname = m.value_of("_output").unwrap_or("out.c");
             // catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
         }
-        ("fmt", Some(_m)) => {
+        Command::Fmt {} => {
             info!("Formatting...");
         }
-        ("start-language-server", Some(_m)) => {
-            // TODO: Better error handling
-            catlang::language_server::LanguageServer::run().unwrap();
+        Command::LanguageServer {} => {
+            catlang::language_server::LanguageServer::run()?;
         }
-        _ => warn!("Unrecognized subcommand"),
     }
     Ok(())
 }

@@ -16,7 +16,6 @@ edition = "2018"
 
 [dependencies]
 chrono = "0.4.13"
-clap = "2.33.1"
 console = "0.11.3"
 fnv = "1.0.7"
 human-panic = "1.0.3"
@@ -35,6 +34,7 @@ lsp-server = "0.3.3"
 lsp-types = "0.79.0"
 serde_json = "1.0.57"
 anyhow = "1.0.32"
+structopt = "0.3.16"
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"
