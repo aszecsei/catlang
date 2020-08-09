@@ -61,14 +61,18 @@ jobs:
             - "~/.cargo"
             - "./target"
   code-coverage:
-    machine: true
+    machine:
+      image: ubuntu-1604:202007-01
     steps:
       - checkout
       - run:
           name: Install LLVM
           command: |
             sudo apt-get update
-            sudo apt-get install -y libllvm10 llvm-10 llvm-10-dev llvm-10-runtime
+            sudo apt-get install -y lsb-release software-properties-common
+            wget https://apt.llvm.org/llvm.sh
+            chmod +x llvm.sh
+            sudo ./llvm.sh 10
       - run:
           name: Pull xd009642/tarpaulin
           command: docker pull xd009642/tarpaulin:latest
