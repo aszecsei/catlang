@@ -89,7 +89,7 @@ fn run(opt: &Opt) -> anyhow::Result<()> {
         }
         Command::Build {
             output: _output,
-            optimization: _optimization,
+            optimization,
             input,
         } => {
             info!("Building...");
@@ -103,6 +103,9 @@ fn run(opt: &Opt) -> anyhow::Result<()> {
             info!("Body: {:?}", body);
             // let _out_fname = m.value_of("_output").unwrap_or("out.c");
             // catlang::syntax::codegen::llvm::codegen(main_block, out_fname);
+
+            // codegen
+            println!("{}", catlang::codegen::run(*optimization));
         }
         Command::Fmt {} => {
             info!("Formatting...");
