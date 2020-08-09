@@ -8,6 +8,14 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install LLVM
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y lsb-release software-properties-common
+            wget https://apt.llvm.org/llvm.sh
+            chmod +x llvm.sh
+            sudo ./llvm.sh 10
+      - run:
           name: Install nightly & stable
           command: |
             rustup install nightly
@@ -53,7 +61,8 @@ jobs:
             - "~/.cargo"
             - "./target"
   code-coverage:
-    machine: true
+    machine:
+      image: ubuntu-1604:202007-01
     steps:
       - checkout
       - run:
@@ -63,8 +72,9 @@ jobs:
           name: Generate report
           command: >
             docker run --security-opt seccomp=unconfined -e CODECOV_TOKEN=${CODECOV_TOKEN}
-            -v $PWD:/volume xd009642/tarpaulin cargo tarpaulin -v --ciserver circle-ci
-            --out Xml --all-features
+            -v $PWD:/volume xd009642/tarpaulin sh -c "apt-get update && apt-get install -y lsb-release software-properties-common
+            && wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 10 && cargo tarpaulin -v
+            --ciserver circle-ci --out Xml --all-features"
       - run:
           name: Upload
           command: bash <(curl -s https://codecov.io/bash) -Z -f cobertura.xml
