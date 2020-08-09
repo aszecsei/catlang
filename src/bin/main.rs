@@ -39,10 +39,16 @@ enum Command {
 /// compiler for the catlang programming language
 struct Opt {
     /// verbose mode (-v, -vv, -vvv, etc.)
-    #[structopt(short, long, parse(from_occurrences), conflicts_with = "quiet")]
+    #[structopt(
+        short,
+        long,
+        parse(from_occurrences),
+        conflicts_with = "quiet",
+        global = true
+    )]
     pub verbose: u8,
     /// quiet output
-    #[structopt(long)]
+    #[structopt(long, global = true)]
     pub quiet: bool,
     #[structopt(subcommand)]
     pub command: Command,
