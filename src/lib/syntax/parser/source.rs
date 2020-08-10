@@ -62,6 +62,7 @@ fn is_declaration_starter(t: Token) -> bool {
         Token::Function => true,
         Token::Struct => true,
         Token::Enum => true,
+        Token::LAttr => true,
         _ => false,
     }
 }
