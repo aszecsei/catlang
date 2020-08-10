@@ -1,0 +1,25 @@
+---
+source: src/lib/syntax/parser/module.rs
+expression: res
+---
+(7:50) ReExport(
+    ExportReExport {
+        exports: NamedImportList(
+            NamedImportList {
+                imports: [
+                    (9:24) ImportIdentifier {
+                        identifier: (9:16) "Vector2",
+                        renamed_to: Some(
+                            (20:24) "Vec2",
+                        ),
+                    },
+                    (26:33) ImportIdentifier {
+                        identifier: (26:33) "Vector3",
+                        renamed_to: None,
+                    },
+                ],
+            },
+        ),
+        path: (41:50) "\"vectors\"",
+    },
+)

@@ -43,7 +43,7 @@ pub struct ImportIdentifier<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Export<'ast> {
-    Declaration(Declaration<'ast>),
+    Declaration(DeclarationNode<'ast>),
     Statement(ExportStatement<'ast>),
     ReExport(ExportReExport<'ast>),
 }
@@ -56,7 +56,7 @@ pub struct ExportStatement<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ExportReExport<'ast> {
-    pub exports: NodeList<'ast, ImportIdentifier<'ast>>,
+    pub exports: ImportList<'ast>,
     pub path: StringLiteralNode<'ast>,
 }
 
@@ -71,7 +71,7 @@ impl_from! {
     NamedImportList => ImportList::NamedImportList,
     GlobImportList => ImportList::GlobImportList,
 
-    Declaration => Export::Declaration,
+    DeclarationNode => Export::Declaration,
     ExportStatement => Export::Statement,
     ExportReExport => Export::ReExport,
 }
