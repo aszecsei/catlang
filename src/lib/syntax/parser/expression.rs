@@ -662,7 +662,6 @@ impl<'ast> Parser<'ast> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::syntax::parser::parse;
     use insta::assert_debug_snapshot;
     use toolshed::Arena;
 

@@ -1,0 +1,12 @@
+---
+source: src/lib/syntax/parser/module.rs
+expression: res
+---
+(7:36) Import {
+    import_list: GlobImportList(
+        GlobImportList {
+            identifier: (12:19) "vectors",
+        },
+    ),
+    path: (25:36) "\"./vectors\"",
+}

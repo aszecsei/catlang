@@ -3,22 +3,13 @@ use super::*;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Module<'ast> {
     pub elements: NodeList<'ast, ModuleElement<'ast>>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Script<'ast> {
-    pub elements: NodeList<'ast, ScriptElement<'ast>>,
+    pub is_script: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ModuleElement<'ast> {
     Import(ImportNode<'ast>),
     Export(ExportNode<'ast>),
-    Declaration(DeclarationNode<'ast>),
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum ScriptElement<'ast> {
     Declaration(DeclarationNode<'ast>),
 }
 
@@ -47,7 +38,7 @@ pub struct GlobImportList<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ImportIdentifier<'ast> {
     pub identifier: IdentifierNode<'ast>,
-    pub renamed_to: IdentifierNode<'ast>,
+    pub renamed_to: Option<IdentifierNode<'ast>>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -76,8 +67,6 @@ impl_from! {
     ImportNode => ModuleElement::Import,
     ExportNode => ModuleElement::Export,
     DeclarationNode => ModuleElement::Declaration,
-
-    DeclarationNode => ScriptElement::Declaration,
 
     NamedImportList => ImportList::NamedImportList,
     GlobImportList => ImportList::GlobImportList,

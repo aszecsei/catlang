@@ -10,4 +10,11 @@ impl<'ast> Parser<'ast> {
         self.expect(Token::Ident);
         Ok(self.node_at(start, end, val))
     }
+
+    pub fn string_literal_node(&mut self) -> Result<StringLiteralNode<'ast>> {
+        let (start, end) = (self.current_span.start as u32, self.current_span.end as u32);
+        let val = self.current_slice;
+        self.expect(Token::LiteralString);
+        Ok(self.node_at(start, end, val))
+    }
 }
