@@ -608,7 +608,7 @@ suffix operator
 value
     = "sizeof" , "(" , type expression , ")"
     | lambda expression
-    | [ "new" ] , type expression , [ struct initializer ] (* struct allocation via initializer or empty *)
+    | [ "new" ] , type expression , [ generic type list ] , [ struct initializer ] (* struct allocation via initializer or empty *)
     | type expression , "::" , identifier (* scoped value *)
     | number
     | string literal
@@ -629,8 +629,12 @@ lambda expression
     = [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
     ;
 
+scoped value
+    = [ type expression , "::" ] , identifier
+    ;
+
 reference
-    = identifier
+    = scoped value
     | "this"
     ;
 ```
