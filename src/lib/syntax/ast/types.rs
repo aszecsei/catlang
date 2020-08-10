@@ -40,6 +40,18 @@ pub enum PrimitiveType<'ast> {
     NamedType(IdentifierNode<'ast>),
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum EnumRepresentationType {
+    S8,
+    U8,
+    S16,
+    U16,
+    S32,
+    U32,
+    S64,
+    U64,
+}
+
 pub type TypeExpressionNode<'ast> = Node<'ast, TypeExpression<'ast>>;
 pub type TypeExpressionList<'ast> = NodeList<'ast, TypeExpression<'ast>>;
 

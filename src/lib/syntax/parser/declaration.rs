@@ -246,8 +246,8 @@ impl<'ast> Parser<'ast> {
     fn enum_declarator(&mut self) -> Result<Declarator<'ast>> {
         self.expect(Token::Enum);
         let identifier = self.identifier_node()?;
-        let type_expression = if self.eat(Token::Colon) {
-            Some(self.type_node()?)
+        let representation = if self.eat(Token::Colon) {
+            Some(self.enum_representation()?)
         } else {
             None
         };
@@ -257,10 +257,38 @@ impl<'ast> Parser<'ast> {
 
         Ok(EnumDeclarator {
             identifier,
-            type_expression,
+            representation,
             members,
         }
         .into())
+    }
+
+    fn enum_representation(&mut self) -> Result<EnumRepresentationType> {
+        match self.current_token {
+            Token::S8 => Ok(EnumRepresentationType::S8),
+            Token::U8 => Ok(EnumRepresentationType::U8),
+            Token::S16 => Ok(EnumRepresentationType::S16),
+            Token::U16 => Ok(EnumRepresentationType::U16),
+            Token::S32 => Ok(EnumRepresentationType::S32),
+            Token::U32 => Ok(EnumRepresentationType::U32),
+            Token::S64 => Ok(EnumRepresentationType::S64),
+            Token::U64 => Ok(EnumRepresentationType::U64),
+            _ => Err(Error::ExpectedOneOfButGot {
+                expected_tokens: vec![
+                    Token::S8,
+                    Token::U8,
+                    Token::S16,
+                    Token::U16,
+                    Token::S32,
+                    Token::U32,
+                    Token::S64,
+                    Token::U64,
+                ],
+                token: self.current_token,
+                raw: self.lexer.slice().into(),
+                span: self.lexer.span(),
+            }),
+        }
     }
 
     fn enum_member_list(&mut self) -> Result<NodeList<'ast, EnumMember<'ast>>> {
