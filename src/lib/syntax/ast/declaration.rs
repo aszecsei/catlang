@@ -69,7 +69,13 @@ pub struct StructMember<'ast> {
 pub struct EnumDeclarator<'ast> {
     pub identifier: IdentifierNode<'ast>,
     pub type_expression: Option<TypeExpressionNode<'ast>>,
-    pub values: IdentifierList<'ast>,
+    pub members: NodeList<'ast, EnumMember<'ast>>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct EnumMember<'ast> {
+    pub identifier: IdentifierNode<'ast>,
+    pub value: Option<ExpressionNode<'ast>>,
 }
 
 pub type DeclarationNode<'ast> = Node<'ast, Declaration<'ast>>;

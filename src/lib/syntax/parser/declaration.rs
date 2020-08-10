@@ -246,24 +246,43 @@ impl<'ast> Parser<'ast> {
     fn enum_declarator(&mut self) -> Result<Declarator<'ast>> {
         self.expect(Token::Enum);
         let identifier = self.identifier_node()?;
-        let enum_type = if self.eat(Token::Colon) {
+        let type_expression = if self.eat(Token::Colon) {
             Some(self.type_node()?)
         } else {
             None
         };
         self.expect(Token::LCurlyB);
-        let values = GrowableList::new();
-        while self.current_token != Token::RCurlyB {
-            values.push(self.arena, self.identifier_node()?);
-            self.expect_one_of(&[Token::Comma], &[Token::RCurlyB]);
-        }
+        let members = self.enum_member_list()?;
         self.expect(Token::RCurlyB);
 
         Ok(EnumDeclarator {
             identifier,
-            type_expression: enum_type,
-            values: values.as_list(),
+            type_expression,
+            members,
         }
         .into())
+    }
+
+    fn enum_member_list(&mut self) -> Result<NodeList<'ast, EnumMember<'ast>>> {
+        let member_list = GrowableList::new();
+        while self.current_token != Token::RCurlyB {
+            let start = self.current_span.start as u32;
+            let identifier = self.identifier_node()?;
+            let mut end = identifier.end;
+            let value = if self.eat(Token::Equals) {
+                let expr = self.expression_node()?;
+                end = expr.end;
+                Some(expr)
+            } else {
+                None
+            };
+            member_list.push(
+                self.arena,
+                self.node_at(start, end, EnumMember { identifier, value }),
+            );
+            self.expect_one_of(&[Token::Comma], &[Token::RCurlyB]);
+        }
+
+        Ok(member_list.as_list())
     }
 }
