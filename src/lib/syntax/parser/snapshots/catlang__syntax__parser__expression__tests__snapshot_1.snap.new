@@ -1,9 +1,0 @@
----
-source: src/lib/syntax/parser/expression.rs
-expression: value
----
-[
-    1,
-    2,
-    3,
-]

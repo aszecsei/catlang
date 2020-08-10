@@ -82,7 +82,8 @@ fn postfix_binding_power(tok: Token) -> Option<(u8, ())> {
         Token::LParen => Some((31, ())),
         Token::LSquareB => Some((31, ())),
         Token::Dot => Some((31, ())),
-        Token::Question => Some((31, ())),
+        Token::NullConditional => Some((31, ())),
+        Token::NullConditionalIndex => Some((31, ())),
         _ => None,
     }
 }
@@ -148,9 +149,13 @@ impl<'ast> Parser<'ast> {
                     Token::LParen => return Err(Error::NotImplementedError), // function call
                     Token::LSquareB => return Err(Error::NotImplementedError), // index
                     Token::Dot => return Err(Error::NotImplementedError),    // member access
-                    Token::Question => self.node_at_token(PostfixExpression {
+                    Token::NullConditional => self.node_at_token(PostfixExpression {
                         operand: lhs,
                         operator: PostfixOperator::NullConditional,
+                    }),
+                    Token::NullConditionalIndex => self.node_at_token(PostfixExpression {
+                        operand: lhs,
+                        operator: PostfixOperator::NullConditionalIndex,
                     }),
                     _ => return Err(Error::NotImplementedError),
                 };
@@ -664,6 +669,16 @@ mod tests {
     #[test]
     fn test_basic_expression() {
         let source = "(1 + 2) * 3";
+        let arena = Arena::new();
+        let mut p = Parser::new(source, &arena);
+        let res = p.expression_node().unwrap();
+
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
+    fn test_ternary_associativity() {
+        let source = "1 == 1 ? 2 : 3 == 4 ? 5 : 6";
         let arena = Arena::new();
         let mut p = Parser::new(source, &arena);
         let res = p.expression_node().unwrap();

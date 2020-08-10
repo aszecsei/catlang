@@ -107,6 +107,7 @@ pub enum PostfixOperator {
     Increment,
     Decrement,
     NullConditional,
+    NullConditionalIndex,
     NullForgiving,
 }
 

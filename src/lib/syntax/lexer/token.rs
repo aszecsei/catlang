@@ -125,6 +125,10 @@ pub enum Token {
     Arrow,
     #[token("?")]
     Question,
+    #[token("?.")]
+    NullConditional,
+    #[token("?[")]
+    NullConditionalIndex,
     #[token("??")]
     NullCoalesce,
     #[token("??=")]
