@@ -1,0 +1,29 @@
+---
+source: src/lib/syntax/parser/expression.rs
+expression: res
+---
+(1:11) BinaryExpression(
+    BinaryExpression {
+        left: (1:6) BinaryExpression(
+            BinaryExpression {
+                left: (1:2) PrimitiveExpression(
+                    DecimalNumber(
+                        "1",
+                    ),
+                ),
+                operator: Addition,
+                right: (5:6) PrimitiveExpression(
+                    DecimalNumber(
+                        "2",
+                    ),
+                ),
+            },
+        ),
+        operator: Multiplication,
+        right: (10:11) PrimitiveExpression(
+            DecimalNumber(
+                "3",
+            ),
+        ),
+    },
+)

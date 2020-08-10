@@ -2,7 +2,6 @@ use super::*;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Declaration<'ast> {
-    pub is_exported: bool,
     pub attributes: AttributeList<'ast>,
     pub declarator: Declarator<'ast>,
 }
@@ -20,6 +19,7 @@ pub enum Declarator<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ConstantDeclarator<'ast> {
     pub identifier: IdentifierNode<'ast>,
+    pub type_expression: Option<TypeExpressionNode<'ast>>,
     pub expression: ExpressionNode<'ast>,
 }
 
@@ -38,7 +38,8 @@ pub struct VariableDeclarator<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FunctionDeclarator<'ast> {
-    pub identifier: IdentifierNode<'ast>,
+    pub function_name: ScopedValueNode<'ast>,
+    pub generic_parameters: IdentifierList<'ast>,
     pub parameters: NodeList<'ast, Parameter<'ast>>,
     pub return_type: Option<TypeExpressionNode<'ast>>,
     pub block: BlockNode<'ast>,
@@ -46,7 +47,6 @@ pub struct FunctionDeclarator<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Parameter<'ast> {
-    pub is_const: bool,
     pub identifier: IdentifierNode<'ast>,
     pub type_expression: TypeExpressionNode<'ast>,
 }
@@ -54,6 +54,7 @@ pub struct Parameter<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct StructDeclarator<'ast> {
     pub identifier: IdentifierNode<'ast>,
+    pub generic_parameters: IdentifierList<'ast>,
     pub members: NodeList<'ast, StructMember<'ast>>,
 }
 
@@ -68,7 +69,14 @@ pub struct StructMember<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct EnumDeclarator<'ast> {
     pub identifier: IdentifierNode<'ast>,
-    pub values: IdentifierList<'ast>,
+    pub representation: TypeExpressionNode<'ast>, // TODO: Should this only be a primitive type?
+    pub values: NodeList<'ast, EnumValue<'ast>>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct EnumValue<'ast> {
+    pub identifier: IdentifierNode<'ast>,
+    pub value: Option<ExpressionNode<'ast>>,
 }
 
 pub type DeclarationNode<'ast> = Node<'ast, Declaration<'ast>>;

@@ -150,6 +150,8 @@ pub enum Token {
     Delete,
     #[token("typeof")]
     Typeof,
+    #[token("sizeof")]
+    Sizeof,
     #[token("is")]
     Is,
     #[token("as")]

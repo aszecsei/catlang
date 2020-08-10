@@ -328,6 +328,7 @@ statement
     | if
     | loop
     | jump
+    | delete
     | expression
     ;
 
@@ -362,6 +363,10 @@ jump
     = "break"
     | "continue"
     | "return" , [ expression ]
+    ;
+
+delete
+    = "delete" , scoped value
     ;
 
 type expression

@@ -1,274 +1,673 @@
+use crate::syntax::ast::Primitive::DecimalNumber;
 use crate::syntax::ast::*;
 use crate::syntax::error::*;
 use crate::syntax::lexer::Token;
 use crate::syntax::parser::Parser;
 
+// Pratt parsing! Note that if the return of .0 < .1, the operator will be left-associative,
+// and if .0 > .1, the operator will be right-associative.
+
+fn infix_binding_power(tok: Token) -> Option<(u8, u8)> {
+    match tok {
+        // Assignment operators
+        Token::Assign => Some((2, 1)),
+        Token::AddAssign => Some((2, 1)),
+        Token::SubAssign => Some((2, 1)),
+        Token::MulAssign => Some((2, 1)),
+        Token::QuoAssign => Some((2, 1)),
+        Token::ModAssign => Some((2, 1)),
+        Token::BitAndAssign => Some((2, 1)),
+        Token::AndAssign => Some((2, 1)),
+        Token::BitOrAssign => Some((2, 1)),
+        Token::OrAssign => Some((2, 1)),
+        Token::XorAssign => Some((2, 1)),
+        Token::ShiftLAssign => Some((2, 1)),
+        Token::ShiftRAssign => Some((2, 1)),
+        Token::NullCoalesceAssign => Some((2, 1)),
+        // Ternary
+        Token::Question => Some((4, 3)),
+        // Logical or
+        Token::Or => Some((5, 6)),
+        // Logical and
+        Token::And => Some((7, 8)),
+        // Equality
+        Token::Equals | Token::NotEquals => Some((9, 10)),
+        // Type test
+        Token::Is => Some((11, 12)),
+        // Comparison
+        Token::LessThan => Some((13, 14)),
+        Token::LessThanEquals => Some((13, 14)),
+        Token::GreaterThan => Some((13, 14)),
+        Token::GreaterThanEquals => Some((13, 14)),
+        Token::In => Some((13, 14)),
+        // Bitwise or
+        Token::BitOr => Some((15, 16)),
+        // Bitwise xor
+        Token::Xor => Some((17, 18)),
+        // Bitwise and
+        Token::BitAnd => Some((19, 20)),
+        // Bitshift
+        Token::ShiftL | Token::ShiftR => Some((21, 22)),
+        // Range
+        Token::DotDot | Token::DotDotDot => Some((23, 24)),
+        // Add, subtract
+        Token::Add | Token::Sub => Some((25, 26)),
+        // Multiply, divide, modulo
+        Token::Mul | Token::Quo | Token::Mod => Some((27, 28)),
+        // Casting, null coalesce
+        Token::As | Token::NullCoalesce => Some((30, 29)),
+        _ => None,
+    }
+}
+
+fn prefix_binding_power(tok: Token) -> Option<((), u8)> {
+    match tok {
+        Token::Increment => Some(((), 29)),
+        Token::Decrement => Some(((), 29)),
+        Token::Add => Some(((), 29)),
+        Token::Sub => Some(((), 29)),
+        Token::Not => Some(((), 29)),
+        Token::BitNot => Some(((), 29)),
+        Token::At => Some(((), 29)),
+        Token::Mul => Some(((), 29)),
+        _ => None,
+    }
+}
+
+fn postfix_binding_power(tok: Token) -> Option<(u8, ())> {
+    match tok {
+        Token::Increment => Some((31, ())),
+        Token::Decrement => Some((31, ())),
+        Token::Not => Some((31, ())),
+        Token::LParen => Some((31, ())),
+        Token::LSquareB => Some((31, ())),
+        Token::Dot => Some((31, ())),
+        Token::Question => Some((31, ())),
+        _ => None,
+    }
+}
+
 impl<'ast> Parser<'ast> {
     pub fn expression_node(&mut self) -> Result<ExpressionNode<'ast>> {
-        self.assignment_expression()
+        self.expression_bp(0)
     }
 
-    // Right-associative
-    fn assignment_expression(&mut self) -> Result<ExpressionNode<'ast>> {
-        let lhs = self.conditional_expression()?;
-        let assignment = match self.current_token {
-            Token::Assign => Some(AssignmentOperator::Plain),
-            Token::AddAssign => Some(AssignmentOperator::Addition),
-            Token::SubAssign => Some(AssignmentOperator::Subtraction),
-            Token::MulAssign => Some(AssignmentOperator::Multiplication),
-            Token::QuoAssign => Some(AssignmentOperator::Division),
-            Token::ModAssign => Some(AssignmentOperator::Remainder),
-            Token::BitOrAssign => Some(AssignmentOperator::BitOr),
-            Token::OrAssign => Some(AssignmentOperator::LogicalOr),
-            Token::BitAndAssign => Some(AssignmentOperator::BitAnd),
-            Token::AndAssign => Some(AssignmentOperator::LogicalAnd),
-            Token::XorAssign => Some(AssignmentOperator::BitXor),
-            Token::ShiftLAssign => Some(AssignmentOperator::BitShiftLeft),
-            Token::ShiftRAssign => Some(AssignmentOperator::BitShiftRight),
-            Token::NullCoalesceAssign => Some(AssignmentOperator::NullCoalesce),
-            _ => None,
-        };
-        if let Some(assignment_operator) = assignment {
-            self.bump();
-            let rhs = self.expression_node()?;
-            Ok(self.node_at(
-                lhs.start,
-                rhs.end,
-                AssignmentExpression {
-                    left: lhs,
-                    operator: assignment_operator,
-                    right: rhs,
-                },
-            ))
-        } else {
-            Ok(lhs)
-        }
-    }
-
-    // Right-associative
-    fn conditional_expression(&mut self) -> Result<ExpressionNode<'ast>> {
-        let condition = self.comparing_expression()?;
-        if self.eat(Token::Question) {
-            let true_value = self.expression_node()?;
-            self.expect(Token::Colon);
-            let false_value = self.expression_node()?;
-            Ok(self.node_at(
-                condition.start,
-                false_value.end,
-                TernaryExpression {
-                    condition,
-                    when_true: true_value,
-                    when_false: false_value,
-                },
-            ))
-        } else {
-            Ok(condition)
-        }
-    }
-
-    // Right-associative
-    fn comparing_expression(&mut self) -> Result<ExpressionNode<'ast>> {
-        let lhs = self.comparand()?;
-        let operator = match self.current_token {
-            Token::Equals => Some(BinaryOperator::Equals),
-            Token::GreaterThan => Some(BinaryOperator::GreaterThan),
-            Token::GreaterThanEquals => Some(BinaryOperator::GreaterThanEquals),
-            Token::NotEquals => Some(BinaryOperator::NotEquals),
-            Token::LessThan => Some(BinaryOperator::LessThan),
-            Token::LessThanEquals => Some(BinaryOperator::LessThanEquals),
-            Token::In => Some(BinaryOperator::In),
-            _ => None,
-        };
-        if let Some(binary_operator) = operator {
-            self.bump();
-            let rhs = self.expression_node()?;
-            Ok(self.node_at(
-                lhs.start,
-                rhs.end,
-                BinaryExpression {
-                    left: lhs,
-                    operator: binary_operator,
-                    right: rhs,
-                },
-            ))
-        } else {
-            Ok(lhs)
-        }
-    }
-
-    // Left-associative
-    fn comparand(&mut self) -> Result<ExpressionNode<'ast>> {
-        let lhs = self.term()?;
-        let mut expr = lhs;
-        loop {
-            let operator = match self.current_token {
-                Token::Add => Some(BinaryOperator::Addition),
-                Token::Sub => Some(BinaryOperator::Subtraction),
-                Token::Or => Some(BinaryOperator::LogicalOr),
-                Token::BitOr => Some(BinaryOperator::BitOr),
-                _ => None,
-            };
-            if let Some(binary_operator) = operator {
-                self.bump();
-                let rhs = self.term()?;
-                expr = self.node_at(
-                    expr.start,
-                    expr.end,
-                    BinaryExpression {
-                        left: lhs,
-                        operator: binary_operator,
-                        right: rhs,
-                    },
-                );
-            } else {
-                break Ok(expr);
-            }
-        }
-    }
-
-    // Left-associative
-    fn term(&mut self) -> Result<ExpressionNode<'ast>> {
-        let lhs = self.factor()?;
-        let mut expr = lhs;
-        loop {
-            let operator = match self.current_token {
-                Token::Mul => Some(BinaryOperator::Multiplication),
-                Token::Quo => Some(BinaryOperator::Division),
-                Token::And => Some(BinaryOperator::LogicalAnd),
-                Token::BitAnd => Some(BinaryOperator::BitAnd),
-                _ => None,
-            };
-            if let Some(binary_operator) = operator {
-                self.bump();
-                let rhs = self.factor()?;
-                expr = self.node_at(
-                    expr.start,
-                    expr.end,
-                    BinaryExpression {
-                        left: lhs,
-                        operator: binary_operator,
-                        right: rhs,
-                    },
-                );
-            } else {
-                break Ok(expr);
-            }
-        }
-    }
-
-    // Left-associative
-    fn factor(&mut self) -> Result<ExpressionNode<'ast>> {
-        let lhs = self.unary()?;
-        let mut expr = lhs;
-        loop {
-            let operator = match self.current_token {
-                Token::ShiftL => Some(BinaryOperator::BitShiftLeft),
-                Token::ShiftR => Some(BinaryOperator::BitShiftRight),
-                _ => None,
-            };
-            if let Some(binary_operator) = operator {
-                self.bump();
-                let rhs = self.unary()?;
-                expr = self.node_at(
-                    expr.start,
-                    expr.end,
-                    BinaryExpression {
-                        left: lhs,
-                        operator: binary_operator,
-                        right: rhs,
-                    },
-                );
-            } else {
-                break Ok(expr);
-            }
-        }
-    }
-
-    fn unary(&mut self) -> Result<ExpressionNode<'ast>> {
-        let operator = match self.current_token {
-            Token::Not => Some(PrefixOperator::LogicalNot),
-            Token::BitNot => Some(PrefixOperator::BitNot),
-            Token::Sub => Some(PrefixOperator::Minus),
-            Token::Add => Some(PrefixOperator::Plus),
-            Token::Increment => Some(PrefixOperator::Increment),
-            Token::Decrement => Some(PrefixOperator::Decrement),
-            _ => None,
-        };
-        if let Some(prefix_operator) = operator {
-            let start = self.loc().0;
-            self.bump();
-            let rhs = self.unary()?;
-            return Ok(self.node_at(
-                start,
-                rhs.end,
-                PrefixExpression {
-                    operator: prefix_operator,
-                    operand: rhs,
-                },
-            ));
-        }
-
-        let mut expr = self.primary_expression()?;
-        loop {
-            let operator = match self.current_token {
-                Token::Increment => Some(PostfixOperator::Increment),
-                Token::Decrement => Some(PostfixOperator::Decrement),
-                Token::Not => Some(PostfixOperator::NullForgiving),
-                _ => None,
-            };
-            if let Some(postfix_operator) = operator {
-                let end = self.loc().1;
-                self.bump();
-                expr = self.node_at(
-                    expr.start,
-                    end,
-                    PostfixExpression {
-                        operator: postfix_operator,
-                        operand: expr,
-                    },
-                );
-            } else {
-                break Ok(expr);
-            }
-        }
-    }
-
-    fn primary_expression(&mut self) -> Result<ExpressionNode<'ast>> {
-        match self.current_token {
-            Token::Integer(_) => Ok(self.node_from_slice(|s| Primitive::DecimalNumber(s))),
-            Token::LiteralString => Ok(self.node_from_slice(|s| Primitive::String(s))),
-            Token::Bool(b) => Ok(self.node_at_token(Primitive::Bool(b))),
-            Token::Null => Ok(self.node_at_token(Primitive::Null)),
+    fn expression_bp(&mut self, min_bp: u8) -> Result<ExpressionNode<'ast>> {
+        let mut lhs: ExpressionNode<'ast> = match self.current_token {
+            // TODO: Values
+            Token::Integer(_) => self.node_from_slice(|s| Primitive::DecimalNumber(s)),
+            Token::Bool(b) => self.node_at_token(Primitive::Bool(b)),
             Token::LParen => {
-                self.expect(Token::LParen);
-                if self.peek_token == Token::Colon {
-                    // TODO: Lambdas
-                    Err(Error::NotImplementedError)
-                } else {
-                    let inside = self.expression_node()?;
-                    self.expect(Token::RParen);
-                    Ok(inside)
+                self.bump();
+                let lhs = self.expression_bp(0)?;
+                self.expect(Token::RParen);
+                lhs
+            }
+            t => match prefix_binding_power(t) {
+                Some(((), r_bp)) => {
+                    let start = self.start_then_advance();
+                    let rhs = self.expression_bp(r_bp)?;
+                    self.node_at(
+                        start,
+                        rhs.end,
+                        PrefixExpression {
+                            operand: rhs,
+                            operator: t.into(),
+                        },
+                    )
                 }
-            }
-            _ => self.reference(),
-        }
-    }
+                None => return Err(Error::NotImplementedError),
+            },
+        };
 
-    fn reference(&mut self) -> Result<ExpressionNode<'ast>> {
-        // TODO: Remove this exception
-        #[allow(clippy::match_single_binding)]
-        match self.current_token {
-            // Token::At => Address-of reference
-            // Token::Mul => Dereference
-            // TODO: Member access
-            // TODO: Function call
-            // TODO: Constructor call
-            // TODO: Array reference
-            // TODO: Cast reference
-            _ => {
-                let ident = self.identifier_node()?;
-                Ok(self.node_at(ident.start, ident.end, ident))
+        loop {
+            let op = match self.current_token {
+                Token::EndOfFile => break,
+                t => t,
+            };
+
+            if let Some((l_bp, ())) = postfix_binding_power(op) {
+                if l_bp < min_bp {
+                    break;
+                }
+                self.bump();
+
+                lhs = match op {
+                    Token::Increment => self.node_at_token(PostfixExpression {
+                        operand: lhs,
+                        operator: PostfixOperator::Increment,
+                    }),
+                    Token::Decrement => self.node_at_token(PostfixExpression {
+                        operand: lhs,
+                        operator: PostfixOperator::Decrement,
+                    }),
+                    Token::Not => self.node_at_token(PostfixExpression {
+                        operand: lhs,
+                        operator: PostfixOperator::NullForgiving,
+                    }),
+                    Token::LParen => return Err(Error::NotImplementedError), // function call
+                    Token::LSquareB => return Err(Error::NotImplementedError), // index
+                    Token::Dot => return Err(Error::NotImplementedError),    // member access
+                    Token::Question => self.node_at_token(PostfixExpression {
+                        operand: lhs,
+                        operator: PostfixOperator::NullConditional,
+                    }),
+                    _ => return Err(Error::NotImplementedError),
+                };
+                continue;
             }
+
+            if let Some((l_bp, r_bp)) = infix_binding_power(op) {
+                if l_bp < min_bp {
+                    break;
+                }
+                self.bump();
+
+                lhs = match op {
+                    // Assignment operators
+                    Token::Assign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::Plain,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::AddAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::Addition,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::SubAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::Subtraction,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::MulAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::Multiplication,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::QuoAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::Division,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::ModAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::Remainder,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::BitAndAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::BitAnd,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::AndAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::LogicalAnd,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::BitOrAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::BitOr,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::OrAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::LogicalOr,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::XorAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::BitXor,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::ShiftLAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::BitShiftLeft,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::ShiftRAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::BitShiftRight,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::NullCoalesceAssign => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            AssignmentExpression {
+                                left: lhs,
+                                operator: AssignmentOperator::NullCoalesce,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Ternary
+                    Token::Question => {
+                        let mhs = self.expression_bp(0)?;
+                        self.expect(Token::Colon);
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            TernaryExpression {
+                                condition: lhs,
+                                when_true: mhs,
+                                when_false: rhs,
+                            },
+                        )
+                    }
+                    // Logical or
+                    Token::Or => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::LogicalOr,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Logical and
+                    Token::And => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::LogicalAnd,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Equality
+                    Token::Equals => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::Equals,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::NotEquals => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::NotEquals,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Type test
+                    Token::Is => return Err(Error::NotImplementedError), // TODO
+                    // Comparison
+                    Token::LessThan => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::LessThan,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::LessThanEquals => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::LessThanEquals,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::GreaterThan => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::GreaterThan,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::GreaterThanEquals => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::GreaterThanEquals,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::In => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::In,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Bitwise or
+                    Token::BitOr => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::BitOr,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Bitwise xor
+                    Token::Xor => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::BitXor,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Bitwise and
+                    Token::BitAnd => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::BitAnd,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Bitshift
+                    Token::ShiftL => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::BitShiftLeft,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::ShiftR => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::BitShiftRight,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Range
+                    Token::DotDot => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::RangeExclusive,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::DotDotDot => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::RangeInclusive,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Add, subtract
+                    Token::Add => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::Addition,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::Sub => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::Subtraction,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Multiply, divide, modulo
+                    Token::Mul => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::Multiplication,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::Quo => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::Division,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::Mod => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::Remainder,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    // Casting, null coalesce
+                    Token::As => {
+                        let operator = if self.eat(Token::Not) {
+                            BinaryOperator::ForcedCast
+                        } else {
+                            BinaryOperator::Cast
+                        };
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    Token::NullCoalesce => {
+                        let rhs = self.expression_bp(r_bp)?;
+                        self.node_at(
+                            lhs.start,
+                            rhs.end,
+                            BinaryExpression {
+                                left: lhs,
+                                operator: BinaryOperator::NullCoalesce,
+                                right: rhs,
+                            },
+                        )
+                    }
+                    _ => return Err(Error::NotImplementedError),
+                };
+                continue;
+            }
+            break;
         }
+
+        Ok(lhs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::syntax::parser::parse;
+    use insta::assert_debug_snapshot;
+    use toolshed::Arena;
+
+    #[test]
+    fn test_basic_expression() {
+        let source = "(1 + 2) * 3";
+        let arena = Arena::new();
+        let mut p = Parser::new(source, &arena);
+        let res = p.expression_node().unwrap();
+
+        assert_debug_snapshot!(res);
     }
 }

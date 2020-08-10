@@ -2,19 +2,18 @@ use crate::syntax::ast::*;
 
 /// A `SourceUnit` is the top level construct of the grammar.
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct SourceUnit<'ast> {
-    pub block: BlockNode<'ast>,
+pub enum SourceUnit<'ast> {
+    Script(Script<'ast>),
+    Module(Module<'ast>),
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Block<'ast> {
-    pub elements: NodeList<'ast, BlockElement<'ast>>,
+impl_from! {
+    Script => SourceUnit::Script,
+    Module => SourceUnit::Module,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum BlockElement<'ast> {
-    Declaration(DeclarationNode<'ast>),
-    Statement(StatementNode<'ast>),
+impl Visitable for SourceUnit<'_> {
+    fn visit(&self, v: &mut dyn Visitor) -> anyhow::Result<()> {
+        unimplemented!()
+    }
 }
-
-pub type BlockNode<'ast> = Node<'ast, Block<'ast>>;

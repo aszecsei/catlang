@@ -1,4 +1,6 @@
 use super::*;
+use crate::syntax::lexer::Token;
+use inkwell::FloatPredicate::PredicateFalse;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Expression<'ast> {
@@ -39,7 +41,8 @@ pub enum BinaryOperator {
     LessThan,
     LessThanEquals,
     In,
-    As,
+    Cast,
+    ForcedCast,
     Addition,
     Subtraction,
     BitOr,
@@ -53,6 +56,8 @@ pub enum BinaryOperator {
     BitShiftLeft,
     BitShiftRight,
     NullCoalesce,
+    RangeExclusive,
+    RangeInclusive,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -77,18 +82,44 @@ pub enum AssignmentOperator {
 pub enum PrefixOperator {
     LogicalNot,
     BitNot,
-    Delete,
     Increment,
     Decrement,
     Plus,
     Minus,
 }
 
+impl From<Token> for PrefixOperator {
+    fn from(t: Token) -> Self {
+        match t {
+            Token::Not => PrefixOperator::LogicalNot,
+            Token::BitNot => PrefixOperator::BitNot,
+            Token::Increment => PrefixOperator::Increment,
+            Token::Decrement => PrefixOperator::Decrement,
+            Token::Add => PrefixOperator::Plus,
+            Token::Sub => PrefixOperator::Minus,
+            t => panic!("invalid prefix operator {:?}", t),
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PostfixOperator {
     Increment,
     Decrement,
+    NullConditional,
     NullForgiving,
+}
+
+impl From<Token> for PostfixOperator {
+    fn from(t: Token) -> Self {
+        match t {
+            Token::Increment => PostfixOperator::Increment,
+            Token::Decrement => PostfixOperator::Decrement,
+            Token::Not => PostfixOperator::NullForgiving,
+            Token::Question => PostfixOperator::NullConditional,
+            t => panic!("invalid postfix operator {:?}", t),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -161,6 +192,14 @@ pub struct LambdaExpression<'ast> {
     pub parameters: NodeList<'ast, Parameter<'ast>>,
     pub block: BlockNode<'ast>,
 }
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ScopedValue<'ast> {
+    pub type_expression: Option<TypeExpressionNode<'ast>>,
+    pub identifier: IdentifierNode<'ast>,
+}
+
+pub type ScopedValueNode<'ast> = Node<'ast, ScopedValue<'ast>>;
 
 pub type ExpressionNode<'ast> = Node<'ast, Expression<'ast>>;
 pub type ExpressionList<'ast> = NodeList<'ast, Expression<'ast>>;

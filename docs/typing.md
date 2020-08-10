@@ -148,7 +148,7 @@ The `any` type is the equivalent of C's `void*` type. It can be used to escape C
 Catlang includes an "optional" type, equivalent to `type | null`, to help avoid null-pointer exceptions. Any function that requires a non-Optional value must be enclosed in a conditional to ensure that the Optional value exists, or an error will be thrown.
 
 ```catlang
-const myPrint = (num: int?) -> {
+const myPrint = (num: ?int) -> {
   if (num) {
     print(num);
   } else {
@@ -160,7 +160,7 @@ const myPrint = (num: int?) -> {
 If a user wishes to force-unwrap an optional value, they can use the null-forgiving (`!`) operation to do so. This is not recommended as it may lead to null-pointer exceptions.
 
 ```catlang
-const myPrint = (num: int?) -> {
+const myPrint = (num: ?int) -> {
   print(num!);
 }
 ```
@@ -168,7 +168,7 @@ const myPrint = (num: int?) -> {
 To reduce if-statements, null-coalescing and null-conditional operators are provided.
 
 ```catlang
-const myPrint = (obj: MyStruct?) -> {
+const myPrint = (obj: ?MyStruct) -> {
   if (obj) {
     obj.DoMethod();
   }
@@ -207,7 +207,7 @@ When multiple types are in use, Catlang attempts to find a "best common type" fo
 let x = [] { 1, 2, null };
 ```
 
-The type of the `x` variable would be inferred to be `[](int | null)` - or, equivalently, `[](int?)`.
+The type of the `x` variable would be inferred to be `[](int | null)` - or, equivalently, `[](?int)`.
 
 ### Contextual Typing
 
