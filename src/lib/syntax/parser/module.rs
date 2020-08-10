@@ -73,10 +73,30 @@ impl<'ast> Parser<'ast> {
             let exports = self.import_list()?;
             self.expect(Token::From);
             let path = self.string_literal_node()?;
+            self.eat(Token::Semicolon);
             Ok(self.node_at(start, path.end, ExportReExport { exports, path }))
         } else {
             // Export statement
-            Err(Error::NotImplementedError)
+            let identifier = self.identifier_node()?;
+            let renamed_to = if self.eat(Token::As) {
+                Some(self.identifier_node()?)
+            } else {
+                None
+            };
+            let end = if let Some(renamed) = renamed_to {
+                renamed.end
+            } else {
+                identifier.end
+            };
+            self.eat(Token::Semicolon);
+            Ok(self.node_at(
+                start,
+                end,
+                ExportStatement {
+                    identifier,
+                    renamed_to,
+                },
+            ))
         }
     }
 }
@@ -132,6 +152,26 @@ mod tests {
     #[test]
     fn test_named_re_export() {
         let source = "export { Vector2 as Vec2, Vector3 } from \"vectors\";";
+        let arena = Arena::new();
+        let mut p = Parser::new(source, &arena);
+        let res = p.export().unwrap();
+
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
+    fn test_export_statement() {
+        let source = "export PI;";
+        let arena = Arena::new();
+        let mut p = Parser::new(source, &arena);
+        let res = p.export().unwrap();
+
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
+    fn test_renamed_export_statement() {
+        let source = "export PI_CONST as PI;";
         let arena = Arena::new();
         let mut p = Parser::new(source, &arena);
         let res = p.export().unwrap();

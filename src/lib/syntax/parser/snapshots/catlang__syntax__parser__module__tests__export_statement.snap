@@ -1,0 +1,10 @@
+---
+source: src/lib/syntax/parser/module.rs
+expression: res
+---
+(7:9) Statement(
+    ExportStatement {
+        identifier: (7:9) "PI",
+        renamed_to: None,
+    },
+)

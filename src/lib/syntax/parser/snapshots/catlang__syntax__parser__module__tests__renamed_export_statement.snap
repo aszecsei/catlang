@@ -1,0 +1,12 @@
+---
+source: src/lib/syntax/parser/module.rs
+expression: res
+---
+(7:21) Statement(
+    ExportStatement {
+        identifier: (7:15) "PI_CONST",
+        renamed_to: Some(
+            (19:21) "PI",
+        ),
+    },
+)

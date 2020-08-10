@@ -51,7 +51,7 @@ pub enum Export<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ExportStatement<'ast> {
     pub identifier: IdentifierNode<'ast>,
-    pub renamed_to: IdentifierNode<'ast>,
+    pub renamed_to: Option<IdentifierNode<'ast>>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
