@@ -12,14 +12,14 @@ pub struct Script<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ModuleElement<'ast> {
-    Import(Import<'ast>),
-    Export(Export<'ast>),
-    Declaration(Declaration<'ast>),
+    Import(ImportNode<'ast>),
+    Export(ExportNode<'ast>),
+    Declaration(DeclarationNode<'ast>),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ScriptElement<'ast> {
-    Declaration(Declaration<'ast>),
+    Declaration(DeclarationNode<'ast>),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -70,13 +70,14 @@ pub struct ExportReExport<'ast> {
 }
 
 pub type ImportNode<'ast> = Node<'ast, Import<'ast>>;
+pub type ExportNode<'ast> = Node<'ast, Export<'ast>>;
 
 impl_from! {
-    Import => ModuleElement::Import,
-    Export => ModuleElement::Export,
-    Declaration => ModuleElement::Declaration,
+    ImportNode => ModuleElement::Import,
+    ExportNode => ModuleElement::Export,
+    DeclarationNode => ModuleElement::Declaration,
 
-    Declaration => ScriptElement::Declaration,
+    DeclarationNode => ScriptElement::Declaration,
 
     NamedImportList => ImportList::NamedImportList,
     GlobImportList => ImportList::GlobImportList,

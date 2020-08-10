@@ -599,15 +599,14 @@ prefix operator
 suffix expression (* left-associative *)
     = value , suffix operator
     | value , [ generic type list ] , "(" , [ expression list ] , ")" (* function call *)
-    | value , "[" , [ expression list ] , "]" (* subscript *)
-    | value , { "." , suffix expression } (* member access *)
+    | value , [ "?" ] , "[" , [ expression list ] , "]" (* subscript *)
+    | value , { [ "?" ] , "." , suffix expression } (* member access *)
     | value
     ;
 suffix operator
     = "++"
     | "--"
     | "!"
-    | "?"
     ;
 
 value
