@@ -11,41 +11,28 @@ impl<'ast> Parser<'ast> {
         while self.current_token == Token::LAttr {
             attr_list.push(self.arena, self.attribute_node()?)
         }
-        match self.current_token {
-            Token::Export => {
-                let start = self.start_then_advance();
-                let d = self.declarator_node()?;
-                let end = self.last_span.end as u32;
-                Ok(self.node_at(
-                    start,
-                    end,
-                    Declaration {
-                        attributes: attr_list.as_list(),
-                        declarator: d,
-                        is_exported: true,
-                    },
-                ))
-            }
-            _ => {
-                let start = self.current_span.start as u32;
-                let d = self.declarator_node()?;
-                let end = self.last_span.end as u32;
-                Ok(self.node_at(
-                    start,
-                    end,
-                    Declaration {
-                        attributes: attr_list.as_list(),
-                        declarator: d,
-                        is_exported: false,
-                    },
-                ))
-            }
-        }
+        let is_exported = self.eat(Token::Export);
+        let start = self.current_span.start as u32;
+        let d = self.declarator_node()?;
+        let end = self.last_span.end as u32;
+        Ok(self.node_at(
+            start,
+            end,
+            Declaration {
+                attributes: attr_list.as_list(),
+                declarator: d,
+                is_exported,
+            },
+        ))
     }
 
     fn attribute_node(&mut self) -> Result<AttributeNode<'ast>> {
         let start = self.start_then_advance();
-        let ident = self.identifier_node()?;
+        let ident = if self.current_token == Token::SOA {
+            self.soa_node()?
+        } else {
+            self.identifier_node()?
+        };
         let params = GrowableList::new();
         if self.eat(Token::LParen) {
             while !self.eat(Token::LParen) {
@@ -53,6 +40,7 @@ impl<'ast> Parser<'ast> {
                 self.expect_one_of(&[Token::Comma], &[Token::LParen]);
             }
         }
+        self.expect(Token::RSquareB);
         let end = self.last_span.end as u32;
         Ok(self.node_at(
             start,
@@ -62,6 +50,13 @@ impl<'ast> Parser<'ast> {
                 parameters: params.as_list(),
             },
         ))
+    }
+
+    pub fn soa_node(&mut self) -> Result<IdentifierNode<'ast>> {
+        let (start, end) = (self.current_span.start as u32, self.current_span.end as u32);
+        let val = self.current_slice;
+        self.expect(Token::SOA);
+        Ok(self.node_at(start, end, val))
     }
 
     fn declarator_node(&mut self) -> Result<Declarator<'ast>> {
@@ -242,7 +237,7 @@ impl<'ast> Parser<'ast> {
                     },
                 ),
             );
-            self.expect_one_of(&[Token::Comma], &[Token::RCurlyB]);
+            self.expect_one_of(&[Token::Semicolon], &[Token::RCurlyB]);
         }
 
         Ok(member_list.as_list())
@@ -251,15 +246,22 @@ impl<'ast> Parser<'ast> {
     fn enum_declarator(&mut self) -> Result<Declarator<'ast>> {
         self.expect(Token::Enum);
         let identifier = self.identifier_node()?;
+        let enum_type = if self.eat(Token::Colon) {
+            Some(self.type_node()?)
+        } else {
+            None
+        };
         self.expect(Token::LCurlyB);
         let values = GrowableList::new();
         while self.current_token != Token::RCurlyB {
             values.push(self.arena, self.identifier_node()?);
             self.expect_one_of(&[Token::Comma], &[Token::RCurlyB]);
         }
+        self.expect(Token::RCurlyB);
 
         Ok(EnumDeclarator {
             identifier,
+            type_expression: enum_type,
             values: values.as_list(),
         }
         .into())
