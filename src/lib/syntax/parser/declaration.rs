@@ -162,6 +162,7 @@ impl<'ast> Parser<'ast> {
                 generic_parameters.push(self.arena, self.identifier_node()?);
                 self.expect_one_of(&[Token::Comma], &[Token::GreaterThan]);
             }
+            self.expect(Token::GreaterThan);
         }
         self.expect(Token::LCurlyB);
         let members = self.struct_member_list()?;

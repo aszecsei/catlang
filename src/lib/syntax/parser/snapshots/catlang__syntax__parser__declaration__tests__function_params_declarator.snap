@@ -1,0 +1,27 @@
+---
+source: src/lib/syntax/parser/declaration.rs
+expression: res
+---
+(0:23) Declaration {
+    attributes: [],
+    declarator: Function(
+        FunctionDeclarator {
+            function_name: (9:12) "foo",
+            generic_parameters: [],
+            parameters: [
+                (13:19) Parameter {
+                    identifier: (13:14) "i",
+                    type_expression: (16:19) Simple(
+                        PrimitiveType(
+                            Int,
+                        ),
+                    ),
+                },
+            ],
+            return_type: None,
+            block: (21:23) Block {
+                elements: [],
+            },
+        },
+    ),
+}

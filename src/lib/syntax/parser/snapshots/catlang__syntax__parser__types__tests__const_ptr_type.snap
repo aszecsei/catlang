@@ -1,0 +1,19 @@
+---
+source: src/lib/syntax/parser/types.rs
+expression: res
+---
+(1:12) Unary(
+    UnaryTypeExpression {
+        op: PointerTo,
+        inner: (7:12) Unary(
+            UnaryTypeExpression {
+                op: Const,
+                inner: (7:12) Simple(
+                    PrimitiveType(
+                        Float,
+                    ),
+                ),
+            },
+        ),
+    },
+)

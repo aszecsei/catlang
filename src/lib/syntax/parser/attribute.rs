@@ -7,6 +7,6 @@ use crate::syntax::parser::Parser;
 
 impl<'ast> Parser<'ast> {
     pub fn attribute_node(&mut self) -> Result<AttributeNode<'ast>> {
-        Err(Error::NotImplementedError)
+        unimplemented!()
     }
 }

@@ -200,6 +200,8 @@ pub enum Token {
     Continue,
     #[token("this")]
     This,
+    #[token("volatile")]
+    Volatile,
 
     // Type Primitives
     #[token("s8")]

@@ -13,9 +13,9 @@ pub enum BinaryTypeOperator {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum UnaryTypeOperator<'ast> {
+pub enum UnaryTypeOperator {
     PointerTo,
-    SizedArray(ExpressionNode<'ast>),
+    SizedArray,
     UnsizedArray,
     Const,
     Volatile,
@@ -31,7 +31,7 @@ pub struct BinaryTypeExpression<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct UnaryTypeExpression<'ast> {
-    pub op: UnaryTypeOperator<'ast>,
+    pub op: UnaryTypeOperator,
     pub inner: TypeExpressionNode<'ast>,
 }
 
@@ -46,8 +46,8 @@ pub enum SimpleTypeExpression<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct NamedType<'ast> {
-    pub scopes: IdentifierList<'ast>,
-    pub generic_parameters: Option<TypeExpressionList<'ast>>,
+    pub identifier: IdentifierNode<'ast>,
+    pub generic_parameters: TypeExpressionList<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

@@ -1,0 +1,22 @@
+---
+source: src/lib/syntax/parser/declaration.rs
+expression: res
+---
+(0:22) Declaration {
+    attributes: [],
+    declarator: Type(
+        TypeDeclarator {
+            identifier: (5:12) "f_array",
+            type_expression: (16:22) Unary(
+                UnaryTypeExpression {
+                    op: SizedArray,
+                    inner: (17:22) Simple(
+                        PrimitiveType(
+                            Float,
+                        ),
+                    ),
+                },
+            ),
+        },
+    ),
+}

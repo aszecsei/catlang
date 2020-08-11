@@ -120,7 +120,7 @@ impl<'ast> Parser<'ast> {
                         },
                     )
                 }
-                None => return Err(Error::NotImplementedError),
+                None => unimplemented!(),
             },
         };
 
@@ -149,9 +149,9 @@ impl<'ast> Parser<'ast> {
                         operand: lhs,
                         operator: PostfixOperator::NullForgiving,
                     }),
-                    Token::LParen => return Err(Error::NotImplementedError), // function call
-                    Token::LSquareB => return Err(Error::NotImplementedError), // index
-                    Token::Dot => return Err(Error::NotImplementedError),    // member access
+                    Token::LParen => unimplemented!(), // function call
+                    Token::LSquareB => unimplemented!(), // index
+                    Token::Dot => unimplemented!(),    // member access
                     Token::NullConditional => self.node_at_token(PostfixExpression {
                         operand: lhs,
                         operator: PostfixOperator::NullConditional,
@@ -160,7 +160,7 @@ impl<'ast> Parser<'ast> {
                         operand: lhs,
                         operator: PostfixOperator::NullConditionalIndex,
                     }),
-                    _ => return Err(Error::NotImplementedError),
+                    _ => unimplemented!(),
                 };
                 continue;
             }
@@ -408,7 +408,7 @@ impl<'ast> Parser<'ast> {
                         )
                     }
                     // Type test
-                    Token::Is => return Err(Error::NotImplementedError), // TODO
+                    Token::Is => unimplemented!(),
                     // Comparison
                     Token::LessThan => {
                         let rhs = self.expression_bp(r_bp)?;
@@ -651,7 +651,7 @@ impl<'ast> Parser<'ast> {
                             },
                         )
                     }
-                    _ => return Err(Error::NotImplementedError),
+                    _ => unimplemented!(),
                 };
                 continue;
             }

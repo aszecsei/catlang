@@ -392,7 +392,7 @@ pointer to
     = "*" , unary type expression
     ;
 sized array
-    = "[" , expression , "]" , unary type expression
+    = "[" , "]" , unary type expression
     ;
 unsized array
     = "[" , ".." , "]" , unary type expression

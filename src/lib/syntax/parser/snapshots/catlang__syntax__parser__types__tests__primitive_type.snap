@@ -1,0 +1,9 @@
+---
+source: src/lib/syntax/parser/types.rs
+expression: res
+---
+(0:5) Simple(
+    PrimitiveType(
+        Float,
+    ),
+)

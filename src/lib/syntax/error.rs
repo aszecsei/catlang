@@ -25,8 +25,6 @@ pub enum Error {
     ExtendedBeyondEndOfFile,
     #[error("duplicate flag error at {}:{}", span.start, span.end)]
     DuplicateFlagError { span: Range<usize> },
-    #[error("functionality not implemented")]
-    NotImplementedError,
     #[error("expected either a return type or function start but got {:?}", token)]
     ExpectedFunctionButGot { token: Token },
 }
