@@ -1,5 +1,4 @@
 use super::*;
-use crate::syntax::ast::Export::ReExport;
 
 impl<'ast> Parser<'ast> {
     pub fn import(&mut self) -> Result<ImportNode<'ast>> {
@@ -101,7 +100,7 @@ impl<'ast> Parser<'ast> {
     }
 }
 
-fn is_declaration_starter(t: Token) -> bool {
+pub fn is_declaration_starter(t: Token) -> bool {
     match t {
         Token::Const => true,
         Token::Type => true,

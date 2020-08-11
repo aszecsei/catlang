@@ -38,7 +38,7 @@ pub struct VariableDeclarator<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FunctionDeclarator<'ast> {
-    pub function_name: ScopedValueNode<'ast>,
+    pub function_name: IdentifierNode<'ast>, // TODO: Scoped values?
     pub generic_parameters: IdentifierList<'ast>,
     pub parameters: NodeList<'ast, Parameter<'ast>>,
     pub return_type: Option<TypeExpressionNode<'ast>>,
@@ -69,8 +69,20 @@ pub struct StructMember<'ast> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct EnumDeclarator<'ast> {
     pub identifier: IdentifierNode<'ast>,
-    pub representation: TypeExpressionNode<'ast>, // TODO: Should this only be a primitive type?
+    pub representation: Option<EnumRepresentationType>,
     pub values: NodeList<'ast, EnumValue<'ast>>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum EnumRepresentationType {
+    S8,
+    U8,
+    S16,
+    U16,
+    S32,
+    U32,
+    S64,
+    U64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

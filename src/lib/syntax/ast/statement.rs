@@ -52,7 +52,7 @@ pub enum JumpStatement<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct DeleteStatement<'ast> {
-    pub deleted: ScopedValueNode<'ast>,
+    pub deleted: IdentifierNode<'ast>, // TODO: Scoped identifier?
 }
 
 pub type StatementNode<'ast> = Node<'ast, Statement<'ast>>;

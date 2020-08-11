@@ -247,7 +247,7 @@ import identifier
     ;
 
 block
-    = "{" { declaration | statement } "}"
+    = "{" { declaration | statement | import } "}"
     ;
 
 declaration
@@ -268,11 +268,11 @@ type declaration
     ;
 
 variable declaration
-    = "let" , identifier , [ ":" , type expression ] , "=" , expression
+    = "let" , identifier , [ ":" , type expression ] , [ "=" , expression ]
     ;
 
 function declaration
-    = "function" , scoped value , [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
+    = "function" , scoped identifier , [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
     ;
 
 formal parameter list
@@ -366,7 +366,7 @@ jump
     ;
 
 delete
-    = "delete" , scoped value
+    = "delete" , scoped identifier
     ;
 
 type expression
@@ -479,7 +479,7 @@ expression
     ;
 
 assignment expression (* right-associative *)
-    = scoped value , assignment operator , assignment expression
+    = scoped identifier , assignment operator , assignment expression
     | ternary expression
     ;
 assignment operator
@@ -613,7 +613,7 @@ value
     = "sizeof" , "(" , type expression , ")"
     | lambda expression
     | [ "new" ] , type expression , [ generic type list ] , [ struct initializer ] (* struct allocation via initializer or empty *)
-    | type expression , "::" , identifier (* scoped value *)
+    | identifier , { "." , identifier } (* module-scoped type *)
     | number
     | string literal
     | character literal
@@ -633,12 +633,12 @@ lambda expression
     = [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
     ;
 
-scoped value
+scoped identifier
     = [ type expression , "::" ] , identifier
     ;
 
 reference
-    = scoped value
+    = scoped identifier
     | "this"
     ;
 ```

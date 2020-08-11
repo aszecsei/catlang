@@ -194,14 +194,6 @@ pub struct LambdaExpression<'ast> {
     pub block: BlockNode<'ast>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct ScopedValue<'ast> {
-    pub type_expression: Option<TypeExpressionNode<'ast>>,
-    pub identifier: IdentifierNode<'ast>,
-}
-
-pub type ScopedValueNode<'ast> = Node<'ast, ScopedValue<'ast>>;
-
 pub type ExpressionNode<'ast> = Node<'ast, Expression<'ast>>;
 pub type ExpressionList<'ast> = NodeList<'ast, Expression<'ast>>;
 

@@ -1,3 +1,5 @@
+mod attribute;
+mod block;
 mod declaration;
 mod expression;
 mod module;

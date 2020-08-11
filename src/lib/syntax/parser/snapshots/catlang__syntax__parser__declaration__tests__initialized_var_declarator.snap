@@ -1,0 +1,20 @@
+---
+source: src/lib/syntax/parser/declaration.rs
+expression: res
+---
+(0:10) Declaration {
+    attributes: [],
+    declarator: Variable(
+        VariableDeclarator {
+            identifier: (4:6) "pi",
+            type_expression: None,
+            expression: Some(
+                (9:10) PrimitiveExpression(
+                    DecimalNumber(
+                        "3",
+                    ),
+                ),
+            ),
+        },
+    ),
+}

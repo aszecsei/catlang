@@ -7,15 +7,16 @@ pub struct Block<'ast> {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum BlockElement<'ast> {
-    Declaration(Declaration<'ast>),
-    Statement(Statement<'ast>),
-    Import(Import<'ast>),
+    Declaration(DeclarationNode<'ast>),
+    Statement(StatementNode<'ast>),
+    Import(ImportNode<'ast>),
 }
 
 pub type BlockNode<'ast> = Node<'ast, Block<'ast>>;
+pub type BlockElementNode<'ast> = Node<'ast, BlockElement<'ast>>;
 
 impl_from! {
-    Declaration => BlockElement::Declaration,
-    Statement => BlockElement::Statement,
-    Import => BlockElement::Import,
+    DeclarationNode => BlockElement::Declaration,
+    StatementNode => BlockElement::Statement,
+    ImportNode => BlockElement::Import,
 }
