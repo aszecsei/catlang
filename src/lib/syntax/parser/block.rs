@@ -14,6 +14,7 @@ impl<'ast> Parser<'ast> {
         loop {
             match self.current_token {
                 Token::RCurlyB => break,
+                Token::Semicolon => self.bump(),
                 _ => elements.push(self.arena, self.block_element()?),
             }
         }
