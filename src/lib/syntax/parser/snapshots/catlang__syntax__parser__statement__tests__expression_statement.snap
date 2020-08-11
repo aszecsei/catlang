@@ -1,0 +1,27 @@
+---
+source: src/lib/syntax/parser/statement.rs
+expression: res
+---
+(0:9) Expression(
+    (0:9) AssignmentExpression(
+        AssignmentExpression {
+            left: (0:1) IdentifierExpression(
+                (0:1) "x",
+            ),
+            operator: Plain,
+            right: (4:9) BinaryExpression(
+                BinaryExpression {
+                    left: (4:5) IdentifierExpression(
+                        (4:5) "y",
+                    ),
+                    operator: Addition,
+                    right: (8:9) PrimitiveExpression(
+                        DecimalNumber(
+                            "3",
+                        ),
+                    ),
+                },
+            ),
+        },
+    ),
+)

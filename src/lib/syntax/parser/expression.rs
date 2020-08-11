@@ -95,7 +95,10 @@ impl<'ast> Parser<'ast> {
 
     fn expression_bp(&mut self, min_bp: u8) -> Result<ExpressionNode<'ast>> {
         let mut lhs: ExpressionNode<'ast> = match self.current_token {
-            // TODO: Values
+            Token::Ident => {
+                let identifier = self.identifier_node()?;
+                self.node_at(identifier.start, identifier.end, identifier)
+            }
             Token::Integer(_) => self.node_from_slice(|s| Primitive::DecimalNumber(s)),
             Token::Bool(b) => self.node_at_token(Primitive::Bool(b)),
             Token::LParen => {

@@ -1,0 +1,34 @@
+---
+source: src/lib/syntax/parser/statement.rs
+expression: res
+---
+(6:18) Loop(
+    WhileLoop(
+        WhileLoop {
+            is_do_while: false,
+            condition: (7:13) BinaryExpression(
+                BinaryExpression {
+                    left: (7:8) IdentifierExpression(
+                        (7:8) "i",
+                    ),
+                    operator: LessThan,
+                    right: (11:13) PrimitiveExpression(
+                        DecimalNumber(
+                            "10",
+                        ),
+                    ),
+                },
+            ),
+            statement: (17:18) Expression(
+                (17:18) PrefixExpression(
+                    PrefixExpression {
+                        operator: Increment,
+                        operand: (17:18) IdentifierExpression(
+                            (17:18) "i",
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+)
