@@ -295,7 +295,7 @@
     ;
 
 <span class="hljs-attribute">block</span>
-    = <span class="hljs-string">"{"</span> { declaration | statement } <span class="hljs-string">"}"</span>
+    = <span class="hljs-string">"{"</span> { declaration | statement | import } <span class="hljs-string">"}"</span>
     ;
 
 <span class="hljs-attribute">declaration</span>
@@ -316,11 +316,11 @@
     ;
 
 <span class="hljs-attribute">variable declaration</span>
-    = <span class="hljs-string">"let"</span> , identifier , [ <span class="hljs-string">":"</span> , type expression ] , <span class="hljs-string">"="</span> , expression
+    = <span class="hljs-string">"let"</span> , identifier , [ <span class="hljs-string">":"</span> , type expression ] , [ <span class="hljs-string">"="</span> , expression ]
     ;
 
 <span class="hljs-attribute">function declaration</span>
-    = <span class="hljs-string">"function"</span> , scoped value , [ generic parameter list ] , <span class="hljs-string">"("</span> , [ formal parameter list ] , <span class="hljs-string">")"</span> , [ <span class="hljs-string">"-&gt;"</span> , [ type expression ] ] , block
+    = <span class="hljs-string">"function"</span> , scoped identifier , [ generic parameter list ] , <span class="hljs-string">"("</span> , [ formal parameter list ] , <span class="hljs-string">")"</span> , [ <span class="hljs-string">"-&gt;"</span> , [ type expression ] ] , block
     ;
 
 <span class="hljs-attribute">formal parameter list</span>
@@ -376,6 +376,7 @@
     | if
     | loop
     | jump
+    | delete
     | expression
     ;
 
@@ -412,6 +413,10 @@
     | <span class="hljs-string">"return"</span> , [ expression ]
     ;
 
+<span class="hljs-attribute">delete</span>
+    = <span class="hljs-string">"delete"</span> , scoped identifier
+    ;
+
 <span class="hljs-attribute">type expression</span>
     = type union
     | unary type expression
@@ -435,7 +440,7 @@
     = <span class="hljs-string">"*"</span> , unary type expression
     ;
 <span class="hljs-attribute">sized array</span>
-    = <span class="hljs-string">"["</span> , expression , <span class="hljs-string">"]"</span> , unary type expression
+    = <span class="hljs-string">"["</span> , <span class="hljs-string">"]"</span> , unary type expression
     ;
 <span class="hljs-attribute">unsized array</span>
     = <span class="hljs-string">"["</span> , <span class="hljs-string">".."</span> , <span class="hljs-string">"]"</span> , unary type expression
@@ -522,7 +527,7 @@
     ;
 
 <span class="hljs-attribute">assignment expression</span> <span class="hljs-comment">(* right-associative *)</span>
-    = scoped value , assignment operator , assignment expression
+    = scoped identifier , assignment operator , assignment expression
     | ternary expression
     ;
 <span class="hljs-attribute">assignment operator</span>
@@ -642,22 +647,21 @@
 <span class="hljs-attribute">suffix expression</span> <span class="hljs-comment">(* left-associative *)</span>
     = value , suffix operator
     | value , [ generic type list ] , <span class="hljs-string">"("</span> , [ expression list ] , <span class="hljs-string">")"</span> <span class="hljs-comment">(* function call *)</span>
-    | value , <span class="hljs-string">"["</span> , [ expression list ] , <span class="hljs-string">"]"</span> <span class="hljs-comment">(* subscript *)</span>
-    | value , { <span class="hljs-string">"."</span> , suffix expression } <span class="hljs-comment">(* member access *)</span>
+    | value , [ <span class="hljs-string">"?"</span> ] , <span class="hljs-string">"["</span> , [ expression list ] , <span class="hljs-string">"]"</span> <span class="hljs-comment">(* subscript *)</span>
+    | value , { [ <span class="hljs-string">"?"</span> ] , <span class="hljs-string">"."</span> , suffix expression } <span class="hljs-comment">(* member access *)</span>
     | value
     ;
 <span class="hljs-attribute">suffix operator</span>
     = <span class="hljs-string">"++"</span>
     | <span class="hljs-string">"--"</span>
     | <span class="hljs-string">"!"</span>
-    | <span class="hljs-string">"?"</span>
     ;
 
 <span class="hljs-attribute">value</span>
     = <span class="hljs-string">"sizeof"</span> , <span class="hljs-string">"("</span> , type expression , <span class="hljs-string">")"</span>
     | lambda expression
-    | [ <span class="hljs-string">"new"</span> ] , type expression , [ struct initializer ] <span class="hljs-comment">(* struct allocation via initializer or empty *)</span>
-    | type expression , <span class="hljs-string">"::"</span> , identifier <span class="hljs-comment">(* scoped value *)</span>
+    | [ <span class="hljs-string">"new"</span> ] , type expression , [ generic type list ] , [ struct initializer ] <span class="hljs-comment">(* struct allocation via initializer or empty *)</span>
+    | identifier , { <span class="hljs-string">"."</span> , identifier } <span class="hljs-comment">(* module-scoped type *)</span>
     | number
     | string literal
     | character literal
@@ -677,8 +681,12 @@
     = [ generic parameter list ] , <span class="hljs-string">"("</span> , [ formal parameter list ] , <span class="hljs-string">")"</span> , [ <span class="hljs-string">"-&gt;"</span> , [ type expression ] ] , block
     ;
 
+<span class="hljs-attribute">scoped identifier</span>
+    = [ type expression , <span class="hljs-string">"::"</span> ] , identifier
+    ;
+
 <span class="hljs-attribute">reference</span>
-    = identifier
+    = scoped identifier
     | <span class="hljs-string">"this"</span>
     ;
 </code></pre>

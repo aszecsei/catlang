@@ -146,7 +146,7 @@ const genericFunction = (input: number) -&gt; {
 <p>The <code>any</code> type is the equivalent of C's <code>void*</code> type. It can be used to escape Catlang's type system - <code>any</code> types can be cast to any type without any analysis. Note that this will <em>not</em> perform any transformations on numeric types - a <code>float</code> cast to <code>any</code> and then cast to <code>int</code> will be an integer representation of the bits of that float, which is unlikely to be the desired behavior of such a casting operation. Be very careful when using this feature!</p>
 <h2><a class="anchor" aria-hidden="true" id="optionals"></a><a href="#optionals" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Optionals</h2>
 <p>Catlang includes an &quot;optional&quot; type, equivalent to <code>type | null</code>, to help avoid null-pointer exceptions. Any function that requires a non-Optional value must be enclosed in a conditional to ensure that the Optional value exists, or an error will be thrown.</p>
-<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> myPrint = (<span class="hljs-built_in">num</span>: <span class="hljs-built_in">int</span>?) -&gt; {
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> myPrint = (<span class="hljs-built_in">num</span>: ?<span class="hljs-built_in">int</span>) -&gt; {
   <span class="hljs-keyword">if</span> (<span class="hljs-built_in">num</span>) {
     <span class="hljs-built_in">print</span>(<span class="hljs-built_in">num</span>);
   } <span class="hljs-keyword">else</span> {
@@ -155,12 +155,12 @@ const genericFunction = (input: number) -&gt; {
 }
 </code></pre>
 <p>If a user wishes to force-unwrap an optional value, they can use the null-forgiving (<code>!</code>) operation to do so. This is not recommended as it may lead to null-pointer exceptions.</p>
-<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> myPrint = (<span class="hljs-built_in">num</span>: <span class="hljs-built_in">int</span>?) -&gt; {
+<pre><code class="hljs css language-catlang"><span class="hljs-keyword">const</span> myPrint = (<span class="hljs-built_in">num</span>: ?<span class="hljs-built_in">int</span>) -&gt; {
   <span class="hljs-built_in">print</span>(<span class="hljs-built_in">num</span>!);
 }
 </code></pre>
 <p>To reduce if-statements, null-coalescing and null-conditional operators are provided.</p>
-<pre><code class="hljs css language-catlang">const myPrint = <span class="hljs-function"><span class="hljs-params">(obj: MyStruct?)</span> -&gt;</span> {
+<pre><code class="hljs css language-catlang">const myPrint = <span class="hljs-function"><span class="hljs-params">(obj: ?MyStruct)</span> -&gt;</span> {
   <span class="hljs-keyword">if</span> (obj) {
     obj.DoMethod();
   }
@@ -188,7 +188,7 @@ const genericFunction = (input: number) -&gt; {
 <p>When multiple types are in use, Catlang attempts to find a &quot;best common type&quot; for those types. This usually creates the smallest type union possible to encompass all values used. For example, in this code</p>
 <pre><code class="hljs css language-catlang"><span class="hljs-string">let</span> <span class="hljs-string">x</span> <span class="hljs-string">=</span> <span class="hljs-string">[]</span> <span class="hljs-string">{</span> <span class="hljs-number">1</span><span class="hljs-string">,</span> <span class="hljs-number">2</span><span class="hljs-string">,</span> <span class="hljs-literal">null</span> <span class="hljs-string">};</span>
 </code></pre>
-<p>The type of the <code>x</code> variable would be inferred to be <code>[](int | null)</code> - or, equivalently, <code>[](int?)</code>.</p>
+<p>The type of the <code>x</code> variable would be inferred to be <code>[](int | null)</code> - or, equivalently, <code>[](?int)</code>.</p>
 <h3><a class="anchor" aria-hidden="true" id="contextual-typing"></a><a href="#contextual-typing" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Contextual Typing</h3>
 <p>In some cases, type inference can occur in the opposite direction - that is, the declared type influences the type of the expression. For example:</p>
 <pre><code class="hljs css language-catlang">function floatMap(<span class="hljs-function"><span class="hljs-keyword">fun</span>: <span class="hljs-params">(float)</span></span> -&gt; float, arr: []float) -&gt; []float {
