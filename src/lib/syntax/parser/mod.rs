@@ -1,5 +1,8 @@
+mod attribute;
+mod block;
 mod declaration;
 mod expression;
+mod module;
 mod primitive;
 mod source;
 mod statement;

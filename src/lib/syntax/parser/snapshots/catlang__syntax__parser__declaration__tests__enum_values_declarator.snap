@@ -1,0 +1,29 @@
+---
+source: src/lib/syntax/parser/declaration.rs
+expression: res
+---
+(0:24) Declaration {
+    attributes: [],
+    declarator: Enum(
+        EnumDeclarator {
+            identifier: (5:11) "MyEnum",
+            representation: None,
+            values: [
+                (14:15) EnumValue {
+                    identifier: (14:15) "A",
+                    value: None,
+                },
+                (17:22) EnumValue {
+                    identifier: (17:18) "B",
+                    value: Some(
+                        (21:22) PrimitiveExpression(
+                            DecimalNumber(
+                                "3",
+                            ),
+                        ),
+                    ),
+                },
+            ],
+        },
+    ),
+}

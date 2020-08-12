@@ -1,0 +1,57 @@
+---
+source: src/lib/syntax/parser/expression.rs
+expression: res
+---
+(0:27) TernaryExpression(
+    TernaryExpression {
+        condition: (0:6) BinaryExpression(
+            BinaryExpression {
+                left: (0:1) PrimitiveExpression(
+                    DecimalNumber(
+                        "1",
+                    ),
+                ),
+                operator: Equals,
+                right: (5:6) PrimitiveExpression(
+                    DecimalNumber(
+                        "1",
+                    ),
+                ),
+            },
+        ),
+        when_true: (9:10) PrimitiveExpression(
+            DecimalNumber(
+                "2",
+            ),
+        ),
+        when_false: (13:27) TernaryExpression(
+            TernaryExpression {
+                condition: (13:19) BinaryExpression(
+                    BinaryExpression {
+                        left: (13:14) PrimitiveExpression(
+                            DecimalNumber(
+                                "3",
+                            ),
+                        ),
+                        operator: Equals,
+                        right: (18:19) PrimitiveExpression(
+                            DecimalNumber(
+                                "4",
+                            ),
+                        ),
+                    },
+                ),
+                when_true: (22:23) PrimitiveExpression(
+                    DecimalNumber(
+                        "5",
+                    ),
+                ),
+                when_false: (26:27) PrimitiveExpression(
+                    DecimalNumber(
+                        "6",
+                    ),
+                ),
+            },
+        ),
+    },
+)

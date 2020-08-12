@@ -1,0 +1,14 @@
+---
+source: src/lib/syntax/parser/types.rs
+expression: res
+---
+(1:7) Unary(
+    UnaryTypeExpression {
+        op: SizedArray,
+        inner: (2:7) Simple(
+            PrimitiveType(
+                Float,
+            ),
+        ),
+    },
+)

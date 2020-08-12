@@ -1,3 +1,4 @@
+use crate::syntax::ast::{Visitable, Visitor};
 use std::fmt::{self, Debug};
 use std::ops::Deref;
 use toolshed::CopyCell;
@@ -80,6 +81,13 @@ impl<'ast, T: 'ast + Debug> Debug for Node<'ast, T> {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), f)
+    }
+}
+
+impl<'ast, T: 'ast + Visitable> Visitable for Node<'ast, T> {
+    #[inline]
+    fn visit(&self, v: &mut dyn Visitor) -> anyhow::Result<()> {
+        self.inner.get().value.visit(v)
     }
 }
 

@@ -1,0 +1,7 @@
+---
+source: src/lib/syntax/parser/statement.rs
+expression: res
+---
+(0:8) Jump(
+    Continue,
+)

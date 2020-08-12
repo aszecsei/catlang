@@ -1,0 +1,37 @@
+---
+source: src/lib/syntax/parser/statement.rs
+expression: res
+---
+(3:17) If(
+    IfStatement {
+        condition: (4:10) BinaryExpression(
+            BinaryExpression {
+                left: (4:5) IdentifierExpression(
+                    (4:5) "x",
+                ),
+                operator: Equals,
+                right: (9:10) PrimitiveExpression(
+                    DecimalNumber(
+                        "3",
+                    ),
+                ),
+            },
+        ),
+        true_block: (12:17) Expression(
+            (12:17) AssignmentExpression(
+                AssignmentExpression {
+                    left: (12:13) IdentifierExpression(
+                        (12:13) "y",
+                    ),
+                    operator: Plain,
+                    right: (16:17) PrimitiveExpression(
+                        DecimalNumber(
+                            "2",
+                        ),
+                    ),
+                },
+            ),
+        ),
+        else_block: None,
+    },
+)

@@ -1,0 +1,28 @@
+---
+source: src/lib/syntax/parser/statement.rs
+expression: res
+---
+(5:13) Loop(
+    InfiniteLoop(
+        InfiniteLoop {
+            statement: (5:13) InnerBlock(
+                (5:13) Block {
+                    elements: [
+                        (9:10) Statement(
+                            (9:10) Expression(
+                                (9:10) PrefixExpression(
+                                    PrefixExpression {
+                                        operator: Increment,
+                                        operand: (9:10) IdentifierExpression(
+                                            (9:10) "i",
+                                        ),
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        },
+    ),
+)

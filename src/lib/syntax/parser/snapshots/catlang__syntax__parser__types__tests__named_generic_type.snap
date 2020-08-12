@@ -1,0 +1,18 @@
+---
+source: src/lib/syntax/parser/types.rs
+expression: res
+---
+(0:12) Simple(
+    NamedType(
+        NamedType {
+            identifier: (0:5) "Array",
+            generic_parameters: [
+                (6:11) Simple(
+                    PrimitiveType(
+                        Float,
+                    ),
+                ),
+            ],
+        },
+    ),
+)

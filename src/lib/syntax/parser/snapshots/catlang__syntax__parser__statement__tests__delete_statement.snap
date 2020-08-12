@@ -1,0 +1,9 @@
+---
+source: src/lib/syntax/parser/statement.rs
+expression: res
+---
+(7:12) Delete(
+    DeleteStatement {
+        deleted: (7:12) "myVar",
+    },
+)

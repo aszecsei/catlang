@@ -1,0 +1,14 @@
+---
+source: src/lib/syntax/parser/module.rs
+expression: res
+---
+(7:34) ReExport(
+    ExportReExport {
+        exports: GlobImportList(
+            GlobImportList {
+                identifier: (12:19) "vectors",
+            },
+        ),
+        path: (25:34) "\"vectors\"",
+    },
+)

@@ -2,29 +2,56 @@ use super::*;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum TypeExpression<'ast> {
-    PointerType(TypeExpressionNode<'ast>),
-    SizedArrayType(SizedArrayType<'ast>),
-    UnsizedArrayType(TypeExpressionNode<'ast>),
-    TypeUnion(TypeUnionExpression<'ast>),
-    TypeofExpression(ExpressionNode<'ast>),
-    OptionalType(TypeExpressionNode<'ast>),
-    PrimitiveType(PrimitiveType<'ast>),
+    Binary(BinaryTypeExpression<'ast>),
+    Unary(UnaryTypeExpression<'ast>),
+    Simple(SimpleTypeExpression<'ast>),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct TypeUnionExpression<'ast> {
+pub enum BinaryTypeOperator {
+    TypeUnion,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum UnaryTypeOperator {
+    PointerTo,
+    SizedArray,
+    UnsizedArray,
+    Const,
+    Volatile,
+    Optional,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct BinaryTypeExpression<'ast> {
     pub left: TypeExpressionNode<'ast>,
+    pub op: BinaryTypeOperator,
     pub right: TypeExpressionNode<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct SizedArrayType<'ast> {
-    pub size: ExpressionNode<'ast>,
+pub struct UnaryTypeExpression<'ast> {
+    pub op: UnaryTypeOperator,
     pub inner: TypeExpressionNode<'ast>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum PrimitiveType<'ast> {
+pub enum SimpleTypeExpression<'ast> {
+    Typeof(ExpressionNode<'ast>),
+    NamedType(NamedType<'ast>),
+    PrimitiveType(PrimitiveType),
+    SubExpression(TypeExpressionNode<'ast>),
+    Any,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct NamedType<'ast> {
+    pub identifier: IdentifierNode<'ast>,
+    pub generic_parameters: TypeExpressionList<'ast>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum PrimitiveType {
     S8,
     U8,
     S16,
@@ -33,20 +60,44 @@ pub enum PrimitiveType<'ast> {
     U32,
     S64,
     U64,
+    Char,
+    Short,
+    Int,
+    Long,
+    CShort,
+    CUShort,
+    CInt,
+    CUInt,
+    CLong,
+    CULong,
+    CLongLong,
+    CULongLong,
+    CLongDouble,
     Bool,
+    F32,
+    F64,
     Float,
     Double,
     Null,
-    NamedType(IdentifierNode<'ast>),
+    NoReturn,
+    CVoid,
 }
 
 pub type TypeExpressionNode<'ast> = Node<'ast, TypeExpression<'ast>>;
 pub type TypeExpressionList<'ast> = NodeList<'ast, TypeExpression<'ast>>;
 
 impl_from! {
-    TypeUnionExpression => TypeExpression::TypeUnion,
-    SizedArrayType => TypeExpression::SizedArrayType,
-    ExpressionNode => TypeExpression::TypeofExpression,
-    PrimitiveType => TypeExpression::PrimitiveType,
-    IdentifierNode => PrimitiveType::NamedType,
+    BinaryTypeExpression => TypeExpression::Binary,
+    UnaryTypeExpression => TypeExpression::Unary,
+    SimpleTypeExpression => TypeExpression::Simple,
+
+    ExpressionNode => SimpleTypeExpression::Typeof,
+    NamedType => SimpleTypeExpression::NamedType,
+    TypeExpressionNode => SimpleTypeExpression::SubExpression,
+}
+
+impl<'ast> From<PrimitiveType> for SimpleTypeExpression<'ast> {
+    fn from(pt: PrimitiveType) -> Self {
+        SimpleTypeExpression::PrimitiveType(pt)
+    }
 }

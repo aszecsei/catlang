@@ -1,0 +1,14 @@
+---
+source: src/lib/syntax/parser/types.rs
+expression: res
+---
+(1:6) Unary(
+    UnaryTypeExpression {
+        op: Optional,
+        inner: (1:6) Simple(
+            PrimitiveType(
+                Float,
+            ),
+        ),
+    },
+)

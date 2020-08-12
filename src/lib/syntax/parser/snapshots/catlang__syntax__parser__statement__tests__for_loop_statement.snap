@@ -1,0 +1,31 @@
+---
+source: src/lib/syntax/parser/statement.rs
+expression: res
+---
+(4:19) Loop(
+    ForLoop(
+        ForLoop {
+            identifier: (5:6) "x",
+            range: (10:14) BinaryExpression(
+                BinaryExpression {
+                    left: (10:11) PrimitiveExpression(
+                        DecimalNumber(
+                            "0",
+                        ),
+                    ),
+                    operator: RangeExclusive,
+                    right: (13:14) PrimitiveExpression(
+                        DecimalNumber(
+                            "3",
+                        ),
+                    ),
+                },
+            ),
+            statement: (16:19) InnerBlock(
+                (16:19) Block {
+                    elements: [],
+                },
+            ),
+        },
+    ),
+)

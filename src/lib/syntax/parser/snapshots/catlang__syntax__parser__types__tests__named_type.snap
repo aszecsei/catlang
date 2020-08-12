@@ -1,0 +1,12 @@
+---
+source: src/lib/syntax/parser/types.rs
+expression: res
+---
+(0:6) Simple(
+    NamedType(
+        NamedType {
+            identifier: (0:6) "string",
+            generic_parameters: [],
+        },
+    ),
+)

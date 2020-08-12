@@ -125,6 +125,10 @@ pub enum Token {
     Arrow,
     #[token("?")]
     Question,
+    #[token("?.")]
+    NullConditional,
+    #[token("?[")]
+    NullConditionalIndex,
     #[token("??")]
     NullCoalesce,
     #[token("??=")]
@@ -150,6 +154,8 @@ pub enum Token {
     Delete,
     #[token("typeof")]
     Typeof,
+    #[token("sizeof")]
+    Sizeof,
     #[token("is")]
     Is,
     #[token("as")]
@@ -194,6 +200,8 @@ pub enum Token {
     Continue,
     #[token("this")]
     This,
+    #[token("volatile")]
+    Volatile,
 
     // Type Primitives
     #[token("s8")]

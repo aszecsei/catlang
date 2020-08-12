@@ -1,0 +1,47 @@
+---
+source: src/lib/syntax/parser/declaration.rs
+expression: res
+---
+(0:42) Declaration {
+    attributes: [],
+    declarator: Struct(
+        StructDeclarator {
+            identifier: (7:14) "Vector2",
+            generic_parameters: [],
+            members: [
+                (17:27) StructMember {
+                    identifier: (17:18) "x",
+                    is_owned: false,
+                    type_expression: (20:23) Simple(
+                        PrimitiveType(
+                            F32,
+                        ),
+                    ),
+                    default_value: Some(
+                        (26:27) PrimitiveExpression(
+                            DecimalNumber(
+                                "0",
+                            ),
+                        ),
+                    ),
+                },
+                (29:39) StructMember {
+                    identifier: (29:30) "y",
+                    is_owned: false,
+                    type_expression: (32:35) Simple(
+                        PrimitiveType(
+                            F32,
+                        ),
+                    ),
+                    default_value: Some(
+                        (38:39) PrimitiveExpression(
+                            DecimalNumber(
+                                "0",
+                            ),
+                        ),
+                    ),
+                },
+            ],
+        },
+    ),
+}

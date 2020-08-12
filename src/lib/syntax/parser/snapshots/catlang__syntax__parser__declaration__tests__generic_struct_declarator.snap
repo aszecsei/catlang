@@ -1,0 +1,43 @@
+---
+source: src/lib/syntax/parser/declaration.rs
+expression: res
+---
+(0:33) Declaration {
+    attributes: [],
+    declarator: Struct(
+        StructDeclarator {
+            identifier: (7:14) "Vector2",
+            generic_parameters: [
+                (15:16) "T",
+            ],
+            members: [
+                (20:24) StructMember {
+                    identifier: (20:21) "x",
+                    is_owned: false,
+                    type_expression: (23:24) Simple(
+                        NamedType(
+                            NamedType {
+                                identifier: (23:24) "T",
+                                generic_parameters: [],
+                            },
+                        ),
+                    ),
+                    default_value: None,
+                },
+                (26:30) StructMember {
+                    identifier: (26:27) "y",
+                    is_owned: false,
+                    type_expression: (29:30) Simple(
+                        NamedType(
+                            NamedType {
+                                identifier: (29:30) "T",
+                                generic_parameters: [],
+                            },
+                        ),
+                    ),
+                    default_value: None,
+                },
+            ],
+        },
+    ),
+}

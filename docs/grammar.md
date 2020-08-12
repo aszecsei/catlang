@@ -247,7 +247,7 @@ import identifier
     ;
 
 block
-    = "{" { declaration | statement } "}"
+    = "{" { declaration | statement | import } "}"
     ;
 
 declaration
@@ -268,11 +268,11 @@ type declaration
     ;
 
 variable declaration
-    = "let" , identifier , [ ":" , type expression ] , "=" , expression
+    = "let" , identifier , [ ":" , type expression ] , [ "=" , expression ]
     ;
 
 function declaration
-    = "function" , scoped value , [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
+    = "function" , scoped identifier , [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
     ;
 
 formal parameter list
@@ -328,6 +328,7 @@ statement
     | if
     | loop
     | jump
+    | delete
     | expression
     ;
 
@@ -364,6 +365,10 @@ jump
     | "return" , [ expression ]
     ;
 
+delete
+    = "delete" , scoped identifier
+    ;
+
 type expression
     = type union
     | unary type expression
@@ -387,7 +392,7 @@ pointer to
     = "*" , unary type expression
     ;
 sized array
-    = "[" , expression , "]" , unary type expression
+    = "[" , "]" , unary type expression
     ;
 unsized array
     = "[" , ".." , "]" , unary type expression
@@ -474,7 +479,7 @@ expression
     ;
 
 assignment expression (* right-associative *)
-    = scoped value , assignment operator , assignment expression
+    = scoped identifier , assignment operator , assignment expression
     | ternary expression
     ;
 assignment operator
@@ -594,22 +599,21 @@ prefix operator
 suffix expression (* left-associative *)
     = value , suffix operator
     | value , [ generic type list ] , "(" , [ expression list ] , ")" (* function call *)
-    | value , "[" , [ expression list ] , "]" (* subscript *)
-    | value , { "." , suffix expression } (* member access *)
+    | value , [ "?" ] , "[" , [ expression list ] , "]" (* subscript *)
+    | value , { [ "?" ] , "." , suffix expression } (* member access *)
     | value
     ;
 suffix operator
     = "++"
     | "--"
     | "!"
-    | "?"
     ;
 
 value
     = "sizeof" , "(" , type expression , ")"
     | lambda expression
-    | [ "new" ] , type expression , [ struct initializer ] (* struct allocation via initializer or empty *)
-    | type expression , "::" , identifier (* scoped value *)
+    | [ "new" ] , type expression , [ generic type list ] , [ struct initializer ] (* struct allocation via initializer or empty *)
+    | identifier , { "." , identifier } (* module-scoped type *)
     | number
     | string literal
     | character literal
@@ -629,8 +633,12 @@ lambda expression
     = [ generic parameter list ] , "(" , [ formal parameter list ] , ")" , [ "->" , [ type expression ] ] , block
     ;
 
+scoped identifier
+    = [ type expression , "::" ] , identifier
+    ;
+
 reference
-    = identifier
+    = scoped identifier
     | "this"
     ;
 ```

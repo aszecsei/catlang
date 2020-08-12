@@ -1,30 +1,37 @@
 use toolshed::list::GrowableList;
 
 use crate::syntax::ast::*;
-use crate::syntax::error::*;
+use crate::syntax::error::Result;
 use crate::syntax::lexer::Token;
 use crate::syntax::parser::Parser;
 
 impl<'ast> Parser<'ast> {
     pub fn source_unit(&mut self) -> SourceUnitNode<'ast> {
         let start = self.current_span.start as u32;
-        let block = self.block_node();
-        let end = self.last_span.end as u32;
-        self.node_at(start, end, SourceUnit { block })
-    }
 
-    pub fn block_node(&mut self) -> BlockNode<'ast> {
-        let start = self.current_span.start as u32;
         let elements = GrowableList::new();
+        let mut is_script = true;
         loop {
             match self.current_token {
                 Token::EndOfFile => break,
-                Token::RCurlyB => break,
-                Token::Semicolon => {
-                    self.bump();
+                Token::Semicolon => self.bump(),
+                Token::Export => {
+                    // TODO: =BUG= If this is an export declaration, it might have attributes before it.
+                    is_script = false;
+                    let res = self.module_element_node();
+                    if let Ok(element_node) = res {
+                        elements.push(self.arena, element_node);
+                    }
+                }
+                Token::Import => {
+                    is_script = false;
+                    let res = self.module_element_node();
+                    if let Ok(element_node) = res {
+                        elements.push(self.arena, element_node);
+                    }
                 }
                 _ => {
-                    let res = self.block_element_node();
+                    let res = self.module_element_node();
                     if let Ok(element_node) = res {
                         elements.push(self.arena, element_node);
                     }
@@ -32,36 +39,33 @@ impl<'ast> Parser<'ast> {
             }
         }
         let end = self.last_span.end as u32;
+
         self.node_at(
             start,
             end,
-            Block {
+            Module {
                 elements: elements.as_list(),
+                is_script,
             },
         )
     }
 
-    fn block_element_node(&mut self) -> Result<Node<'ast, BlockElement<'ast>>> {
-        let start = self.current_span.start as u32;
-        let block_element = if is_declaration_starter(self.current_token) {
-            BlockElement::Declaration(self.declaration_node()?)
-        } else {
-            BlockElement::Statement(self.statement_node()?)
+    fn module_element_node(&mut self) -> Result<Node<'ast, ModuleElement<'ast>>> {
+        let (start, end, element): (u32, u32, ModuleElement) = match self.current_token {
+            Token::Export => {
+                let element = self.export()?;
+                (element.start, element.end, element.into())
+            }
+            Token::Import => {
+                let element = self.import()?;
+                (element.start, element.end, element.into())
+            }
+            _ => {
+                let element = self.declaration_node()?;
+                (element.start, element.end, element.into())
+            }
         };
-        let end = self.last_span.end as u32;
-        Ok(self.node_at(start, end, block_element))
-    }
-}
 
-fn is_declaration_starter(t: Token) -> bool {
-    match t {
-        Token::Export => true,
-        Token::Const => true,
-        Token::Type => true,
-        Token::Let => true,
-        Token::Function => true,
-        Token::Struct => true,
-        Token::Enum => true,
-        _ => false,
+        Ok(self.node_at(start, end, element))
     }
 }

@@ -1,0 +1,13 @@
+---
+source: src/lib/syntax/parser/statement.rs
+expression: res
+---
+(7:8) Jump(
+    Return(
+        (7:8) PrimitiveExpression(
+            DecimalNumber(
+                "3",
+            ),
+        ),
+    ),
+)

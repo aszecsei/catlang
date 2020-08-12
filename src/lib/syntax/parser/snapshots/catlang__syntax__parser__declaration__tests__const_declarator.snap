@@ -1,0 +1,18 @@
+---
+source: src/lib/syntax/parser/declaration.rs
+expression: res
+---
+(0:12) Declaration {
+    attributes: [],
+    declarator: Constant(
+        ConstantDeclarator {
+            identifier: (6:8) "PI",
+            type_expression: None,
+            expression: (11:12) PrimitiveExpression(
+                DecimalNumber(
+                    "3",
+                ),
+            ),
+        },
+    ),
+}
