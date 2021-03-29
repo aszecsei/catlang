@@ -1,12 +1,29 @@
 ---
 id: what-and-why
-title: What & Why
-sidebar_label: What & Why
+title: Introduction
+sidebar_label: Introduction
+slug: /
 ---
 
-## What Is Catlang?
+Catlang is a systems programming language with a C-like syntax that compiles to native code. It is statically typed, and does not include automatic memory management.
 
-Catlang is a systems programming language designed for both speed and kindness.
+It has been designed for both speed and kindness.
+
+## Phases of Compilation
+
+### Lexical Analysis
+
+### Syntax Analysis
+
+### Semantic Analysis
+
+### Optimization
+
+### Code Generation
+
+## Memory Model
+
+## Object Model
 
 ## Why Catlang?
 

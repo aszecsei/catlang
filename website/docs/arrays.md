@@ -88,8 +88,8 @@ const printFirst = (in: []string) -> {
 Arrays are mutable by default. You can replace any existing element of an array using the subscript operator:
 
 ```catlang
-const replaceFirst = (in: []string) -> {
-  in[0] = "new string!";
+const replaceFirst = (replaceIn: []string) -> {
+  replaceIn[0] = "new string!";
 }
 ```
 

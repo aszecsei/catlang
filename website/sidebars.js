@@ -1,31 +1,31 @@
-{
-  "docs": {
-    "Intro": ["what-and-why"],
+module.exports = {
+  docs: {
+    "Catlang": ["what-and-why"],
     "Setup": ["installation", "editor-plugins"],
     "Language Basics": [
       "overview",
       "syntax",
-      "native-types",
+      "types",
       "arrays",
       "method-calls",
       "control-flow",
       "variables",
       "functions",
       "structs",
+      "unions",
       "enums",
       "interfaces",
       "iterators",
-      "typing",
       "casting",
       "generics",
       "error-handling",
       "project-structure",
       "interop",
       "build-system",
-      "grammar"
+      "grammar",
     ]
   },
-  "api": {
-    "Index": ["api-index"]
+  api: {
+    "Index": ["api"]
   }
 }

@@ -1,8 +1,8 @@
 ---
 title: Hello, World!
 author: Alic Szecsei
-authorURL: https://alic-szecsei.com/
-authorImageURL: https://alic-szecsei.com/img/profile2.png
+authorURL: "https://alic-szecsei.com/"
+authorImageURL: "https://alic-szecsei.com/img/profile2.png"
 ---
 
 While much of Catlang is progressing nicely (the grammar is almost entirely fleshed out!) there have been a few setbacks. Namely, we're switching from Go to Rust - which is a net positive, but requires re-writing some of the existing code.

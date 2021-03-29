@@ -4,32 +4,25 @@ title: Method Calls
 sidebar_label: Method Calls
 ---
 
-## Signature
-
-In catlang, a function defined via the `function` syntax may be overloaded:
+Methods are performed using a traditional syntax:
 
 ```catlang
-function printMe() -> {
-  print("Hello");
-}
-function printMe(times: int) -> {
-  for (i = 0; i < times; ++i) {
-    printMe();
-  }
-}
+myFunction(arguments);
 ```
 
-A function declared using lambda-style syntax, may not be overloaded.
+## Instance Method Calls
 
 ```catlang
-const printMe = () => {
-  print("Hello");
-}
-const printMe = (times: int) -> { // ERROR: Re-definition of constant!
-  for (i = 0; i < times; ++i) {
-    printMe();
-  }
-}
+const v1 = Vector3;
+const v2 = v1.double();
+```
+
+## Static Method Calls
+
+```catlang
+const v1 = Vector3;
+const v2 = Vector3;
+const dot = Vector3::dot(v1, v2);
 ```
 
 ## Operators
@@ -41,15 +34,19 @@ struct Vector2 {
   x: float,
   y: float
 }
-function Vector2::operator +(lhs: Vector2, rhs: Vector2) -> Vector2 {
+function Vector2::operator +(this, rhs: Vector2) -> Vector2 {
   return Vector2 {
     x: lhs.x + rhs.x,
     y: lhs.y + rhs.y
   };
 }
+
+let v1: Vector2;
+let v2: Vector2;
+let v3 = v1 + v2;
 ```
 
-Operator overloads _must_ be static functions.
+Operator overloads _cannot_ be static functions.
 
 ### Subscript Operator
 
@@ -61,11 +58,11 @@ struct Vector2 {
   y: float
 }
 
-function Vector2::operator [](v: Vector2, index: int) -> float {
+function Vector2::operator [](this, index: int) -> float {
   if (index == 0) return v.x;
   else return v.y;
 }
-function Vector2::operator []=(v: Vector2, index: int, value: float) {
+function Vector2::operator []=(this, index: int, value: float) {
   if (index == 0) v.x = value;
   else v.y = value;
 }
@@ -85,7 +82,7 @@ struct Vector2 {
   y: float
 }
 
-function Vector2::operator deconstruct(v: Vector2) -> (float, float) {
+function Vector2::operator deconstruct(this) -> (float, float) {
   return (v.x, v.y);
 }
 
@@ -93,7 +90,7 @@ let example = Vector2 { x: 1.0, y: 2.0 };
 let (a, b) = example; // a is 1.0, b is 2.0
 ```
 
-## Casting Operator
+### Casting Operator
 
 To create a user-defined cast, you can overload the casting operator:
 

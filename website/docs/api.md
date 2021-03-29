@@ -1,5 +1,5 @@
 ---
-id: api-index
+id: api
 title: Index
 sidebar_label: Index
 ---
