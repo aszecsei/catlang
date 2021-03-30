@@ -92,8 +92,3 @@ workflows:
             branches:
               ignore:
                 - gh-pages
-      - deploy-website:
-          filters:
-            branches:
-              only:
-                - master
