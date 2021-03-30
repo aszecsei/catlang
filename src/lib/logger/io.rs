@@ -42,11 +42,11 @@ pub fn print(record: &log::Record) {
     ));
 
     if let Err(err) = res {
-        panic!(err);
+        panic!("{}", err);
     }
 
     let flush_res = term.flush();
     if let Err(err) = flush_res {
-        panic!(err);
+        panic!("{}", err);
     }
 }

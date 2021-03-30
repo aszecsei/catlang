@@ -1,6 +1,5 @@
 use super::*;
 use crate::syntax::lexer::Token;
-use inkwell::FloatPredicate::PredicateFalse;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Expression<'ast> {

@@ -173,7 +173,7 @@ pub enum Token {
     #[token("enum")]
     Enum,
     #[token("SOA")]
-    SOA,
+    Soa,
     #[token("owned")]
     Owned,
     #[token("import")]
@@ -230,18 +230,22 @@ pub enum Token {
     Long,
     #[token("c_short")]
     CShort,
+    #[allow(clippy::upper_case_acronyms)]
     #[token("c_ushort")]
     CUShort,
     #[token("c_int")]
     CInt,
+    #[allow(clippy::upper_case_acronyms)]
     #[token("c_uint")]
     CUInt,
     #[token("c_long")]
     CLong,
+    #[allow(clippy::upper_case_acronyms)]
     #[token("c_ulong")]
     CULong,
     #[token("c_longlong")]
     CLongLong,
+    #[allow(clippy::upper_case_acronyms)]
     #[token("c_ulonglong")]
     CULongLong,
     #[token("c_longdouble")]
@@ -270,7 +274,7 @@ impl Default for Token {
     }
 }
 
-fn skip_block_comment<'source>(lex: &mut Lexer<'source, Token>) -> logos::Filter<()> {
+fn skip_block_comment(lex: &mut Lexer<Token>) -> logos::Filter<()> {
     let remainder = lex.remainder();
     if let Some(idx) = remainder.find("*/") {
         lex.bump(idx + 2);

@@ -65,12 +65,16 @@ pub enum PrimitiveType {
     Int,
     Long,
     CShort,
+    #[allow(clippy::upper_case_acronyms)]
     CUShort,
     CInt,
+    #[allow(clippy::upper_case_acronyms)]
     CUInt,
     CLong,
+    #[allow(clippy::upper_case_acronyms)]
     CULong,
     CLongLong,
+    #[allow(clippy::upper_case_acronyms)]
     CULongLong,
     CLongDouble,
     Bool,

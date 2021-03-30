@@ -1,4 +1,3 @@
-use crate::syntax::ast::Primitive::DecimalNumber;
 use crate::syntax::ast::*;
 use crate::syntax::error::*;
 use crate::syntax::lexer::Token;

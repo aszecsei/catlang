@@ -101,15 +101,10 @@ impl<'ast> Parser<'ast> {
 }
 
 pub fn is_declaration_starter(t: Token) -> bool {
-    match t {
-        Token::Const => true,
-        Token::Type => true,
-        Token::Let => true,
-        Token::Function => true,
-        Token::Struct => true,
-        Token::Enum => true,
-        _ => false,
-    }
+    matches!(
+        t,
+        Token::Const | Token::Type | Token::Let | Token::Function | Token::Struct | Token::Enum
+    )
 }
 
 #[cfg(test)]

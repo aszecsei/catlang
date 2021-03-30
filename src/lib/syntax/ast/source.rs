@@ -11,7 +11,7 @@ impl_from! {
 }
 
 impl Visitable for SourceUnit<'_> {
-    fn visit(&self, v: &mut dyn Visitor) -> anyhow::Result<()> {
+    fn visit(&self, _v: &mut dyn Visitor) -> anyhow::Result<()> {
         unimplemented!()
     }
 }
