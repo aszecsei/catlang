@@ -8,14 +8,12 @@ sidebar_label: Interop
 
 Catlang supports easy C interoperability. You can import symbols directly from a C header file:
 
-```c
-// inc/hello.h
+```c title="inc/hello.h"
 #include <stdio.h>
 void my_c_function();
 ```
 
-```catlang
-// src/main.cat
+```catlang title="src/main.cat"
 import * as cModule from "inc/hello.h";
 
 function main() -> {

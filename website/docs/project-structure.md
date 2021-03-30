@@ -65,13 +65,12 @@ function main() -> {
 
 Deeply-nested folders can lead to very verbose imports. Catlang's build system provides path mapping to let you write shortcuts for these long paths. For example, if there are multiple imports from files in `src/utils/workers/`, you can define a path mapping in the package YAML:
 
-```yaml
-# package.yaml
+```yaml title="package.yaml"
 paths:
   - "@workers": src/utils/workers/
 ```
 
-```catlang
+```catlang title="src/example.cat"
 import { hello } from "@workers/hello.cat"
 ```
 
@@ -100,14 +99,14 @@ let x = new Shapes::Triangle;
 
 It is not recommended to export a single namespace from inside a module, as this leads to unnecessary typing:
 
-```catlang
-// shapes.cat
+```catlang title="src/shapes.cat"
 export namespace Shapes {
   export struct Triangle {}
   export struct Circle {}
 }
+```
 
-// shapesConsumer.cat
+```catlang title="src/shapesConsumer.cat"
 import * as shapes from "./shapes.cat"
 let x = new shapes::Shapes::Triangle; // shapes::Shapes is unnecessary
 ```
