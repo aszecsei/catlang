@@ -6,9 +6,6 @@ on:
 
 name: Check and Lint
 
-env:
-  LLVM_SYS_140_PREFIX: ./llvm
-
 jobs:
   check:
     name: Check
@@ -25,6 +22,7 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1.6.0
         with:
           version: "14.0"
+      - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -50,6 +48,7 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1.6.0
         with:
           version: "14.0"
+      - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -77,6 +76,7 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1.6.0
         with:
           version: "14.0"
+      - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
