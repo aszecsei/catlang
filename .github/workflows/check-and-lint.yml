@@ -11,8 +11,9 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Cache LLVM and Clang
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             C:/Program Files/LLVM
@@ -23,7 +24,6 @@ jobs:
         with:
           version: "14.0"
       - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -37,8 +37,9 @@ jobs:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Cache LLVM and Clang
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             C:/Program Files/LLVM
@@ -49,7 +50,6 @@ jobs:
         with:
           version: "14.0"
       - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -65,8 +65,9 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Cache LLVM and Clang
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             C:/Program Files/LLVM
@@ -77,7 +78,6 @@ jobs:
         with:
           version: "14.0"
       - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
