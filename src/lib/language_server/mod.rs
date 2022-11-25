@@ -1,6 +1,6 @@
 use log::info;
 
-use lsp_server::{Connection, Message, Request, RequestId, Response};
+use lsp_server::{Connection, ExtractError, Message, Request, RequestId, Response};
 use lsp_types::{
     request::GotoDefinition, GotoDefinitionResponse, InitializeParams, ServerCapabilities,
 };
@@ -60,7 +60,7 @@ impl LanguageServer {
     }
 }
 
-fn cast<R>(req: Request) -> Result<(RequestId, R::Params), Request>
+fn cast<R>(req: Request) -> Result<(RequestId, R::Params), ExtractError<Request>>
 where
     R: lsp_types::request::Request,
     R::Params: serde::de::DeserializeOwned,

@@ -1,7 +1,7 @@
 mod token;
 
 pub use self::token::Token;
-pub use logos::{lookup, Logos};
+pub use logos::Logos;
 pub type Lexer<'source> = logos::Lexer<'source, Token>;
 
 #[cfg(test)]

@@ -11,7 +11,7 @@ mod types;
 use crate::syntax::ast::*;
 use crate::syntax::error::*;
 use crate::syntax::lexer::{Lexer, Token};
-pub use logos::{lookup, Logos};
+pub use logos::Logos;
 use toolshed::{list::GrowableList, Arena};
 
 pub struct Parser<'ast> {
