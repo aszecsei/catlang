@@ -14,7 +14,7 @@ jobs:
             sudo apt-get install -y lsb-release software-properties-common
             wget https://apt.llvm.org/llvm.sh
             chmod +x llvm.sh
-            sudo ./llvm.sh 10
+            sudo ./llvm.sh 14
       - run:
           name: Install nightly & stable
           command: |
@@ -73,7 +73,7 @@ jobs:
           command: >
             docker run --security-opt seccomp=unconfined -e CODECOV_TOKEN=${CODECOV_TOKEN}
             -v $PWD:/volume xd009642/tarpaulin sh -c "apt-get update && apt-get install -y lsb-release software-properties-common
-            && wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 10 && cargo tarpaulin -v
+            && wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 14 && cargo tarpaulin -v
             --ciserver circle-ci --out Xml --all-features"
       - run:
           name: Upload
