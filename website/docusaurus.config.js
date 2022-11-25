@@ -1,4 +1,4 @@
-module.exports={
+module.exports = {
   title: "Catlang",
   tagline: "A strongly-typed language without the pain",
   url: "https://aszecsei.github.io",
@@ -9,7 +9,6 @@ module.exports={
   organizationName: "aszecsei",
   projectName: "catlang",
   themeConfig: {
-    sidebarCollapsible: false,
     navbar: {
       title: 'Catlang',
       logo: {
@@ -23,7 +22,7 @@ module.exports={
           label: 'Docs',
           position: 'left',
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
+        { to: 'blog', label: 'Blog', position: 'left' },
         {
           href: 'https://github.com/aszecsei/catlang',
           label: 'GitHub',
@@ -90,6 +89,7 @@ module.exports={
       "@docusaurus/preset-classic",
       {
         docs: {
+          sidebarCollapsible: false,
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/aszecsei/catlang/edit/master/website/',
         },
