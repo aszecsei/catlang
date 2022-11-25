@@ -6,6 +6,9 @@ on:
 
 name: Check and Lint
 
+env:
+  LLVM_SYS_140_PREFIX: ./llvm
+
 jobs:
   check:
     name: Check
