@@ -18,7 +18,7 @@ pub enum Expression<'ast> {
     LambdaExpression(LambdaExpression<'ast>),
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Primitive<'ast> {
     Null,
     Bool(bool),
@@ -31,7 +31,7 @@ pub enum Primitive<'ast> {
     Char(&'ast str),
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BinaryOperator {
     Equals,
     NotEquals,
@@ -59,7 +59,7 @@ pub enum BinaryOperator {
     RangeInclusive,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AssignmentOperator {
     Plain,
     Addition,
@@ -77,7 +77,7 @@ pub enum AssignmentOperator {
     NullCoalesce,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PrefixOperator {
     LogicalNot,
     BitNot,
@@ -101,7 +101,7 @@ impl From<Token> for PrefixOperator {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PostfixOperator {
     Increment,
     Decrement,

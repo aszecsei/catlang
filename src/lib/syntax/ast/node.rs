@@ -11,18 +11,12 @@ pub trait OptionalLocation {
 impl<'ast, T> OptionalLocation for Option<Node<'ast, T>> {
     #[inline]
     fn start(&self) -> Option<u32> {
-        match *self {
-            Some(ref node) => Some(node.start),
-            None => None,
-        }
+        (*self).as_ref().map(|node| node.start)
     }
 
     #[inline]
     fn end(&self) -> Option<u32> {
-        match *self {
-            Some(ref node) => Some(node.end),
-            None => None,
-        }
+        (*self).as_ref().map(|node| node.end)
     }
 }
 
@@ -33,7 +27,7 @@ pub struct Node<'ast, T: 'ast> {
     inner: CopyCell<&'ast NodeInner<T>>,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct NodeInner<T> {
     pub start: u32,
     pub end: u32,

@@ -7,12 +7,12 @@ pub enum TypeExpression<'ast> {
     Simple(SimpleTypeExpression<'ast>),
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BinaryTypeOperator {
     TypeUnion,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum UnaryTypeOperator {
     PointerTo,
     SizedArray,
@@ -50,7 +50,7 @@ pub struct NamedType<'ast> {
     pub generic_parameters: TypeExpressionList<'ast>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PrimitiveType {
     S8,
     U8,

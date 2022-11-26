@@ -28,7 +28,7 @@ pub use self::types::*;
 pub use self::visitor::*;
 
 /// Useful for boolean flags that need location information via FlagNode
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Flag;
 
 pub type Identifier<'ast> = &'ast str;

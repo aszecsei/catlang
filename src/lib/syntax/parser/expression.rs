@@ -98,7 +98,7 @@ impl<'ast> Parser<'ast> {
                 let identifier = self.identifier_node()?;
                 self.node_at(identifier.start, identifier.end, identifier)
             }
-            Token::Integer(_) => self.node_from_slice(|s| Primitive::DecimalNumber(s)),
+            Token::Integer(_) => self.node_from_slice(Primitive::DecimalNumber),
             Token::Bool(b) => self.node_at_token(Primitive::Bool(b)),
             Token::LParen => {
                 self.bump();

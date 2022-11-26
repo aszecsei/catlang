@@ -73,7 +73,7 @@ pub struct EnumDeclarator<'ast> {
     pub values: NodeList<'ast, EnumValue<'ast>>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum EnumRepresentationType {
     S8,
     U8,
