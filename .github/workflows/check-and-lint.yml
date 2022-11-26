@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Cache LLVM and Clang
         uses: actions/cache@v3
         with:
@@ -24,6 +25,7 @@ jobs:
         with:
           version: "14.0"
       - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
+      
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -38,6 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Cache LLVM and Clang
         uses: actions/cache@v3
         with:
@@ -50,12 +53,14 @@ jobs:
         with:
           version: "14.0"
       - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
+
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
       - run: rustup component add rustfmt
+
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -66,6 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Cache LLVM and Clang
         uses: actions/cache@v3
         with:
@@ -78,6 +84,7 @@ jobs:
         with:
           version: "14.0"
       - run: echo "LLVM_SYS_140_PREFIX=${{ env.LLVM_PATH }}" >> $GITHUB_ENV
+      
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
