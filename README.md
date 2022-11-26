@@ -2,7 +2,7 @@
 
 > a painless low-level programming language
 
-[![CircleCI](https://circleci.com/gh/aszecsei/catlang/tree/master.svg?style=svg)](https://circleci.com/gh/aszecsei/catlang/tree/master)
+[![GitHub Actions](https://github.com/aszecsei/catlang/actions/workflows/test.yml/badge.svg)(https://github.com/aszecsei/catlang/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/aszecsei/catlang/branch/master/graph/badge.svg)](https://codecov.io/gh/aszecsei/catlang)
 
 ## Language Guide

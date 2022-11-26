@@ -38,10 +38,15 @@ jobs:
         with:
           command: test
 
-      - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
+      - name: Install cargo-tarpaulin
+        uses: actions-rs/cargo@v1
         with:
-          version: '0.23.1'
+          command: install cargo-tarpaulin
+
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/cargo@v1
+        with:
+          command: tarpaulin --out Xml
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v3
