@@ -1,15 +1,14 @@
 extern crate catlang;
 
-use catlang::logger;
 use console::Emoji;
 use human_panic::setup_panic;
 use indicatif::{HumanBytes, HumanDuration};
-use log::info;
 use std::fs;
 use std::io::prelude::*;
 use std::path::PathBuf;
 use std::time::Instant;
 use structopt::StructOpt;
+use tracing::info;
 
 #[derive(StructOpt)]
 enum Command {
@@ -75,16 +74,19 @@ fn main() {
 }
 
 fn run(opt: &Opt) -> anyhow::Result<()> {
-    let verbose_num = if opt.quiet { 0 } else { opt.verbose + 1 };
+    let verbose_num = opt.verbose + 1;
     let max_log_level = match verbose_num {
-        0 => log::LevelFilter::Off,
-        1 => log::LevelFilter::Warn,
-        2 => log::LevelFilter::Info,
-        3 => log::LevelFilter::Debug,
-        _ => log::LevelFilter::Trace,
+        1 => tracing::Level::WARN,
+        2 => tracing::Level::INFO,
+        3 => tracing::Level::DEBUG,
+        _ => tracing::Level::TRACE,
     };
 
-    let _res = logger::init_with_max_level(max_log_level);
+    if !opt.quiet {
+        tracing_subscriber::fmt()
+            .with_max_level(max_log_level)
+            .init();
+    }
 
     match &opt.command {
         Command::Init {} => {
@@ -102,7 +104,9 @@ fn run(opt: &Opt) -> anyhow::Result<()> {
             let mut file = fs::File::open(input)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
+            info!("Read file contents");
             let parsed = catlang::syntax::parser::parse(&contents).unwrap();
+            info!("Parsed file");
             let body = parsed.body();
             info!("Body: {:?}", body);
             // let _out_fname = m.value_of("_output").unwrap_or("out.c");

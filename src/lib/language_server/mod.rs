@@ -1,4 +1,4 @@
-use log::info;
+use tracing::info;
 
 use lsp_server::{Connection, ExtractError, Message, Request, RequestId, Response};
 use lsp_types::{
